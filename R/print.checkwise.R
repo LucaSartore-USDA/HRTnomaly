@@ -29,7 +29,7 @@
 #' @keywords outliers
 #' @keywords distribution
 #' @keywords probability
-NULL
+#' @export
 print.checkwise <- function(x, confusion = FALSE, ...) {
 
   cat("  Overall accuracy:\n", ...)
