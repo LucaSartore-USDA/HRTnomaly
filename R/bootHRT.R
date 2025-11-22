@@ -36,7 +36,6 @@
 #'   The returned object also includes an attribute \code{"thresholds"} which is a numeric vector of length \code{boot_max_it} containing samples from the posterior distribution of the contamination threshold.
 #' @author Luca Sartore \email{drwolf85@gmail.com}
 #' @examples
-#' \dontrun{
 #' # Load the package
 #' library(HRTnomaly)
 #' set.seed(2025L)
@@ -44,7 +43,6 @@
 #' data(toy)
 #' # Detect cellwise outliers
 #' res <- bootHRT(toy, boot_max_it = 10)
-#' }
 #' @keywords outliers distribution probability
 #' @export
 bootHRT <- function(a, contamination = 0.08, boot_max_it = 1000L) {
