@@ -36,7 +36,6 @@
 #'   }
 #' @author Luca Sartore \email{drwolf85@gmail.com}
 #' @examples
-#' \dontrun{
 #' # Load the package
 #' library(HRTnomaly)
 #' set.seed(2025L)
@@ -44,7 +43,6 @@
 #' data(toy)
 #' # Detect cellwise outliers using Bayesian Analysis
 #' res <- bayeswise(toy[sample.int(100), ], 0.5, 10L)
-#' }
 #' @keywords outliers distribution probability
 #' @export
 bayeswise <- function(a, prior = NULL, epochs = 1000L) {
