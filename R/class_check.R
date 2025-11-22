@@ -3,7 +3,7 @@
 #' @title Evaluate the Accuracy of Outlier Classification Results
 #' @description
 #' The function computes the confusion matrix between the logical output of an outlier detection algorithm and a reference (ground-truth) logical vector.
-#' The function also calculates the overal accuracy of the results from the confusion matrix, including recall, precision, and F1-scores for the two classes (regular, versus outlier).
+#' The function also calculates the overall accuracy of the results from the confusion matrix, including recall, precision, and F1-scores for the two classes (regular, versus outlier).
 #' @usage class_check(pred, truth)
 #' @param pred A logical vector with the classification output from an anomaly detection algorithm.
 #' @param truth A logical vector with the observed classification as a reference (or ground truth).
@@ -29,7 +29,7 @@
 #' @keywords outliers
 #' @keywords distribution
 #' @keywords probability
-NULL
+#' @export
 class_check <- function(pred, truth) {
 
   tb <- table(pred, truth)

@@ -2,7 +2,7 @@
 #' @aliases print.checkwise
 #' @title A Method to Print the Accuracy of Outlier Classification Results
 #' @description
-#' The function print the confusion matrix and accuracy results previously computed with the function \code{class_check}.
+#' The function prints the confusion matrix and accuracy results previously computed with the function \code{class_check}.
 #' @usage \method{print}{checkwise}(x, confusion = FALSE, ...)
 #' @param x An S3 object of the class \code{checkwise}, typically computed with the function \code{class_check}.
 #' @param confusion A logical value, which is \code{FALSE} by default. If \code{TRUE}, the confusion matrix is printed after showing all accuracy metrics.
