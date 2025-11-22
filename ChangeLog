@@ -1,3 +1,29 @@
+2025-11-22 Luca Sartore <drwolf85@gmail.com>
+    * The HRTnomaly package VERSION 25.11.22 has been created
+    * Included roxygen2 documentation to the file `R/bayesHRT.R`
+    * Included roxygen2 documentation to the file `R/bayeswise.R`
+    * Included roxygen2 documentation to the file `R/bootHRT.R`
+    * Included roxygen2 documentation to the file `R/cellwise.R`
+    * Included roxygen2 documentation to the file `R/class_check.R`
+    * Included roxygen2 documentation to the file `R/dif.R`
+    * Included roxygen2 documentation to the file `R/fuzzyHRT.R`
+    * Included roxygen2 documentation to the file `R/gif.R`
+    * Included roxygen2 documentation to the file `R/pif.R`
+    * Included roxygen2 documentation to the file `R/print.checkwise.R`
+    * Included roxygen2 documentation to the file `R/setCores.R` 
+    * Updated the file `man/bayesHRT.R` using roxygen2 
+    * Updated the file `man/bayeswise.R` using roxygen2
+    * Updated the file `man/bootHRT.R` using roxygen2
+    * Updated the file `man/cellwise.R` using roxygen2
+    * Updated the file `man/class_check.R` using roxygen2
+    * Updated the file `man/dif.R` using roxygen2
+    * Updated the file `man/fuzzyHRT.R` using roxygen2
+    * Updated the file `man/gif.R` using roxygen2
+    * Updated the file `man/pif.R` using roxygen2
+    * Updated the file `man/print.checkwise.R` using roxygen2
+    * Updated the file `man/setCores.R` using roxygen2
+    * Mentioned bug reporters into the `THANKS` file
+
 2025-11-20 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 25.11.20 has been created
     * Edited `\usage` lines in `man/pif.Rd` up to 90 characters

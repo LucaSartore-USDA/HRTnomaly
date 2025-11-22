@@ -3,3 +3,8 @@ Agriculture (USDA) National Agricultural Statistics Service (NASS)
 as a collaboration with the National Institute of Statistical
 Sciences (NISS).
 
+Special thanks to:
+
+  - Jessica Whiteaker and Jackson Joyner for reporting bugs with
+    the `cellwise()` and `bayeswise()` functions
+
