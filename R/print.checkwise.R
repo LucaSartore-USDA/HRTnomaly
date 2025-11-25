@@ -16,7 +16,6 @@
 #' @return \code{attr(, "f1-score")} A numeric vector of values between zero and one with the F1-scores for regular and outlier cells.
 #' @author Luca Sartore \email{drwolf85@gmail.com}
 #' @examples
-#' \dontrun{
 #' # Load the package
 #' library(HRTnomaly)
 #' set.seed(2025L)
@@ -24,8 +23,7 @@
 #' data(toy)
 #' # Detect cellwise outliers using Bayesian Analysis
 #' res <- cellwise(toy[sample.int(100), ], 0.5, 10L)
-#' class_check(res$outlier, res$anomaly_flag != "")
-#' }
+#' print(class_check(res$outlier, res$anomaly_flag != ""))
 #' @keywords outliers
 #' @keywords distribution
 #' @keywords probability

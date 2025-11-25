@@ -31,7 +31,6 @@ The function prints the confusion matrix and accuracy results previously compute
 The function computes the confusion matrix using the function \code{table}. True positive and false negative are successively evaluated to compute overall accuracy, recall, precision, and F1-scores.
 }
 \examples{
-\dontrun{
 # Load the package
 library(HRTnomaly)
 set.seed(2025L)
@@ -39,8 +38,7 @@ set.seed(2025L)
 data(toy)
 # Detect cellwise outliers using Bayesian Analysis
 res <- cellwise(toy[sample.int(100), ], 0.5, 10L)
-class_check(res$outlier, res$anomaly_flag != "")
-}
+print(class_check(res$outlier, res$anomaly_flag != ""))
 }
 \author{
 Luca Sartore \email{drwolf85@gmail.com}

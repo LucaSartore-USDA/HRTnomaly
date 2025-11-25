@@ -30,7 +30,6 @@ The function also calculates the overall accuracy of the results from the confus
 The function computes the confusion matrix using the function \code{table}. True positive and false negative are successively evaluated to compute overall accuracy, recall, precision, and F1-scores.
 }
 \examples{
-\dontrun{
 # Load the package
 library(HRTnomaly)
 set.seed(2025L)
@@ -39,7 +38,6 @@ data(toy)
 # Detect cellwise outliers using Cellwise Analysis
 res <- cellwise(toy[sample.int(100), ], 0.05, 2L)
 class_check(res$outlier, res$anomaly_flag != "")
-}
 }
 \author{
 Luca Sartore \email{drwolf85@gmail.com}

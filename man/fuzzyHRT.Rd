@@ -35,7 +35,6 @@ However, these extra columns would be preserved in the system memory and returne
 The use of the R-packages \code{dplyr}, \code{purrr}, and \code{tidyr} is highly recommended to simplify the conversion of datasets between long and wide formats.
 }
 \examples{
-\dontrun{
 # Load the package
 library(HRTnomaly)
 set.seed(2025L)
@@ -43,7 +42,6 @@ set.seed(2025L)
 data(toy)
 # Detect cellwise outliers
 res <- fuzzyHRT(toy[sample.int(100), ])
-}
 }
 \author{
 Luca Sartore \email{drwolf85@gmail.com}

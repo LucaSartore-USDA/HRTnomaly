@@ -24,13 +24,11 @@
 #'   }
 #' @author Luca Sartore \email{drwolf85@gmail.com}
 #' @examples
-#' \dontrun{
 #' # Load the package
 #' library(HRTnomaly)
 #' set.seed(2025L)
 #' # Detect outliers in the `iris` dataset
 #' res <- dif(iris)
-#' }
 #' @keywords outliers distribution probability
 #' @export
 dif <- function(dta, nt = 100L, nss = NULL, threshold = 0.95) {

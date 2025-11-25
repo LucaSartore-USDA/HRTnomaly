@@ -1,3 +1,19 @@
+2025-11-24 Luca Sartore <drwolf85@gmail.com>
+    * The HRTnomaly package VERSION 25.11.24 has been created
+    * Updated `src/cellwise.c` to account for a more robust self-regression 
+    * Removed `\dontrun{}` from the documentation in `man\class_check.Rd`
+    * Removed `\dontrun{}` from the documentation in `man\dif.Rd`
+    * Removed `\dontrun{}` from the documentation in `man\fuzzyHRT.Rd`
+    * Removed `\dontrun{}` from the documentation in `man\gif.Rd`
+    * Removed `\dontrun{}` from the documentation in `man\pif.Rd`
+    * Removed `\dontrun{}` from the documentation in `man\print.checkwise.Rd`
+    * Removed `\dontrun{}` from the roxygen2 documentation in `R\class_check.R`
+    * Removed `\dontrun{}` from the roxygen2 documentation in `R\dif.R`
+    * Removed `\dontrun{}` from the roxygen2 documentation in `R\fuzzyHRT.R`
+    * Removed `\dontrun{}` from the roxygen2 documentation in `R\gif.R`
+    * Removed `\dontrun{}` from the roxygen2 documentation in `R\pif.R`
+    * Removed `\dontrun{}` from the roxygen2 documentation in `R\print.checkwise.R`
+
 2025-11-22 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 25.11.22 has been created
     * Included roxygen2 documentation to the file `R/bayesHRT.R`

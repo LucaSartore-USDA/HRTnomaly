@@ -32,7 +32,6 @@
 #'   }
 #' @author Luca Sartore \email{drwolf85@gmail.com}
 #' @examples
-#' \dontrun{
 #' # Load the package
 #' library(HRTnomaly)
 #' set.seed(2025L)
@@ -52,7 +51,6 @@
 #' res_prx <- pif(ir, 5L, 18L, 5L, .85, "pivotal", my_dst)
 #' # count identified anomalies
 #' print(sum(attr(res_prd, "flag")))
-#' }
 #' @keywords outliers distribution probability
 #' @export
 pif <- function(dta, nt = 100L, nss = NULL,

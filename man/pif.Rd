@@ -47,7 +47,6 @@ This object is considered as a list of arbitrary R objects that will be analyzed
 Three algorithms are implemented. The user can choose the proximity type by providing the number of prototypes used to build the isolation trees in the forest. A \code{"single"} prototype uses the distance between an input data point to a single randomly selected prototype at each branching node of the tree. Two prototypes (denoted as \code{"paired"}) are randomly chosen and successively considered as gravitational point of their respective basins of attraction for partitioning the data. An additional \code{"pivotal"} point is randomly selected to enhance the algorithm based on two prototypes. In this case, the two distances between a data point and the two prototypes are normalized through the Steinhaus transformation and the pivotal prototype.
 }
 \examples{
-\dontrun{
 # Load the package
 library(HRTnomaly)
 set.seed(2025L)
@@ -67,7 +66,6 @@ res_prd <- pif(ir, 5L, 18L, 5L, .85, "paired", my_dst)
 res_prx <- pif(ir, 5L, 18L, 5L, .85, "pivotal", my_dst)
 # count identified anomalies
 print(sum(attr(res_prd, "flag")))
-}
 }
 \author{
 Luca Sartore \email{drwolf85@gmail.com}

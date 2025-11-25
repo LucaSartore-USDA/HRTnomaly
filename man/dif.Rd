@@ -36,13 +36,11 @@ This object is considered as a wide-format \code{data.frame}.
 The use of the R-packages \code{dplyr}, \code{purrr}, and \code{tidyr} is highly recommended to simplify the conversion of datasets between long and wide formats.
 }
 \examples{
-\dontrun{
 # Load the package
 library(HRTnomaly)
 set.seed(2025L)
 # Detect outliers in the `iris` dataset
 res <- dif(iris)
-}
 }
 \author{
 Luca Sartore \email{drwolf85@gmail.com}

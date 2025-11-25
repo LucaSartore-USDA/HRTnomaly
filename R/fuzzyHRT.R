@@ -25,7 +25,6 @@
 #' @return The long-format \code{data.frame} is provided as input data and contains extra columns i.e., anomaly flags and outlier indicators columns.
 #' @author Luca Sartore \email{drwolf85@gmail.com}
 #' @examples
-#' \dontrun{
 #' # Load the package
 #' library(HRTnomaly)
 #' set.seed(2025L)
@@ -33,7 +32,6 @@
 #' data(toy)
 #' # Detect cellwise outliers
 #' res <- fuzzyHRT(toy[sample.int(100), ])
-#' }
 #' @keywords outliers
 #' @keywords distribution
 #' @keywords probability

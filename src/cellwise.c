@@ -16,6 +16,8 @@
 #define BETA_2 0.999
 #define FACTOR_P 0.01
 
+#define LEVEL_TRK 2.807033768343811352963
+
 static int N_EPOCHS = 1000;
 static char BAYES = 0;
 
@@ -305,18 +307,22 @@ static inline void init_param(double *mat, double *dta, int *dim) {
 */
 static inline void residuals(double *res, double *A, int *dimA, double *R, int *dimR) {
     int i, j, pos;
+    double fixa;
     dgemm(res, A, dimA, R, dimR); /* Matrix multiplication `A %*% R`*/
     #if __VOPENMP
-    #pragma omp parallel for private(i, j, pos) collapse(2)
+    #pragma omp parallel for private(i, j, pos, fixa) collapse(2)
     #endif
     for (j = 0; j < dimA[1]; j++) {
         for (i = 0; i < *dimA; i++) {
             pos = *dimA * j + i;
-            if (isfinite(res[pos]) && isfinite(A[pos]))
-                res[pos] -= A[pos];
+	    fixa = A[pos];
+	    fixa -= (double)(fixa < -LEVEL_TRK) * (LEVEL_TRK + fixa);
+	    fixa -= (double)(fixa > LEVEL_TRK) * (fixa - LEVEL_TRK);
+            if (isfinite(res[pos]) && isfinite(fixa))
+                res[pos] -= fixa;
         }
     }
-} 
+}
 
 /**
 * @brief Compute the matrix-valued gradient of a robust objective function
@@ -332,7 +338,7 @@ static void mat_val_grad(double *grd_v, double *param, int *len, void *info) {
     int const p = dta.dimA[1];
     int i, j, k;
     int dimR[2];
-    double tmp, slp;
+    double fxa, tmp, slp;
 
     /* Computing the residuals */
     dimR[0] = dimR[1] = p;
@@ -340,7 +346,7 @@ static void mat_val_grad(double *grd_v, double *param, int *len, void *info) {
     memset(grd_v, 0, *len * sizeof(double));
     /* Computing the gradient */
     #if __VOPENMP
-    #pragma omp parallel for private(i, j, k, tmp, slp) collapse(2)
+    #pragma omp parallel for private(i, j, k, fxa, tmp, slp) collapse(2)
     #endif
     for (i = 0; i < p; i++) {
         for (j = 0; j < p; j++) {
@@ -348,8 +354,12 @@ static void mat_val_grad(double *grd_v, double *param, int *len, void *info) {
             if (i != j) for (k = 0; k < n; k++) {
                 tmp = dta.E[n * i + k];
                 tmp = (double) (tmp > 0.0) - (double) (tmp < 0.0);
-                if (isfinite(dta.A[n * j + k]))
-                    slp += dta.A[n * j + k] * tmp;
+                if (isfinite(dta.A[n * j + k])) {
+		    fxa = dta.A[n * j + k];
+	            fxa -= (double)(fxa < -LEVEL_TRK) * (LEVEL_TRK + fxa);
+	            fxa -= (double)(fxa > LEVEL_TRK) * (fxa - LEVEL_TRK);
+                    slp += fxa * tmp;
+		}
             } /* This assure that the diagonal is zero (by assumption/constraint) */
             grd_v[p * i + j] = slp;
         }
