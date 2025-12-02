@@ -11,10 +11,10 @@
 #define EPSILON 1e-5
 #define N_ITERATIONS 10
 
-#define LEARNING_RATE 0.001
 #define BETA_1 0.9
 #define BETA_2 0.999
 #define FACTOR_P 0.01
+#define MY_EPS_LEARN_RATE nextafter(nextafter(0.5, 1.0) - 0.5, 1.0)
 
 #define LEVEL_TRK 2.807033768343811352963
 
@@ -22,6 +22,35 @@ static int N_EPOCHS = 1000;
 static char BAYES = 0;
 
 void post_results(double *, int *, int *, double *, double *, double *);
+
+/**
+ * @brief Modified Malitsky and Mishchenzko's adaptive learning rate
+ * @param cx Pointer to current guess of optimal values
+ * @param ox Pointer to old guess of optimal values
+ * @param cg Pointer to current gradient values
+ * @param og Pointer to old gradient values
+ * @param p Number of values in each of the previous pointers
+ */
+static inline double mnm_ada_lr(double *cx, double *ox, double *cg, double *og, size_t p) {
+  double res;
+  double nrmx = 0.0;
+  double nrmg = 0.0;
+  double inpg = 0.0;
+  size_t i;
+  for (i = 0; i < p; i++) {
+    res = cx[i] - ox[i];
+    nrmx += res * res;
+    res = cg[i];
+    nrmg += res * res;
+    res *= og[i];
+    inpg += res;
+  }
+  res = 3.0 * nrmg - 4.0 * inpg;
+  res = nextafter(fabs(res), INFINITY);
+  res = nrmx / res;
+  if (!isfinite(res)) return 1.0;
+  return 0.9999 * sqrt(fabs(res));
+}
 
 /**
 * A `mydata_str` is a structure with the following properties:
@@ -385,15 +414,19 @@ static inline void lion(double *param, int *len, int *n_iter, void *info,
           void (*grad)(double *, double *, int *, void *)) {
     int t, i, np = *len;
     double *grd_v;
+    double *old_w;
+    double *stp_o;
     double *mom_m;
-    double sgn;
+    double sgn = 1.0;
 
     grd_v = (double *) malloc(np * sizeof(double));
+    old_w = (double *) calloc(np, sizeof(double));
+    stp_o = (double *) calloc(np, sizeof(double));
     mom_m = (double *) calloc(np, sizeof(double));
-    if (mom_m && grd_v) {
-        for (t = 0; t < *n_iter; t++) {
+    if (mom_m && grd_v && old_w && stp_o) {
+        for (t = 0; t < *n_iter && sgn > MY_EPS_LEARN_RATE; t++) {
             /* Update the gradient */
-            (*grad)(grd_v, param, len, info);
+            grad(grd_v, param, len, info);
             #if __VOPENMP
             #pragma omp parallel for simd private(sgn)
             #endif
@@ -406,13 +439,23 @@ static inline void lion(double *param, int *len, int *n_iter, void *info,
                 mom_m[i] += (1.0 - BETA_2) * grd_v[i];
                 /* Computing the step */
                 grd_v[i] = sgn + FACTOR_P * param[i];
-                grd_v[i] *= LEARNING_RATE;
-                param[i] -= grd_v[i];
+	    }
+	    /* Learning rate */
+	    sgn = mnm_ada_lr(param, old_w, grd_v, stp_o, (size_t)np);
+	    memcpy(old_w, param, np * sizeof(double));
+	    memcpy(stp_o, grd_v, np * sizeof(double));
+            #if __VOPENMP
+            #pragma omp parallel for simd
+            #endif
+            for (i = 0; i < np; i++) {
+                param[i] -= grd_v[i] * sgn;
             }
         }
     }
     if (mom_m) free(mom_m);
     if (grd_v) free(grd_v);
+    if (stp_o) free(stp_o);
+    if (old_w) free(old_w);
 } 
 
 /**
