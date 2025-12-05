@@ -63,6 +63,8 @@ cellwise <- function(a, contamination = 0.08, epochs = 1000L) {
   dtap <- dtap[ord, ]
   xc <- as.matrix(dtac[, -1L:-2L]) # Current
   xp <- as.matrix(dtap[, -1L:-2L]) # Past
+  storage.mode(xc) <- "double"
+  storage.mode(xp) <- "double"
   s <- matrix(0, nrow(xc), ncol(xc))
   z <- matrix(0, nrow(xc), ncol(xc))
   h <- matrix(0, nrow(xc), ncol(xc))

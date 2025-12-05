@@ -91,6 +91,8 @@ bayeswise <- function(a, prior = NULL, epochs = 1000L) {
   t <- matrix(0, nrow(xc), ncol(xc))
   storage.mode(g) <- "integer"
   storage.mode(s) <- "double"
+  storage.mode(xc) <- "double"
+  storage.mode(xp) <- "double"
   scores <- .C("bayeswise", s = s, G = g, z = z, h = h, r = r, t = t, xc, xp,
                dim(xc), epochs, NAOK = TRUE, PACKAGE = "HRTnomaly")
   scores$s <- as.data.frame(scores$s)
