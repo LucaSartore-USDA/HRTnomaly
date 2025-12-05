@@ -2,6 +2,7 @@
     * The HRTnomaly package VERSION 25.12.04 has been created
     * Enforced storage mode of data-derived matrices in `R\cellwise.R`
     * Enforced storage mode of data-derived matrices in `R\bayeswise.R`
+    * Add a badge in `README.md` with GitHub version 
 
 2025-12-01 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 25.12.01 has been created
