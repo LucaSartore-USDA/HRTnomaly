@@ -10,6 +10,8 @@
 #' @param a A long-format \code{data.frame} object with survey data. For details see information on the data format.
 #' @param contamination A number between zero and one used as a threshold when identifying outliers from the fuzzy scores. By default, the algorithm will identify 8\% of the records as anomalies.
 #' @param epochs Number of epochs used to train a nontrivial robust linear model via the lion algorithm. By default, the algorithm will run 1000 iterations.
+#' @param weighted A string indicating the isolation forest algorithm (\code{"\link{dif}"}, \code{"\link{gif}"} or \code{"\link{pif}"}) to use for weighted calculations. If \code{NULL}, the algorithm will use unweighted calculations by default.
+#' @param ... Additional arguments that are passed to the functions executing the isolation algorihtms (or not used if \code{weighted = NULL}).
 #'
 #' @details The argument \code{a} is proivded as an object of class \code{data.frame}.
 #' This object is considered as a long-format \code{data.frame}, and it must have at least five columns with the following names:
@@ -47,7 +49,7 @@
 #'
 #' @keywords outliers distribution probability
 #' @export
-cellwise <- function(a, contamination = 0.08, epochs = 1000L) {
+cellwise <- function(a, contamination = 0.08, epochs = 1000L, weighted = NULL, ...) {
   if (!is.numeric(epochs) || !is.finite(epochs)) stop("The argument `epochs` must be a finite integer number")
   storage.mode(epochs) <- "integer"
   wh <- c("strata", "unit_id", "master_varname")
@@ -70,8 +72,20 @@ cellwise <- function(a, contamination = 0.08, epochs = 1000L) {
   h <- matrix(0, nrow(xc), ncol(xc))
   r <- matrix(0, nrow(xc), ncol(xc))
   t <- matrix(0, nrow(xc), ncol(xc))
-  scores <- .C("cellwise", s = s, z = z, h = h, r = r, t = t, xc, xp,
-               dim(xc), epochs, NAOK = TRUE, PACKAGE = "HRTnomaly")
+  rls <- switch(weighted,
+                "dif" = 1 - dif(xc, ...)[, ncol(xc) + 1L],
+                "gif" = 1 - gif(xc, ...)[, ncol(xc) + 1L],
+                "pif" = 1 - attr(pif(apply(xc, 1, list), ...), "score"),
+                NULL)
+  if (is.null(rls)) {
+    scores <- .C("cellwise", s = s, z = z, h = h, r = r, t = t, xc, xp,
+                 dim(xc), epochs, NAOK = TRUE, PACKAGE = "HRTnomaly")
+  } else {
+    rls[!is.finite(rls)] <- 0.5
+    storage.mode(rls) <- "double"
+    scores <- .C("wcellwise", s = s, z = z, h = h, r = r, t = t, xc, xp,
+                 dim(xc), rls, epochs, NAOK = TRUE, PACKAGE = "HRTnomaly")
+  }
   scores$s <- as.data.frame(scores$s)
   scores$z <- as.data.frame(scores$z)
   scores$h <- as.data.frame(scores$h)

@@ -4,7 +4,7 @@
 \alias{cellwise}
 \title{Calculate Cellwise Flags for Anomaly Detection}
 \usage{
-cellwise(a, contamination = 0.08, epochs = 1000L)
+cellwise(a, contamination = 0.08, epochs = 1000L, weighted = NULL, ...)
 }
 \arguments{
 \item{a}{A long-format \code{data.frame} object with survey data. For details see information on the data format.}
@@ -12,6 +12,10 @@ cellwise(a, contamination = 0.08, epochs = 1000L)
 \item{contamination}{A number between zero and one used as a threshold when identifying outliers from the fuzzy scores. By default, the algorithm will identify 8\% of the records as anomalies.}
 
 \item{epochs}{Number of epochs used to train a nontrivial robust linear model via the lion algorithm. By default, the algorithm will run 1000 iterations.}
+
+\item{weighted}{A string indicating the isolation forest algorithm (\code{"\link{dif}"}, \code{"\link{gif}"} or \code{"\link{pif}"}) to use for weighted calculations. If \code{NULL}, the algorithm will use unweighted calculations by default.}
+
+\item{...}{Additional arguments that are passed to the functions executing the isolation algorihtms (or not used if \code{weighted = NULL}).}
 }
 \value{
 A data frame with the same columns as the input data frame, plus

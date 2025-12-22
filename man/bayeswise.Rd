@@ -4,7 +4,7 @@
 \alias{bayeswise}
 \title{Calculate Cellwise Flags for Anomaly Detection Using Robust Bayesian Methods}
 \usage{
-bayeswise(a, prior = NULL, epochs = 1000L)
+bayeswise(a, prior = NULL, epochs = 1000L, weighted = NULL, ...)
 }
 \arguments{
 \item{a}{A long-format \code{data.frame} object with survey data. For details see information on the data format.}
@@ -12,6 +12,10 @@ bayeswise(a, prior = NULL, epochs = 1000L)
 \item{prior}{A numerical value or vector of cell-level prior probabilities of observing an outlier. It is \code{NULL} by default. If false, the function searches for a column named \code{"prior"} within the dataset. If such column is not provided in the dataset, a \code{0.5} non-informative value is used for all cells.}
 
 \item{epochs}{Number of epochs used to train a nontrivial robust linear model via the lion algorithm. By default, the algorithm will run 1000 iterations.}
+
+\item{weighted}{A string indicating the isolation forest algorithm (\code{"\link{dif}"}, \code{"\link{gif}"} or \code{"\link{pif}"}) to use for weighted calculations. If \code{NULL}, the algorithm will use unweighted calculations by default.}
+
+\item{...}{Additional arguments that are passed to the functions executing the isolation algorihtms (or not used if \code{weighted = NULL}).}
 }
 \value{
 A data frame with the same columns as the input data frame, plus the following additional columns:

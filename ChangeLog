@@ -1,3 +1,14 @@
+2025-12-22 Luca Sartore <drwolf85@gmail.com>
+    * The HRTnomaly package VERSION 25.12.22 has been created
+    * The new functions `wscroring_tails()`, `wtail_check()`, `wcellwise()`
+    and `wbayeswise()` are now implemented in `src\cellwise.c`
+    * The functions `init_param()` and `relat_check()` are updated for
+    weighted regression in `src\cellwise.c`
+    * The `cellwise()` function in `R\cellwise.R` was update for weighted calculations
+    * The `bayeswise()` function in `R\bayeswise.R` was update for weighted calculations
+    * The documentation of the `cellwise()` function in `man\cellwise.Rd` was update accordingly.
+    * The documentation of the `bayeswise()` function in `man\bayeswise.Rd` was update accordingly.
+
 2025-12-04 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 25.12.04 has been created
     * Enforced storage mode of data-derived matrices in `R\cellwise.R`

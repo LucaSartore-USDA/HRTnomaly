@@ -62,7 +62,13 @@ typedef struct {
       double *E;
       double *A;
       int *dimA;
+      double *wt;
 } mydata_str;
+
+typedef struct {
+	double v;
+	double w;
+} idvec_t;
 
 static int cmp_dbl(const void *aa, const void *bb) {
     double a = *(double *) aa;
@@ -70,6 +76,15 @@ static int cmp_dbl(const void *aa, const void *bb) {
     if (!isfinite(a) && isfinite(b)) return 1;
     if (isfinite(a) && !isfinite(b)) return -1;
     if (isfinite(a) && isfinite(b)) return 2 * (a > b) - 1;
+    return 0;
+}
+
+static int cmp_vec(const void *aa, const void *bb) {
+    idvec_t a = *(idvec_t *) aa;
+    idvec_t b = *(idvec_t *) bb;
+    if (!(isfinite(a.v) && isfinite(a.w)) && (isfinite(b.v) && isfinite(b.w))) return 1;
+    if ((isfinite(a.v) && isfinite(a.w)) && !(isfinite(b.v) && isfinite(b.w))) return -1;
+    if ((isfinite(a.v) && isfinite(a.w)) && (isfinite(b.v) && isfinite(b.w))) return 2 * (a.v > b.v) - 1;
     return 0;
 }
 
@@ -94,6 +109,100 @@ static inline double median_wna(double *x, int n) {
     }
     if (y) free(y);
     return m;
+}
+
+/**
+ * @brief Weighted median with NAs
+ * @param x Pointer to a vector of real numbers
+ * @param w Pointer to a vector of positive weights
+ * @param n Length of the vector `x` and `w`
+ * @return double
+ */
+static inline double wmedian_wna(double *x, double *w, int n) {
+    int i;
+    double nf = 0.0;
+    double m = 0.0;
+    idvec_t *y = (idvec_t *) calloc(n, sizeof(idvec_t));
+    if (y) {
+        for (i = 0; i < n; i++) {
+            y[i].v = x[i];
+	    y[i].w = w[i] * (double)(w[i] > 0.0); /* Set to zero negative weights */
+	    if (isfinite(w[i])) {
+            	nf += (double)isfinite(x[i]) * w[i];
+	    }
+        }
+        if (nf > 0.0) {
+	    nf = 1.0 / nf;
+            qsort(y, n, sizeof(idvec_t), cmp_vec);
+	    for (i = 0; i < n && m < 0.5; i++) m += y[i].w * nf;
+	    m = i >= 0 && i < n ? y[i].v : median_wna(x, n);
+        }
+    }
+    if (y) free(y);
+    return m;
+}
+
+/**
+* @brief Generic scoring function for weighted tail and historical outliers
+*
+* @param scores vector of real numbers where to store the results of this algorithm
+* @param dta matrix of (unsorted) data
+* @param wt vector of record-level anomaly scores (used as weights)
+* @param n number of records
+* @param p number of variables
+* @param zeroMedian {0, 1} flag, if zero computes the median, otherwise assumes median equal to zero
+* @param dataUpdate {0, 1} flag, if zero does not update the data, otherwise update `dta` with "standardized residuals"
+*/
+static inline void wscoring_tails(double *scores, double *dta, double *wt, int n, int p, char zeroMedian, char dataUpdate) {
+    int i, j;
+    double nm, mae, tmp, m;
+    #if __VOPENMP
+    #pragma omp parallel for private(i, j, mae, nm, tmp, m)
+    #endif
+    for (j = 0; j < p; j++) {
+        /* Compute the median */
+        if (zeroMedian) {
+            m = 0.0;
+        }
+        else {
+            m = wmedian_wna(&dta[n * j], wt, n);
+        }
+        mae = 0.0;
+        nm = 0.0;
+        /* Compute sufficient stats for MAE */
+        for (i = 0; i < n; i++) {
+            tmp = dta[n * j + i] - m;
+            if (isfinite(tmp)) {
+                mae += fabs(tmp) * wt[i];
+                nm += wt[i];
+            }
+        }
+        /* Invert MAE */
+        if (mae > 0.0 && nm > 0) {
+            mae = (double) nm / mae;
+        }
+        else {
+            mae = 1.0;
+        }
+        for (i = 0; i < n; i++) {
+            /* Normalization*/
+            tmp = (dta[n * j + i] - m) * mae;
+            if (dataUpdate && isfinite(tmp)) dta[n * j + i] = tmp;
+            /* Compute the scores */
+            tmp = fabs(tmp);
+            if (BAYES) {
+                scores[n * j + i] = tmp;
+            }
+            else {
+                if (tmp > 1.0) {
+                    scores[n * j + i] = 1.0 / tmp;
+                }
+                else {
+                    scores[n * j + i] = 1.0;
+                }
+            }
+        }
+    }
 }
 
 /**
@@ -219,6 +328,26 @@ static inline void tail_check(double *tScore, double *dta, int n, int p) {
 }
 
 /**
+* @brief Scoring system based on weighted tail-outlier identification
+*
+* @param tScore matrix of real numbers where to store the results of this algorithm
+* @param dta matrix of data (unsorted... they will be standardized at the end of this routine)
+* @param wt vector of weights
+* @param n number of records
+* @param p number of variables
+*/
+static inline void wtail_check(double *tScore, double *dta, double *wt, int n, int p) {
+      int i;
+      #if __VOPENMP
+      #pragma omp parallel for private(i)
+      #endif
+      for (i = 0; i < n * p; i++) {
+           dta[i] = log(dta[i]);
+      }
+      wscoring_tails(tScore, dta, wt, n, p, 0, 1);
+}
+
+/**
 * @brief Double GEneral Matrix Multiplication
 *
 * @param res empty array where to store A %*% B (column-major format)
@@ -288,21 +417,23 @@ static inline void normalize(double *E, int *dim) {
 *
 * @param mat an zero/empty (p x p) matrix (column-major format)
 * @param dta a (n x p) matrix of data (stored by column, i.e. column-major format)
+* @parma wt a pointer to a vector of weights (zero if no weights are used)
 * @param dim an integer array storing the number of data points (n) and number of variables (p)
 */
-static inline void init_param(double *mat, double *dta, int *dim) {
-    int i, j, k, n;
-    double tmp, x, y;
+static inline void init_param(double *mat, double *dta, double *wt, int *dim) {
+    int i, j, k;
+    double tmp, x, y, n, w;
     int const p = dim[1];
     #if __VOPENMP
-    #pragma omp parallel for private(i, j, k, n, tmp, x, y) collapse(2)
+    #pragma omp parallel for private(i, j, k, tmp, x, y, n, w) collapse(2)
     #endif
     for (i = 0; i < p; i++) {
         for (j = 0; j < p; j++) {
             if (j > i) {
-                n = 0;
+                n = 0.0;
                 tmp = 0.0;
                 for (k = 0; k < *dim; k++) {
+		    w = wt ? wt[k] : 1.0;
                     x = dta[*dim * i + k];
                     y = dta[*dim * j + k];
                     if (isfinite(x) && isfinite(y)) {
@@ -310,11 +441,11 @@ static inline void init_param(double *mat, double *dta, int *dim) {
                         x -= (double) (x < -1.0) * (x + 1.0);
                         y -= (double) (y > 1.0) * (y - 1.0);
                         y -= (double) (y < -1.0) * (y + 1.0);
-                        tmp += x * y;
-                        n++;
+                        tmp += x * y * w; 
+                        n += w;
                     }
                 }
-                if (n > 0) mat[p * j + i] = tmp / (double) n;
+                if (n > 0.0) mat[p * j + i] = tmp / n;
                 mat[p * i + j] = mat[p * j + i];
             }
         }
@@ -323,7 +454,7 @@ static inline void init_param(double *mat, double *dta, int *dim) {
     #pragma omp parallel for
     #endif
     for (i = 0; i < p; i++) mat[p * i + i] = 0.0;
-} 
+}
 
 /**
 * @brief Computing the model residuals based on a linear algebra approach
@@ -367,7 +498,7 @@ static void mat_val_grad(double *grd_v, double *param, int *len, void *info) {
     int const p = dta.dimA[1];
     int i, j, k;
     int dimR[2];
-    double fxa, tmp, slp;
+    double fxa, tmp, slp, w;
 
     /* Computing the residuals */
     dimR[0] = dimR[1] = p;
@@ -375,7 +506,7 @@ static void mat_val_grad(double *grd_v, double *param, int *len, void *info) {
     memset(grd_v, 0, *len * sizeof(double));
     /* Computing the gradient */
     #if __VOPENMP
-    #pragma omp parallel for private(i, j, k, fxa, tmp, slp) collapse(2)
+    #pragma omp parallel for private(i, j, k, fxa, tmp, slp, w) collapse(2)
     #endif
     for (i = 0; i < p; i++) {
         for (j = 0; j < p; j++) {
@@ -383,11 +514,12 @@ static void mat_val_grad(double *grd_v, double *param, int *len, void *info) {
             if (i != j) for (k = 0; k < n; k++) {
                 tmp = dta.E[n * i + k];
                 tmp = (double) (tmp > 0.0) - (double) (tmp < 0.0);
+		w = dta.wt ? dta.wt[k] : 1.0;
                 if (isfinite(dta.A[n * j + k])) {
 		    fxa = dta.A[n * j + k];
 	            fxa -= (double)(fxa < -LEVEL_TRK) * (LEVEL_TRK + fxa);
 	            fxa -= (double)(fxa > LEVEL_TRK) * (fxa - LEVEL_TRK);
-                    slp += fxa * tmp;
+                    slp += fxa * tmp * w;
 		}
             } /* This assure that the diagonal is zero (by assumption/constraint) */
             grd_v[p * i + j] = slp;
@@ -461,10 +593,12 @@ static inline void lion(double *param, int *len, int *n_iter, void *info,
 /**
 * @brief  Scoring system to identify relational outliers -- (interfaced with R, python...)
 *
-* @param A input matrix of data (including NAs)... also used to store the output
+* @param rScores pointer to a vector of relational scores where to store the output
+* @param A input matrix of data (including NAs)
+* @param wt Pointer to a vector of record-level anomaly scores (used as weights)
 * @param dim array containing the number of rows and columns
 */
-static inline void relat_check(double *rScore, double *A, int *dim) {
+static inline void relat_check(double *rScore, double *A, double *wt, int *dim) {
     mydata_str mydata;
     double *E, *R;
     double tmp;
@@ -477,10 +611,12 @@ static inline void relat_check(double *rScore, double *A, int *dim) {
         mydata.E = E;
         mydata.A = A;
         mydata.dimA = dim;
+	mydata.wt = 0;
+	if (wt) mydata.wt = wt;
         dimR[0] = dimR[1] = dim[1];
         lenR = dim[1] * dim[1];
     	/* Computes robust regression coefficients */
-        init_param(R, A, dim);
+        init_param(R, A, wt, dim);
         for (i = 0; i < N_EPOCHS; i++)
             lion(R, &lenR, &n_iter, (void *) &mydata, mat_val_grad);
     	/* Residual standardization */
@@ -529,7 +665,39 @@ extern void cellwise(double *s, double *z, double *h, double *r, double *t, doub
     format_check(z, Xc, &len);
     history_check(h, Xc, Xp, dimX[0], dimX[1]);
     tail_check(t, Xc, dimX[0], dimX[1]);
-    relat_check(r, Xc, dimX);
+    relat_check(r, Xc, 0, dimX);
+    /* Combining the four scores using the product t-norm */
+    #if __VOPENMP
+    #pragma omp parallel for private(i)
+    #endif
+    for (i = 0; i < len; i++) {
+        s[i] = z[i] * h[i] * r[i] * t[i];
+    }
+}
+
+/**
+* @brief Weighted cellwise anomaly for state-level wide datasets
+*
+* @param s Pointer to an empty vector where to store the final scores
+* @param z Pointer to an empty vector for data format anomaly scores
+* @param h Pointer to an empty vector for historical anomaly scores
+* @param r Pointer to an empty vector for relational anomaly scores
+* @param t Pointer to an empty vector for tail anomaly scores
+* @param Xc Pointer to a matrix of current data
+* @param Xp Pointer to a matrix of previously reported data
+* @param dimX Pointer to a vector with the dimensions of `Xc` and `Xp`
+* @param wt Pointer to a vector of record-level anomaly scores (used as weights)
+* @param epochs Pointer to the number of gradient-descent epochs
+*/
+extern void wcellwise(double *s, double *z, double *h, double *r, double *t, double *Xc, double *Xp, int *dimX, double *wt, int *epochs) {
+    int i;
+    int len = dimX[0] * dimX[1];
+    N_EPOCHS = *epochs;
+    BAYES = 0;
+    format_check(z, Xc, &len);
+    history_check(h, Xc, Xp, dimX[0], dimX[1]);
+    wtail_check(t, Xc, wt, dimX[0], dimX[1]);
+    relat_check(r, Xc, wt, dimX);
     /* Combining the four scores using the product t-norm */
     #if __VOPENMP
     #pragma omp parallel for private(i)
@@ -550,6 +718,7 @@ extern void cellwise(double *s, double *z, double *h, double *r, double *t, doub
 * @param Xc Pointer to a matrix of current data
 * @param Xp Pointer to a matrix of previously reported data
 * @param dimX Pointer to a vector with the dimensions of `Xc` and `Xp`
+* @param epochs Pointer to the number of gradient-descent epochs
 */
 #ifndef MY_TEST
 extern void bayeswise(double *s, int *G, double *z, double *h, double *r, double *t, double *Xc, double *Xp, int *dimX, int *epochs) {
@@ -560,7 +729,40 @@ extern void bayeswise(double *s, int *G, double *z, double *h, double *r, double
     format_check(z, Xc, &len);
     history_check(h, Xc, Xp, dimX[0], dimX[1]);
     tail_check(t, Xc, dimX[0], dimX[1]);
-    relat_check(r, Xc, dimX);
+    relat_check(r, Xc, 0, dimX);
+    /* Combining the four scores using the Bayesian testing */
+    #if __VOPENMP
+    #pragma omp parallel for private(i)
+    #endif
+    for (i = 0; i < len; i++) {
+        s[i] *= z[i];
+    }
+    post_results(s, G, dimX, h, r, t);
+}
+
+/**
+* @brief Weighted cellwise anomaly for state-level wide datasets using Bayesian testing
+*
+* @param s Pointer to an empty vector where to store the final scores
+* @param z Pointer to an empty vector for data format anomaly scores
+* @param h Pointer to an empty vector for historical anomaly scores
+* @param r Pointer to an empty vector for relational anomaly scores
+* @param t Pointer to an empty vector for tail anomaly scores
+* @param Xc Pointer to a matrix of current data
+* @param Xp Pointer to a matrix of previously reported data
+* @param dimX Pointer to a vector with the dimensions of `Xc` and `Xp`
+* @param wt Pointer to a vector of record-level anomaly scores (used as weights)
+* @param epochs Pointer to the number of gradient-descent epochs
+*/
+extern void wbayeswise(double *s, int *G, double *z, double *h, double *r, double *t, double *Xc, double *Xp, int *dimX, double *wt, int *epochs) {
+    int i;
+    int len = dimX[0] * dimX[1];
+    N_EPOCHS = *epochs;
+    BAYES = 1;
+    format_check(z, Xc, &len);
+    history_check(h, Xc, Xp, dimX[0], dimX[1]);
+    wtail_check(t, Xc, wt, dimX[0], dimX[1]);
+    relat_check(r, Xc, wt, dimX);
     /* Combining the four scores using the Bayesian testing */
     #if __VOPENMP
     #pragma omp parallel for private(i)
@@ -592,6 +794,7 @@ int main() {
     double G[16] = {0.0};
     double s[28];
     double z[28] = {0.0}, h[28] = {0.0}, r[28] = {0.0}, t[28] = {0.0};
+    double weights[] = {0.1, 0.1, 0.1, 0.9, 0.9, 0.9, 0.9};
     mydata_str info;
     a = 1.0;
     b = 2.0;
@@ -603,6 +806,9 @@ int main() {
     printf("\n");
     printf("Testing \e[1;31mmedian_wna\e[0m:\n");
     printf("Median: %f", median_wna(x, 7));
+    printf("\n");
+    printf("Testing \e[1;31mwmedian_wna\e[0m:\n");
+    printf("Weighted median: %f", wmedian_wna(x + 7, w + 7, 7));
     printf("\n");
     printf("Testing \e[1;31mscoring_tain with median and no data update\e[0m:\n");
     memset(s, 0, sizeof(double) * 28);
@@ -686,7 +892,7 @@ int main() {
     }
     printf("\n");
     printf("Testing \e[1;31minit_param\e[0m:\n");
-    init_param(B, w, dim7);
+    init_param(B, w, weights, dim7);
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 4; j++) {
             printf("%.2f ", B[i * 4 + j]);
@@ -708,6 +914,7 @@ int main() {
     info.A = x;
     info.dimA = dim7;
     info.E = w;
+    info.wt = weights;
     n = 16;
     mat_val_grad(G, B, &n, (void *) &info);
     for (i = 0; i < 4; i++) {
@@ -730,7 +937,7 @@ int main() {
     N_EPOCHS = 5;
     printf("Testing \e[1;31mrelat_check\e[0m:\n");
     memset(s, 0, sizeof(double) * 28);
-    relat_check(s, x, dim7);
+    relat_check(s, x, weights, dim7);
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 7; j++) {
             printf("%.2f ", w[i * 7 + j]);
