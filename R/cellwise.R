@@ -72,11 +72,14 @@ cellwise <- function(a, contamination = 0.08, epochs = 1000L, weighted = NULL, .
   h <- matrix(0, nrow(xc), ncol(xc))
   r <- matrix(0, nrow(xc), ncol(xc))
   t <- matrix(0, nrow(xc), ncol(xc))
-  rls <- switch(weighted,
-                "dif" = 1 - dif(xc, ...)[, ncol(xc) + 1L],
-                "gif" = 1 - gif(xc, ...)[, ncol(xc) + 1L],
-                "pif" = 1 - attr(pif(apply(xc, 1, list), ...), "score"),
-                NULL)
+  rls <- NULL
+  if (!is.null(weighted)) {
+    rls <- switch(weighted,
+                  "dif" = 1 - dif(dtac[, -1L:-2L], ...)[, ncol(xc) + 1L],
+                  "gif" = 1 - gif(dtac[, -1L:-2L], ...)[, ncol(xc) + 1L],
+                  "pif" = 1 - attr(pif(apply(dtac[, -1L:-2L], 1, list), ...), "score"),
+                  NULL)
+  }
   if (is.null(rls)) {
     scores <- .C("cellwise", s = s, z = z, h = h, r = r, t = t, xc, xp,
                  dim(xc), epochs, NAOK = TRUE, PACKAGE = "HRTnomaly")

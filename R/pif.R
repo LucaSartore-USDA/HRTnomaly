@@ -58,7 +58,7 @@ pif <- function(dta, nt = 100L, nss = NULL,
                 proximity_type = c("single", "paired", "pivotal"),
                 dist_fun = NULL) {
   if (is.null(dist_fun)) {
-    dist_fun <- function(x, y) sum((x - y)^2)
+    dist_fun <- function(x, y) mean((x - y)^2, na.rm = TRUE)
   } else {
     if (!is.function(dist_fun))
       stop("The argument `dist_fun` must be `function(x, y)`.")
@@ -83,7 +83,7 @@ pif <- function(dta, nt = 100L, nss = NULL,
   rnv <- parent.env(rnv)
   s <- .Call("pif", dta, prx, nt, nss, max_depth,
              quote(dist_fun(dta[[i]], dta[[j]])),
-             rnv, pakcage = "HRTnomaly")
+             rnv, package = "HRTnomaly")
   attr(dta, "flag") <- s > quantile(s, prob = threshold)
   attr(dta, "scores") <- s
   return(dta)

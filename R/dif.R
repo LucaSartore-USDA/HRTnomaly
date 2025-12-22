@@ -34,21 +34,36 @@
 dif <- function(dta, nt = 100L, nss = NULL, threshold = 0.95) {
 	if (!is.data.frame(dta))
 		stop("The argument `dta` must be a `data.frame` object.")
+	n <- nrow(dta)
 	nt <- as.integer(nt)
 	if (nt < 1) stop("Provide a positive number of deep isolation trees")
 	if (is.null(nss)) nss <- nrow(dta) * 0.25
 	nss <- as.integer(nss)
 	if (nss < 3 || nrow(dta) < 3) stop("Provide more data points or increase the size of the subsamples")
 	if (nss > nrow(dta)) nss <- nrow(dta)
+	dta <- lapply(dta, function(x) {
+	  if (is.numeric(x)) {
+	    x[is.na(x)] <- 0
+	    x[!is.finite(x)] <- 0
+	  } else if (is.character(x)) {
+	    x[is.na(x)] <- "_NA_HRTnomaly_"
+	  } else if (is.factor(x)) {
+		levels(x) <- c(levels(x), "_NA_HRTnomaly_")
+		x[is.na(x)] <- "_NA_HRTnomaly_"
+	  }
+      return(x)
+    })
 	whchr <- sapply(dta, is.character)
-	dtchr <- as.data.frame(lapply(dta[, whchr], as.factor))
+	whftc <- sapply(dta, is.factor)
+	whchr <- whchr | whftc
+	dtchr <- data.frame(lapply(dta[whchr], as.factor))
 	dtchr <- if (prod(dim(dtchr)) > 0) model.matrix(~ . + 0, data = dtchr) else c()
-	dtnum <- dta[, !whchr]
+	dtnum <- data.frame(dta[!whchr])
 	dtnum <- if (prod(dim(dtnum)) > 0) model.matrix(~ . + 0, data = dtnum) else c()
 	dtnum <- cbind(dtnum, dtchr)
-	storage.mode(dtnum) <- "double"
 	dimD <- dim(dtnum)
-	s <- .C("dif", s = double(dimD[1]), dtnum, dimD, nt, nss, pakcage = "HRTnomaly")$s
+	storage.mode(dtnum) <- "double"
+	s <- .C("dif", s = double(dimD[1]), dtnum, dimD, nt, nss, NAOK = FALSE, package = "HRTnomaly")$s
 	dta <- cbind.data.frame(dta, scores = s, flags = s > quantile(s, prob = threshold))
 	return(dta)
 }

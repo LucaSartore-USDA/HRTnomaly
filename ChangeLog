@@ -8,6 +8,9 @@
     * The `bayeswise()` function in `R\bayeswise.R` was update for weighted calculations
     * The documentation of the `cellwise()` function in `man\cellwise.Rd` was update accordingly.
     * The documentation of the `bayeswise()` function in `man\bayeswise.Rd` was update accordingly.
+    * The `dif()` function in `R\dif.R` is now made to handle missing values
+    * The `gif()` function in `R\gif.R` is now made to handle missing values
+    * Corrected typos in `R\pif.R`
 
 2025-12-04 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 25.12.04 has been created
