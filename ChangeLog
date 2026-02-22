@@ -1,13 +1,27 @@
-2025-12-22 Luca Sartore <drwolf85@gmail.com>
+2026-02-21 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 25.12.22 has been created
+    * The field `SystemRequirements` in `DESCRIPTION` is now requiring a
+      compiler supporting the C11 standard
+    * The source code of the library `mimalloc` and its `LICENSE` file have
+      been included in the `src` folder
+    * All `src\*.c` files using `malloc`, `calloc`, and `free` functions
+      have been edited to use the respective `mi_malloc`, `mi_calloc`,
+      and `mi_free` functions
+
+2025-12-22 Luca Sartore <drwolf85@gmail.com>
+    * The HRTnomaly package VERSION 25.12.22 has been created.
     * The new functions `wscroring_tails()`, `wtail_check()`, `wcellwise()`
-    and `wbayeswise()` are now implemented in `src\cellwise.c`
-    * The functions `init_param()` and `relat_check()` are updated for
-    weighted regression in `src\cellwise.c`
-    * The `cellwise()` function in `R\cellwise.R` was update for weighted calculations
-    * The `bayeswise()` function in `R\bayeswise.R` was update for weighted calculations
-    * The documentation of the `cellwise()` function in `man\cellwise.Rd` was update accordingly.
-    * The documentation of the `bayeswise()` function in `man\bayeswise.Rd` was update accordingly.
+      and `wbayeswise()` are now implemented in `src\cellwise.c`
+    * The functions `init_param()` and `relat_check()` are updated for 
+      weighted regression in `src\cellwise.c`
+    * The `cellwise()` function in `R\cellwise.R` was update for weighted
+      calculations
+    * The `bayeswise()` function in `R\bayeswise.R` was update for weighted
+      calculations
+    * The documentation of the `cellwise()` function in `man\cellwise.Rd`
+      was update accordingly
+    * The documentation of the `bayeswise()` function in `man\bayeswise.Rd`
+      was update accordingly
     * The `dif()` function in `R\dif.R` is now made to handle missing values
     * The `gif()` function in `R\gif.R` is now made to handle missing values
     * Corrected typos in `R\pif.R`
@@ -20,8 +34,8 @@
 
 2025-12-01 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 25.12.01 has been created
-    * Modified the lion algorithm by setting an adaptive learning rate in
-    `src\cellwise.c`
+    * Modified the lion algorithm by setting an adaptive learning rate
+      in `src\cellwise.c`
 
 2025-11-24 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 25.11.24 has been created
@@ -100,9 +114,11 @@
 2025-02-25 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 25.2.25 has been created
     * Udpate version numbers in `DESCRIPTION` and `inst/INSTALL.md` files
-    * Debugged the `median`, `group_normalize`, and `group_tail` functions in `src/fuzzyHRT.c` to fix clang undefined behaviour
+    * Debugged the `median`, `group_normalize`, and `group_tail` functions
+      in `src/fuzzyHRT.c` to fix clang undefined behaviour
     * Udpate markdown code for images in  `README.md`
-    * Modified precompiler code around the `bayeswise` function in `src/cellwise.c` to fix standalone C tests
+    * Modified precompiler code around the `bayeswise` function 
+      in `src/cellwise.c` to fix standalone C tests
     * Fixed example code in `man/bayesHRT.Rd`
     * Fixed example code in `man/bootHRT.Rd`
     * Fixed example code in `man/cellwise.Rd`

@@ -5,6 +5,7 @@
 #include <math.h>
 #include <time.h>
 #include <complex.h>
+#include <mimalloc.h>
 #include <R.h>
 #include <Rmath.h>
 
@@ -53,7 +54,7 @@ static inline void swap(uint32_t *a, uint32_t *b) {
 
 static inline void sample(uint32_t nr, uint32_t psi) {
     uint32_t i;
-    subs = (uint32_t *) calloc(nr, sizeof(uint32_t));
+    subs = (uint32_t *) mi_calloc(nr, sizeof(uint32_t));
     if (subs) {
         if (psi == nr) {
             // #pragma omp for simd
@@ -66,7 +67,7 @@ static inline void sample(uint32_t nr, uint32_t psi) {
                 swap(&subs[i], &subs[(uint32_t) (unif_rand() * (double) nr) % nr]);
         }
         else {
-        	free(subs);
+        	mi_free(subs);
         }
     }
 }
@@ -85,12 +86,12 @@ static inline void init_proj(uint32_t nr, uint32_t psi) {
 static dnn * net_init(uint32_t n_in, uint8_t n_ly) {
     uint32_t i, j, n_out;
     double const isqrtn = 1.0 / sqrt(n_in);
-    dnn *layer = (dnn *) calloc(1, sizeof(dnn));
+    dnn *layer = (dnn *) mi_calloc(1, sizeof(dnn));
     if (layer) {
         layer->n_in = n_in;
         n_out = 1 + rpois(0.5 * (double) n_in);
         layer->n_out = n_out;
-        layer->coef = (double complex *) malloc(n_in * n_out * sizeof(double complex));
+        layer->coef = (double complex *) mi_malloc(n_in * n_out * sizeof(double complex));
         if (layer->coef) {
             for (i = 0; i < n_in; i++) {
                 for (j = 0; j < n_out; j++) {
@@ -106,18 +107,18 @@ static dnn * net_init(uint32_t n_in, uint8_t n_ly) {
 static void net_free(dnn *net) {
     if (net) {
 	if (net->child) net_free(net->child);
-    	if (net->coef) free(net->coef);
-    	free(net);
+    	if (net->coef) mi_free(net->coef);
+    	mi_free(net);
     }
 }
 
 static double complex ** out_vec_alloc(dnn *layer, uint8_t n_ly, uint32_t nr) {
     dnn *next = layer;
     uint8_t i = 0;
-    double complex **vecs = (double complex **) calloc(n_ly + 1, sizeof(double complex *));
+    double complex **vecs = (double complex **) mi_calloc(n_ly + 1, sizeof(double complex *));
     if (vecs && layer) {
         do {
-            vecs[i] = (double complex *) calloc(next->n_out * nr, sizeof(double complex));
+            vecs[i] = (double complex *) mi_calloc(next->n_out * nr, sizeof(double complex));
             next = next->child;
             i++;
         } while(next);
@@ -128,8 +129,8 @@ static double complex ** out_vec_alloc(dnn *layer, uint8_t n_ly, uint32_t nr) {
 static void out_vec_free(double complex **vecs, uint8_t nly) {
     uint8_t i = 0;
     if (vecs) {
-        for (; i <= nly; i++) if (vecs[i]) free(vecs[i]);
-        free(vecs);
+        for (; i <= nly; i++) if (vecs[i]) mi_free(vecs[i]);
+        mi_free(vecs);
     }
 }
 
@@ -159,8 +160,8 @@ static iTrees * iTree(double complex *X, uint32_t pstrt, uint32_t psi, uint32_t 
     uint32_t szl = 0, szr = 0;
     iTrees *my_tree = NULL;
     double *w = NULL;
-    my_tree = (iTrees *) calloc(1, sizeof(iTrees));
-    my_tree->lincon = (double *) calloc((nv << 1), sizeof(double));
+    my_tree = (iTrees *) mi_calloc(1, sizeof(iTrees));
+    my_tree->lincon = (double *) mi_calloc((nv << 1), sizeof(double));
     w = my_tree->lincon;
     if (my_tree && w) {
         if (e >= l || psi <= 1) {GetRNGstate();
@@ -224,12 +225,12 @@ static double path_length(double complex *x, uint32_t nv, iTrees *tree, uint8_t 
 
 static void free_tree(iTrees *tree) {
     if (tree) {
-	if (tree->lincon) free(tree->lincon);
+	if (tree->lincon) mi_free(tree->lincon);
     	if (tree->type) {
         	free_tree(tree->left);
         	free_tree(tree->right);
     	}
-    	free(tree);
+    	mi_free(tree);
     }
 }
 
@@ -312,7 +313,7 @@ static void iso_model(uint32_t t, double *res, double complex *dta_row_maj, uint
         }
     }
     net_free(net_mod);
-    proj = (vector *) malloc(psi * sizeof(vector));
+    proj = (vector *) mi_malloc(psi * sizeof(vector));
     sample(nr, psi);
     init_proj(nr, psi);
     if (proj && subs) {
@@ -325,8 +326,8 @@ static void iso_model(uint32_t t, double *res, double complex *dta_row_maj, uint
             }
         }
     }
-    if (subs) free(subs);
-    if (proj) free(proj);
+    if (subs) mi_free(subs);
+    if (proj) mi_free(proj);
     out_vec_free(vecs, nly);    
     free_tree(mytree);
 }
@@ -335,9 +336,9 @@ extern void dif(double *res, double *dta, int *dimD, int *nt, int *nss) {
     uint32_t i, t;
     /* srand(time(NULL)); */
     GetRNGstate();
-    H = (double *) malloc(dimD[0] * sizeof(double));
+    H = (double *) mi_malloc(dimD[0] * sizeof(double));
     double complex *dta_row_major = (double complex *) \
-        malloc(dimD[0] * dimD[1] * sizeof(double complex));
+        mi_malloc(dimD[0] * dimD[1] * sizeof(double complex));
     if (dta_row_major && H) {
         H[0] = 1.0;
         for (i = 1; i < (uint32_t) *nss; i++) 
@@ -358,8 +359,8 @@ extern void dif(double *res, double *dta, int *dimD, int *nt, int *nss) {
         }
     }
     PutRNGstate();
-    if (dta_row_major) free(dta_row_major);
-    if (H) free(H);
+    if (dta_row_major) mi_free(dta_row_major);
+    if (H) mi_free(H);
 }
 
 /*

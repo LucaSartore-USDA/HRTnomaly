@@ -4,6 +4,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
+#include <mimalloc.h>
 #include "myomp.h"
 
 #define EPS_TOLL 1e-10
@@ -91,7 +92,7 @@ static int cmp_vec(const void *aa, const void *bb) {
 static inline double median_wna(double *x, int n) {
     int i, nf = 0;
     double m = 0.0;
-    double *y = (double *) malloc(n * sizeof(double));
+    double *y = (double *) mi_malloc(n * sizeof(double));
     if (y) {
         for (i = 0; i < n; i++) {
             y[i] = x[i];
@@ -107,7 +108,7 @@ static inline double median_wna(double *x, int n) {
             }
         }
     }
-    if (y) free(y);
+    if (y) mi_free(y);
     return m;
 }
 
@@ -122,7 +123,7 @@ static inline double wmedian_wna(double *x, double *w, int n) {
     int i;
     double nf = 0.0;
     double m = 0.0;
-    idvec_t *y = (idvec_t *) calloc(n, sizeof(idvec_t));
+    idvec_t *y = (idvec_t *) mi_calloc(n, sizeof(idvec_t));
     if (y) {
         for (i = 0; i < n; i++) {
             y[i].v = x[i];
@@ -138,7 +139,7 @@ static inline double wmedian_wna(double *x, double *w, int n) {
 	    m = i >= 0 && i < n ? y[i].v : median_wna(x, n);
         }
     }
-    if (y) free(y);
+    if (y) mi_free(y);
     return m;
 }
 
@@ -551,10 +552,10 @@ static inline void lion(double *param, int *len, int *n_iter, void *info,
     double *mom_m;
     double sgn = 1.0;
 
-    grd_v = (double *) malloc(np * sizeof(double));
-    old_w = (double *) calloc(np, sizeof(double));
-    stp_o = (double *) calloc(np, sizeof(double));
-    mom_m = (double *) calloc(np, sizeof(double));
+    grd_v = (double *) mi_malloc(np * sizeof(double));
+    old_w = (double *) mi_calloc(np, sizeof(double));
+    stp_o = (double *) mi_calloc(np, sizeof(double));
+    mom_m = (double *) mi_calloc(np, sizeof(double));
     if (mom_m && grd_v && old_w && stp_o) {
         for (t = 0; t < *n_iter && sgn > MY_EPS_LEARN_RATE; t++) {
             /* Update the gradient */
@@ -584,10 +585,10 @@ static inline void lion(double *param, int *len, int *n_iter, void *info,
             }
         }
     }
-    if (mom_m) free(mom_m);
-    if (grd_v) free(grd_v);
-    if (stp_o) free(stp_o);
-    if (old_w) free(old_w);
+    if (mom_m) mi_free(mom_m);
+    if (grd_v) mi_free(grd_v);
+    if (stp_o) mi_free(stp_o);
+    if (old_w) mi_free(old_w);
 } 
 
 /**
@@ -605,8 +606,8 @@ static inline void relat_check(double *rScore, double *A, double *wt, int *dim) 
     int i, lenR, dimR[2];
     int n_iter = N_ITERATIONS;
 
-    E = (double *) malloc(dim[0] * dim[1] * sizeof(double));
-    R = (double *) calloc(dim[1] * dim[1], sizeof(double));
+    E = (double *) mi_malloc(dim[0] * dim[1] * sizeof(double));
+    R = (double *) mi_calloc(dim[1] * dim[1], sizeof(double));
     if (E && R) {
         mydata.E = E;
         mydata.A = A;
@@ -641,8 +642,8 @@ static inline void relat_check(double *rScore, double *A, double *wt, int *dim) 
             }
         }
     }
-    if (E) free(E);
-    if (R) free(R);
+    if (E) mi_free(E);
+    if (R) mi_free(R);
 }
  
 /**

@@ -4,6 +4,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
+#include <mimalloc.h>
 #include "myomp.h"
 
 #define MAX_ITER 2000
@@ -33,7 +34,7 @@ double median(double *x, size_t n) {
 	/* Initialize variables to compute upper and lower bounds */
 	u = *x;
 	v = u;
-	wts = (double *) malloc(nbins * sizeof(double));
+	wts = (double *) mi_malloc(nbins * sizeof(double));
 	if (wts) {
 		/* Compute range of values */
 		for (i = 1; i < n; i++) { // This loop can run in parallel
@@ -58,7 +59,7 @@ double median(double *x, size_t n) {
 			u = v + range; /* Set the maximum of the optial bin */
 		} while (range > EPS_TOLL && count++ < MAX_ITER); /* Repeat while the conditions are both true */
 	}
-	if (wts) free(wts);
+	if (wts) mi_free(wts);
 	return v;
 }
 
@@ -77,7 +78,7 @@ void group_normalize(double *res, double *dta, int *dim, int *gr, int g) {
 	size_t i = 0, j = 0;
 	size_t nn = (size_t) *dim;
 	double m = 0.0, v = 1.0, *x;
-	x = (double *) malloc(nn * sizeof(double));
+	x = (double *) mi_malloc(nn * sizeof(double));
 	if (x) {
 		while(i < nn) {
 			if (!isnan(dta[i]) && gr[i] == g) {
@@ -100,7 +101,7 @@ void group_normalize(double *res, double *dta, int *dim, int *gr, int g) {
 			}
 		}
 	}
-	if (x) free(x);
+	if (x) mi_free(x);
 }
 
 /**
@@ -136,7 +137,7 @@ void history_check(double *hScore, double *zScore, double *x, double *w, int *n)
 	double *hdta;
 	double tmp, vr = 0.0;
 	int i, nn = 0;
-	hdta = (double *) malloc(*n * sizeof(double));
+	hdta = (double *) mi_malloc(*n * sizeof(double));
 	if (hdta) {
 		#if __VOPENMP
 		#pragma omp parallel for simd reduction(+ : vr, nn)
@@ -157,7 +158,7 @@ void history_check(double *hScore, double *zScore, double *x, double *w, int *n)
 			hScore[i] = tmp < 1.0 ? tmp : 1.0;
 		}
 	}
-	if (hdta) free(hdta);
+	if (hdta) mi_free(hdta);
 }
 
 /**
@@ -173,7 +174,7 @@ void group_tail(double *res, double *dta, int *dim, int *gr, int g) {
 	size_t i = 0, j = 0;
 	size_t nn = (size_t) *dim;
 	double m = 0.0, v = 1.0, *x;
-	x = (double *) malloc(nn * sizeof(double));
+	x = (double *) mi_malloc(nn * sizeof(double));
 	if (x) {
 		while(i < nn) {
 			if (!isnan(dta[i]) && gr[i] == g) {
@@ -196,7 +197,7 @@ void group_tail(double *res, double *dta, int *dim, int *gr, int g) {
 			}
 		}
 	}
-	if (x) free(x);
+	if (x) mi_free(x);
 }
 
 /**
@@ -236,8 +237,8 @@ void col_check(double *E, double *A, int *dim, int s) {
 	int i, j, k;
 	double tmp, v, *Q, *qty;
 
-	Q = (double *) malloc(dim[0] * (dim[1] - 1) * sizeof(double));
-	qty = (double *) malloc((dim[1] - 1) * sizeof(double));
+	Q = (double *) mi_malloc(dim[0] * (dim[1] - 1) * sizeof(double));
+	qty = (double *) mi_malloc((dim[1] - 1) * sizeof(double));
 	if (Q && qty) {
 		/* Compute only the matrix Q of the QR-decomposition */
 		for (i = 0; i < dim[1] - 1; i++) {
@@ -287,8 +288,8 @@ void col_check(double *E, double *A, int *dim, int s) {
 			E[*dim * s + j] = tmp >= 1.0 ? 1.0 : tmp;
 		}
 	}
-	if (Q) free(Q);
-	if (qty) free(qty);
+	if (Q) mi_free(Q);
+	if (qty) mi_free(qty);
 }
 
 /**
@@ -300,7 +301,7 @@ void relat_check(double *A, int *dim) { /** FIXME: introduce new pointer in inpu
 	int i;
 	double *E;
 
-	E = (double *) malloc(dim[0] * dim[1] * sizeof(double));
+	E = (double *) mi_malloc(dim[0] * dim[1] * sizeof(double));
 	if (E) {
 		#if __VOPENMP
 		#pragma omp parallel for default(shared) private(i)
@@ -315,7 +316,7 @@ void relat_check(double *A, int *dim) { /** FIXME: introduce new pointer in inpu
 			A[i] = E[i];
 		}
 	}
-	if (E) free(E);
+	if (E) mi_free(E);
 }
 
 /****************************************************/
@@ -386,8 +387,8 @@ void col_res(double *E, double *A, int *dim, int s) { /** FIXME: introduce new p
 	int i, j, k;
 	double tmp, v, *Q, *qty;
 
-	Q = (double *) malloc(dim[0] * (dim[1] - 1) * sizeof(double));
-	qty = (double *) malloc((dim[1] - 1) * sizeof(double));
+	Q = (double *) mi_malloc(dim[0] * (dim[1] - 1) * sizeof(double));
+	qty = (double *) mi_malloc((dim[1] - 1) * sizeof(double));
 	if (Q && qty) {
 		/* Compute only the matrix Q of the QR-decomposition */
 		for (i = 0; i < dim[1] - 1; i++) {
@@ -439,8 +440,8 @@ void col_res(double *E, double *A, int *dim, int s) { /** FIXME: introduce new p
 			E[*dim * s + j] *= v;
 		}
 	}
-	if (Q) free(Q);
-	if (qty) free(qty);
+	if (Q) mi_free(Q);
+	if (qty) mi_free(qty);
 }
 
 /**
@@ -452,7 +453,7 @@ void relat_res(double *A, int *dim) {
 	int i;
 	double *E;
 
-	E = (double *) malloc(dim[0] * dim[1] * sizeof(double));
+	E = (double *) mi_malloc(dim[0] * dim[1] * sizeof(double));
 	if (E) {
 		#if __VOPENMP
 		#pragma omp parallel for default(shared) private(i)
@@ -467,5 +468,5 @@ void relat_res(double *A, int *dim) {
 			A[i] = E[i];
 		}
 	}
-	if (E) free(E);
+	if (E) mi_free(E);
 }

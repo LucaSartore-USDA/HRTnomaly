@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <math.h>
+#include <mimalloc.h>
 #include "myomp.h"
 
 #define RAND_MAX_PCG32 (~(uint32_t) 0)
@@ -80,7 +81,7 @@ static double emp_per(int b, double *s, int N, double theta) {
 	double lf, rg;
 	unsigned int lb = 0, ub = N - 1, mb = ub >> 1;
 	pcg32_srand((((uint64_t) N ^ (uint64_t) b << 3ULL)) >> 1ULL);
-	w = (double *) malloc(N * sizeof(double));
+	w = (double *) mi_malloc(N * sizeof(double));
 	if (w && s) {
 		/* Generate from a Dirichlet_{N}(1, ..., 1) */
 		rdiri_seq_cum(w, N);
@@ -105,7 +106,7 @@ static double emp_per(int b, double *s, int N, double theta) {
 			res /= lf;
 		}
 	}
-	if (w) free(w);
+	if (w) mi_free(w);
 	return res;
 }
 
