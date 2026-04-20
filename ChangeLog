@@ -1,5 +1,17 @@
-2026-02-21 Luca Sartore <drwolf85@gmail.com>
-    * The HRTnomaly package VERSION 25.12.22 has been created
+2026-04-20 Luca Sartore <drwolf85@gmail.com>
+    * The HRTnomaly package VERSION 26.04.20 has been created
+    * Syncronized the content of the folder `src/mimalloc/` with its most
+      recent version available on GitHub
+    * Updated `DESCRIPTION` file with current information
+    * Updated `README.md` file with current GitHub version
+    * Updated `inst/INSTALL.md` file with current GitHub version
+
+2026-02-24 Luca Sartore <drwolf85@gmail.com>
+    * The HRTnomaly package VERSION 26.02.24 has been created
+    * Update the example in the `README.md` file
+
+2026-02-22 Luca Sartore <drwolf85@gmail.com>
+    * The HRTnomaly package VERSION 26.02.22 has been created
     * The field `SystemRequirements` in `DESCRIPTION` is now requiring a
       compiler supporting the C11 standard
     * The source code of the library `mimalloc` and its `LICENSE` file have
