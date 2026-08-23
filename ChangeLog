@@ -1,3 +1,11 @@
+2026-08-22 Luca Sartore <drwolf85@gmail.com>
+    * The HRTnomaly package VERSION 26.08.22 has been created
+    * Replaced `master` with `masked` in OpenMP statements in
+      the file `src/HRTnomaly.c`
+    * Updated dependencies to `R (>= 4.5.0)`
+    * Updated `README.md` file with current GitHub version
+    * Updated `inst/INSTALL.md` file with current GitHub version
+
 2026-04-20 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 26.04.20 has been created
     * Syncronized the content of the folder `src/mimalloc/` with its most

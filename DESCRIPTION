@@ -2,8 +2,8 @@ Package: HRTnomaly
 Type: Package
 Classification/MSC-2010: 62G86
 Title: Historical, Relational, and Tail Anomaly-Detection Algorithms 
-Version: 26.4.20
-Date: 2026-04-20
+Version: 26.8.22
+Date: 2026-08-22
 Authors@R: c(person(given = "Luca", 
                     family = "Sartore",
                     role = "aut",
@@ -58,7 +58,7 @@ Description: The presence of outliers in a dataset can substantially bias the
     this publication are those of the authors and should not be construed to
     represent any official USDA, or US Government determination or policy.
 License: AGPL-3
-Depends: R (>= 4.0.0)
+Depends: R (>= 4.5.0)
 Imports: dplyr, purrr, tidyr
 Suggests: knitr, rmarkdown, cellWise
 Encoding: UTF-8
