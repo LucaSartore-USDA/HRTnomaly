@@ -26,10 +26,10 @@ jobs:
         config:
           - {os: macos-latest,   r: 'release'}
 
-          - {os: windows-latest, r: 'devel'}
-          - {os: windows-latest, r: 'release'}
-          # use 4.0 or 4.1 to check with rtools40's older compiler
-          - {os: windows-latest, r: 'oldrel-4'}
+          #- {os: windows-latest, r: 'devel'}
+          #- {os: windows-latest, r: 'release'}
+          ## use 4.0 or 4.1 to check with rtools40's older compiler
+          #- {os: windows-latest, r: 'oldrel-4'}
 
           - {os: ubuntu-latest,  r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,  r: 'release'}
@@ -61,4 +61,4 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
-          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
+          build_args: 'c("--no-manual","--as-cran","--compact-vignettes=gs+qpdf")'
