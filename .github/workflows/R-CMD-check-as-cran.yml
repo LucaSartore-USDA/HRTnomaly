@@ -186,11 +186,8 @@ jobs:
 
           GETTEXT_PREFIX="$(brew --prefix gettext)"
 
-          mkdir -p ~/.R
-          touch ~/.R/Makevars
-          grep -qxF "CPPFLAGS += -I${GETTEXT_PREFIX}/include" ~/.R/Makevars || echo "CPPFLAGS += -I${GETTEXT_PREFIX}/include" >> ~/.R/Makevars
-          grep -qxF "LDFLAGS += -L${GETTEXT_PREFIX}/lib" ~/.R/Makevars || echo "LDFLAGS += -L${GETTEXT_PREFIX}/lib" >> ~/.R/Makevars
-
+          echo "CPPFLAGS=${CPPFLAGS:+${CPPFLAGS} }-I${GETTEXT_PREFIX}/include" >> "${GITHUB_ENV}"
+          echo "LDFLAGS=${LDFLAGS:+${LDFLAGS} }-L${GETTEXT_PREFIX}/lib" >> "${GITHUB_ENV}"
           echo "${GETTEXT_PREFIX}/bin" >> "${GITHUB_PATH}"
           echo "Using default toolchain for macOS R-devel with Homebrew gettext paths to avoid missing libintl.h during dependency builds."
 
