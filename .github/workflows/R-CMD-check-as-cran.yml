@@ -254,6 +254,23 @@ jobs:
           SHLIB_OPENMP_CFLAGS=-fopenmp=libomp
           SHLIB_OPENMP_CXXFLAGS=-fopenmp=libomp
           "@ | Out-File -FilePath "$HOME/.R/Makevars.win" -Encoding ASCII
+          @"
+          CC=${llvmBinShort}/clang.exe --target=x86_64-w64-windows-gnu
+          CXX=${llvmBinShort}/clang++.exe --target=x86_64-w64-windows-gnu
+          CXX11=${llvmBinShort}/clang++.exe --target=x86_64-w64-windows-gnu
+          CXX14=${llvmBinShort}/clang++.exe --target=x86_64-w64-windows-gnu
+          CXX17=${llvmBinShort}/clang++.exe --target=x86_64-w64-windows-gnu
+          CXX20=${llvmBinShort}/clang++.exe --target=x86_64-w64-windows-gnu
+          FC=gfortran
+          F77=gfortran
+          AR=${llvmBinShort}/llvm-ar.exe
+          NM=${llvmBinShort}/llvm-nm.exe
+          RANLIB=${llvmBinShort}/llvm-ranlib.exe
+          CPPFLAGS=-I${llvmRootShort}/include
+          LDFLAGS=-L${llvmRootShort}/lib
+          SHLIB_OPENMP_CFLAGS=-fopenmp=libomp
+          SHLIB_OPENMP_CXXFLAGS=-fopenmp=libomp
+          "@ | Out-File -FilePath "$HOME/.R/Makevars" -Encoding ASCII
 
       # --------------------------------------------------------------------
       # Diagnostic step
