@@ -5,9 +5,6 @@
 #include <R_ext/Rdynload.h>
 #include <R_ext/Lapack.h>
 #include <R_ext/Boolean.h>
-#if defined(__x86_64__) && !defined(_WIN32)
-#include <immintrin.h>
-#endif
 
 /**
  * @brief Get the max number of CPU cores

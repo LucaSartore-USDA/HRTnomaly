@@ -2,9 +2,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <math.h>
-#if defined(__x86_64__) && !defined(_WIN32)
-#include <immintrin.h>
-#endif
 #include "myomp.h"
 
 double const inv_thresh = 1.0 / 2.575829303548899940068; /* One percent on normal tails */
