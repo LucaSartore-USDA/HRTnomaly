@@ -182,7 +182,20 @@ jobs:
         if: runner.os == 'macOS' && matrix.config.r == 'devel'
         shell: bash
         run: |
-          echo "Using default toolchain for macOS R-devel to avoid Homebrew toolchain incompatibilities."
+          brew update
+          brew install gettext
+
+          GETTEXT_PREFIX="$(brew --prefix gettext)"
+
+          mkdir -p ~/.R
+          cat > ~/.R/Makevars <<EOF
+          CPPFLAGS=-I${GETTEXT_PREFIX}/include
+          LDFLAGS=-L${GETTEXT_PREFIX}/lib
+          EOF
+
+          echo "${GETTEXT_PREFIX}/bin" >> "${GITHUB_PATH}"
+          echo "PKG_CONFIG_PATH=${GETTEXT_PREFIX}/lib/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}" >> "${GITHUB_ENV}"
+          echo "Using default toolchain for macOS R-devel with Homebrew gettext paths to avoid missing libintl.h during dependency builds."
 
       # --------------------------------------------------------------------
       # Windows compiler setup
