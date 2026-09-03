@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <math.h>
+#if defined(__x86_64__) && !defined(_WIN32)
+#include <immintrin.h>
+#endif
 #include <mimalloc.h>
 #include "myomp.h"
 

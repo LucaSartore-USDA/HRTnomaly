@@ -5,6 +5,9 @@
 #include <math.h>
 #include <time.h>
 #include <complex.h>
+#if defined(__x86_64__) && !defined(_WIN32)
+#include <immintrin.h>
+#endif
 #include <mimalloc.h>
 #include <R.h>
 #include <Rmath.h>
