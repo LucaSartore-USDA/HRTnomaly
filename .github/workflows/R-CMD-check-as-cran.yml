@@ -45,7 +45,7 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -196,11 +196,64 @@ jobs:
       # Windows compiler setup
       # --------------------------------------------------------------------
 
-      - name: Use default toolchain on Windows
-        if: runner.os == 'Windows'
+      - name: Configure GCC on Windows
+        if: runner.os == 'Windows' && matrix.config.compiler == 'gcc'
         shell: pwsh
         run: |
-          Write-Host "Using default Windows R toolchain (Rtools/UCRT) for improved stability across R-release and R-devel."
+          New-Item -ItemType Directory -Force "$HOME/.R" | Out-Null
+
+          @"
+          CC=gcc
+          CXX=g++
+          CXX11=g++
+          CXX14=g++
+          CXX17=g++
+          CXX20=g++
+          FC=gfortran
+          F77=gfortran
+          "@ | Out-File -FilePath "$HOME/.R/Makevars.win" -Encoding ASCII
+
+      - name: Install LLVM/Clang 23.1.0 on Windows
+        if: runner.os == 'Windows' && matrix.config.compiler == 'clang'
+        shell: pwsh
+        run: |
+          $installerPath = Join-Path $env:RUNNER_TEMP 'LLVM-23.1.0-win64.msi'
+          Invoke-WebRequest `
+            -Uri 'https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.0/LLVM-23.1.0-win64.msi' `
+            -OutFile $installerPath
+          Start-Process msiexec.exe `
+            -ArgumentList '/i', $installerPath, '/qn', '/norestart' `
+            -Wait
+          "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+
+      - name: Configure Clang on Windows
+        if: runner.os == 'Windows' && matrix.config.compiler == 'clang'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force "$HOME/.R" | Out-Null
+
+          $llvmBinShort = cmd /c "for %I in (\"C:\Program Files\LLVM\bin\") do @echo %~sI"
+          $llvmBinShort = $llvmBinShort.Trim() -replace '\\', '/'
+          $llvmRootShort = cmd /c "for %I in (\"C:\Program Files\LLVM\") do @echo %~sI"
+          $llvmRootShort = $llvmRootShort.Trim() -replace '\\', '/'
+
+          @"
+          CC=${llvmBinShort}/clang.exe --target=x86_64-w64-windows-gnu
+          CXX=${llvmBinShort}/clang++.exe --target=x86_64-w64-windows-gnu
+          CXX11=${llvmBinShort}/clang++.exe --target=x86_64-w64-windows-gnu
+          CXX14=${llvmBinShort}/clang++.exe --target=x86_64-w64-windows-gnu
+          CXX17=${llvmBinShort}/clang++.exe --target=x86_64-w64-windows-gnu
+          CXX20=${llvmBinShort}/clang++.exe --target=x86_64-w64-windows-gnu
+          FC=gfortran
+          F77=gfortran
+          AR=${llvmBinShort}/llvm-ar.exe
+          NM=${llvmBinShort}/llvm-nm.exe
+          RANLIB=${llvmBinShort}/llvm-ranlib.exe
+          CPPFLAGS=-I${llvmRootShort}/include
+          LDFLAGS=-L${llvmRootShort}/lib
+          SHLIB_OPENMP_CFLAGS=-fopenmp=libomp
+          SHLIB_OPENMP_CXXFLAGS=-fopenmp=libomp
+          "@ | Out-File -FilePath "$HOME/.R/Makevars.win" -Encoding ASCII
 
       # --------------------------------------------------------------------
       # Diagnostic step
@@ -246,6 +299,14 @@ jobs:
           where.exe clang 2>$null
           where.exe clang++ 2>$null
           where.exe gfortran 2>$null
+
+          Write-Host ""
+          Write-Host "Compiler versions:"
+          if (Get-Command gcc -ErrorAction SilentlyContinue) { gcc --version }
+          if (Get-Command g++ -ErrorAction SilentlyContinue) { g++ --version }
+          if (Get-Command clang -ErrorAction SilentlyContinue) { clang --version }
+          if (Get-Command 'clang++' -ErrorAction SilentlyContinue) { clang++ --version }
+          if (Get-Command gfortran -ErrorAction SilentlyContinue) { gfortran --version }
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
