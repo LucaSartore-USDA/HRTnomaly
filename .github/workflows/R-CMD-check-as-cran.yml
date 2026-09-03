@@ -194,7 +194,7 @@ jobs:
           EOF
 
           echo "${GETTEXT_PREFIX}/bin" >> "${GITHUB_PATH}"
-          echo "PKG_CONFIG_PATH=${GETTEXT_PREFIX}/lib/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}" >> "${GITHUB_ENV}"
+          echo "PKG_CONFIG_PATH=${GETTEXT_PREFIX}/lib/pkgconfig" >> "${GITHUB_ENV}"
           echo "Using default toolchain for macOS R-devel with Homebrew gettext paths to avoid missing libintl.h during dependency builds."
 
       # --------------------------------------------------------------------
