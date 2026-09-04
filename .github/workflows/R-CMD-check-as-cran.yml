@@ -126,7 +126,7 @@ jobs:
       # --------------------------------------------------------------------
 
       - name: Install and configure GCC on macOS
-        if: runner.os == 'macOS' && matrix.config.compiler == 'gcc' && matrix.config.r != 'devel'
+        if: runner.os == 'macOS' && matrix.config.compiler == 'gcc'
         shell: bash
         run: |
           brew update
@@ -164,7 +164,7 @@ jobs:
           EOF
 
       - name: Install and configure Clang on macOS
-        if: runner.os == 'macOS' && matrix.config.compiler == 'clang' && matrix.config.r != 'devel'
+        if: runner.os == 'macOS' && matrix.config.compiler == 'clang'
         shell: bash
         run: |
           brew update
@@ -214,7 +214,7 @@ jobs:
           "@ | Out-File -FilePath "$HOME/.R/Makevars.win" -Encoding ASCII
 
       - name: Install LLVM 23 on Windows
-        if: runner.os == 'Windows' && matrix.config.compiler == 'clang23'
+        if: runner.os == 'Windows' && matrix.config.compiler == 'clang'
         shell: pwsh
         run: |
           $llvmVersion = '23.1.0'
@@ -245,7 +245,7 @@ jobs:
           'C:\Program Files\LLVM\bin' | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
 
       - name: Configure R to use Clang 23 on Windows
-        if: runner.os == 'Windows' && matrix.config.compiler == 'clang23'
+        if: runner.os == 'Windows' && matrix.config.compiler == 'clang'
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force "$HOME/.R" | Out-Null
