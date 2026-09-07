@@ -604,7 +604,7 @@ void _mi_auto_process_init(void) {
   _mi_random_reinit_if_weak(&_mi_heap_main.random);
 }
 
-#if defined(_WIN32) && (defined(_M_IX86) || defined(_M_X64))
+#if defined(_WIN32) && (defined(_M_IX86) || defined(_M_X64)) && defined(_MSC_VER)
 #include <intrin.h>
 mi_decl_cache_align bool _mi_cpu_has_fsrm = false;
 mi_decl_cache_align bool _mi_cpu_has_erms = false;

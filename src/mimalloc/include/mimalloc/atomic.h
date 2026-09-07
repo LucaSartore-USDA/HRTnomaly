@@ -355,7 +355,7 @@ typedef _Atomic(uintptr_t) mi_atomic_guard_t;
 static inline void mi_atomic_yield(void) {
   YieldProcessor();  // see issue #1215 and #1225 why this is preferred over __yield or SwitchToThread
 }
-#elif defined(__SSE2__)
+#elif defined(__SSE2__) && defined(_MSC_VER)
 #include <emmintrin.h>
 static inline void mi_atomic_yield(void) {
   _mm_pause();
