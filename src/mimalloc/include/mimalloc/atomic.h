@@ -351,7 +351,7 @@ typedef _Atomic(uintptr_t) mi_atomic_guard_t;
 // Yield
 // ----------------------------------------------------------------------
 
-#if defined(_WIN32)
+#if defined(_WIN32) && defined(_MSC_VER)
 static inline void mi_atomic_yield(void) {
   YieldProcessor();  // see issue #1215 and #1225 why this is preferred over __yield or SwitchToThread
 }
