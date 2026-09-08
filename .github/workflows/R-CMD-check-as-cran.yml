@@ -184,13 +184,6 @@ jobs:
           CXX20=${LLVM_PREFIX}/bin/clang++
           CPPFLAGS=-I${LLVM_PREFIX}/include
           LDFLAGS=-L${LLVM_PREFIX}/lib
-          EOF
-
-      - name: Use default macOS toolchain on R-devel
-        if: runner.os == 'macOS' && matrix.config.r == 'devel'
-        shell: bash
-        run: |
-          echo "Using default toolchain for macOS R-devel to avoid Homebrew toolchain incompatibilities."
 
       # --------------------------------------------------------------------
       # Windows compiler setup
