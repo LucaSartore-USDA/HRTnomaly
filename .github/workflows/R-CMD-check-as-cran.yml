@@ -55,6 +55,8 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
           Ncpus: '2'
+      
+      - uses: r-lib/actions/setup-renv@v2
 
       # --------------------------------------------------------------------
       # Linux compiler setup
