@@ -1125,9 +1125,11 @@ static inline size_t mi_popcount(size_t x) {
 // we happen to run on x86/x64 cpu's that have "fast short rep movsb" (FSRM) support
 // (AMD Zen3+ (~2020) or Intel Ice Lake+ (~2017). See also issue #201 and pr #253.
 // ---------------------------------------------------------------------------------
+#ifndef RC_INVOKED
+#define RC_INVOKED 0
+#endif
 
-#if !MI_CRAN_COMPLIANT
-#if !MI_TRACK_ENABLED && defined(_WIN32) && (defined(_M_IX86) || defined(_M_X64))
+#if !MI_TRACK_ENABLED && defined(_WIN32) && (defined(_M_IX86) || defined(_M_X64)) && !MI_CRAN_COMPLIANT
 #include <intrin.h>
 extern mi_decl_hidden bool _mi_cpu_has_fsrm;
 extern mi_decl_hidden bool _mi_cpu_has_erms;
@@ -1147,14 +1149,6 @@ static inline void _mi_memzero(void* dst, size_t n) {
     memset(dst, 0, n);
   }
 }
-#else
-static inline void _mi_memcpy(void* dst, const void* src, size_t n) {
-  memcpy(dst, src, n);
-}
-static inline void _mi_memzero(void* dst, size_t n) {
-  memset(dst, 0, n);
-}
-#endif
 #else
 static inline void _mi_memcpy(void* dst, const void* src, size_t n) {
   memcpy(dst, src, n);
