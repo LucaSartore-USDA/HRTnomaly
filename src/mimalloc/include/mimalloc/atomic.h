@@ -156,7 +156,7 @@ static inline void mi_atomic_maxi64_relaxed(volatile int64_t* p, int64_t x) {
 #define mi_atomic_addi64_acq_rel(p,i)           mi_atomic_add_acq_rel(p,i)
 
 
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER) && !MI_CRAN_COMPLIANT
 
 // Deprecated: MSVC plain C compilation wrapper that uses Interlocked operations to model C11 atomics.
 // It is recommended to always compile as C++ when using MSVC.
