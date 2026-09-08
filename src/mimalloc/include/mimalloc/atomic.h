@@ -8,6 +8,8 @@ terms of the MIT license. A copy of the license can be found in the file
 #ifndef MIMALLOC_ATOMIC_H
 #define MIMALLOC_ATOMIC_H
 
+#pragma GCC visibility push(default)
+
 // include windows.h or pthreads.h
 #if defined(_WIN32)
 #ifndef WIN32_LEAN_AND_MEAN
@@ -656,5 +658,6 @@ void _mi_atomic_once_release(mi_atomic_once_t* once);      // defined in `libc.c
   static mi_atomic_once_t _mi_once = { MI_ATOMIC_VAR_INIT(0), MI_LOCK_INITIALIZER }; \
   for(bool _mi_exec = _mi_atomic_once_enter(&_mi_once); _mi_exec; (_mi_atomic_once_release(&_mi_once),_mi_exec=false))
 
+#pragma GCC visibility pop
 
 #endif // __MIMALLOC_ATOMIC_H
