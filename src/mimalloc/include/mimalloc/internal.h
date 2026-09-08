@@ -1013,8 +1013,7 @@ static inline size_t mi_ctz(size_t x) {
   #endif
 }
 
-#elif defined(_MSC_VER)
-
+#elif defined(_MSC_VER) && !MI_CRAN_COMPLIANT
 #include <limits.h>       // LONG_MAX
 #include <intrin.h>       // BitScanReverse64
 #define MI_HAVE_FAST_BITSCAN
@@ -1127,7 +1126,7 @@ static inline size_t mi_popcount(size_t x) {
 // (AMD Zen3+ (~2020) or Intel Ice Lake+ (~2017). See also issue #201 and pr #253.
 // ---------------------------------------------------------------------------------
 
-#if !MI_TRACK_ENABLED && defined(_WIN32) && (defined(_M_IX86) || defined(_M_X64))
+#if !MI_TRACK_ENABLED && defined(_WIN32) && (defined(_M_IX86) || defined(_M_X64)) && !MI_CRAN_COMPLIANT
 #include <intrin.h>
 extern mi_decl_hidden bool _mi_cpu_has_fsrm;
 extern mi_decl_hidden bool _mi_cpu_has_erms;

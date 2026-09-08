@@ -156,7 +156,7 @@ static inline void mi_atomic_maxi64_relaxed(volatile int64_t* p, int64_t x) {
 
 // Deprecated: MSVC plain C compilation wrapper that uses Interlocked operations to model C11 atomics.
 // It is recommended to always compile as C++ when using MSVC.
-
+#if !MI_CRAN_COMPLIANT
 #include <intrin.h>
 #ifdef _WIN64
 typedef LONG64        msc_intptr_t;
@@ -365,7 +365,7 @@ static inline bool mi_atomic_casi64_strong_acq_rel(volatile _Atomic(int64_t)* p,
 #define mi_atomic_storei64_release(p,x) mi_atomic(storei64_explicit)(p,x,mi_memory_order(release))
 #define mi_atomic_storei64_relaxed(p,x) mi_atomic(storei64_explicit)(p,x,mi_memory_order(relaxed))
 
-
+#endif
 #endif
 
 
@@ -404,10 +404,12 @@ static inline void mi_atomic_yield(void) {
   YieldProcessor();  // see issue #1215 and #1225 why this is preferred over __yield or SwitchToThread
 }
 #elif defined(__SSE2__)
+#if !MI_CRAN_COMPLIANT
 #include <emmintrin.h>
 static inline void mi_atomic_yield(void) {
   _mm_pause();
 }
+#endif
 #elif (defined(__GNUC__) || defined(__clang__)) && \
       (defined(__x86_64__) || defined(__i386__) || \
        defined(__aarch64__) || defined(__arm__) || \

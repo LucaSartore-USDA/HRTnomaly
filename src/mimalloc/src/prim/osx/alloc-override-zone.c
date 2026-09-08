@@ -207,7 +207,6 @@ static void intro_reinit_lock(malloc_zone_t* zone) {
   At process start, override the default allocator
 ------------------------------------------------------ */
 
-
 static malloc_introspection_t mi_introspect = {
   .enumerator = &intro_enumerator,
   .good_size = &intro_good_size,
