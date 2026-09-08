@@ -7,7 +7,6 @@ terms of the MIT license. A copy of the license can be found in the file
 #pragma once
 #ifndef MIMALLOC_PRIM_H
 #define MIMALLOC_PRIM_H
-
 #include "internal.h"             // mi_decl_hidden
 
 // --------------------------------------------------------------------------
@@ -299,7 +298,7 @@ static inline mi_threadid_t _mi_prim_thread_id(void) mi_attr_noexcept {
   return tid;
 }
 
-#elif defined(_WIN32) && !MI_CRAN_COMPLIANT
+#elif defined(_WIN32)
 
 static inline mi_threadid_t _mi_prim_thread_id(void) mi_attr_noexcept {
   // Windows: works on Intel and ARM in both 32- and 64-bit
