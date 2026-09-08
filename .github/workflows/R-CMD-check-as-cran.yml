@@ -310,7 +310,7 @@ jobs:
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
         run: |
-          Rscript -e 'install.packages(c("rcmdcheck", "dplyr", "purrr", "tidyr", "knitr", "rmarkdown", "cellWise"), type = "mac.binary")'
+          Rscript -e 'install.packages(c("rcmdcheck", "dplyr", "purrr", "tidyr", "knitr", "rmarkdown", "cellWise"), type = "both", Ncpus =  2L)'
       - name: Install dependencies (non-macOS)
         if: runner.os != 'macOS'
         uses: r-lib/actions/setup-r-dependencies@v2
