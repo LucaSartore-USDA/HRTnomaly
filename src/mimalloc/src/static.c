@@ -14,6 +14,7 @@ terms of the MIT license. A copy of the license can be found in the file
 #endif
 
 #if defined(_WIN32) 
+#define __MINGW_INTRIN_INLINE
 #include "intrin-impl.h"
 #endif
 
