@@ -299,7 +299,7 @@ static inline mi_threadid_t _mi_prim_thread_id(void) mi_attr_noexcept {
   return tid;
 }
 
-#elif defined(_WIN32)
+#elif defined(_WIN32) && !MI_CRAN_COMPLIANT
 
 static inline mi_threadid_t _mi_prim_thread_id(void) mi_attr_noexcept {
   // Windows: works on Intel and ARM in both 32- and 64-bit
