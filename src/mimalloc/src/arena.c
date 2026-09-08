@@ -274,6 +274,8 @@ static mi_decl_noinline void* mi_arena_try_alloc_at(mi_arena_t* arena, size_t ar
       const size_t stat_commit_size = commit_size - mi_arena_block_size(already_committed);
       bool commit_zero = false;
       if (!_mi_os_commit_ex(p, commit_size, &commit_zero, stat_commit_size)) {
+        // set all as uncommitted on commit failure
+        _mi_bitmap_unclaim_across(arena->blocks_committed, arena->field_count, needed_bcount, bitmap_index);
         memid->initially_committed = false;
       }
       else {
@@ -392,7 +394,7 @@ static bool mi_arena_reserve(size_t req_size, bool allow_large, mi_arena_id_t *a
 
   // commit eagerly?
   bool arena_commit = false;
-  if (mi_option_get(mi_option_arena_eager_commit) == 2)      { arena_commit = _mi_os_has_overcommit(); }
+  if (mi_option_get(mi_option_arena_eager_commit) == 2)      { arena_commit = _mi_os_has_overcommit() || mi_option_is_enabled(mi_option_allow_large_os_pages); }
   else if (mi_option_get(mi_option_arena_eager_commit) == 1) { arena_commit = true; }
 
   return (mi_reserve_os_memory_ex(arena_reserve, arena_commit, allow_large, false /* exclusive? */, arena_id) == 0);
@@ -700,12 +702,12 @@ void _mi_arena_free(void* p, size_t size, size_t committed_size, mi_memid_t memi
 
     // checks
     if (arena == NULL) {
-      _mi_error_message(EINVAL, "trying to free from an invalid arena: %p, size %zu, memid: 0x%zx\n", p, size, memid);
+      _mi_error_message(EINVAL, "trying to free from an invalid arena: %p, size %zu, memkind: 0x%x\n", p, size, memid.memkind);
       return;
     }
     mi_assert_internal(arena->field_count > mi_bitmap_index_field(bitmap_idx));
     if (arena->field_count <= mi_bitmap_index_field(bitmap_idx)) {
-      _mi_error_message(EINVAL, "trying to free from an invalid arena block: %p, size %zu, memid: 0x%zx\n", p, size, memid);
+      _mi_error_message(EINVAL, "trying to free from an invalid arena block: %p, size %zu, memid: 0x%x\n", p, size, memid.memkind);
       return;
     }
 
@@ -830,6 +832,10 @@ static bool mi_manage_os_memory_ex2(void* start, size_t size, bool is_large, int
     _mi_warning_message("the arena size is too small (memory at %p with size %zu)\n", start, size);
     return false;
   }
+  if (size > MI_MAX_ALLOC_SIZE) {
+    _mi_error_message(EOVERFLOW, "the arena size is too large (memory at %p with size %zu)\n", start, size);
+    return false;
+  }
   if (is_large) {
     mi_assert_internal(memid.initially_committed && memid.is_pinned);
   }
@@ -900,7 +906,13 @@ bool mi_manage_os_memory_ex(void* start, size_t size, bool is_committed, bool is
 // Reserve a range of regular OS memory
 int mi_reserve_os_memory_ex(size_t size, bool commit, bool allow_large, bool exclusive, mi_arena_id_t* arena_id) mi_attr_noexcept {
   if (arena_id != NULL) *arena_id = _mi_arena_id_none();
-  size = _mi_align_up(size, MI_ARENA_BLOCK_SIZE); // at least one block
+  if (size < MI_MAX_ALLOC_SIZE) {
+    size = _mi_align_up(size, MI_ARENA_BLOCK_SIZE); // at least one block
+  }
+  if (size > MI_MAX_ALLOC_SIZE) {
+    _mi_error_message(EOVERFLOW, "memory reservation request is too large (size %zu)\n", size);
+    return ENOMEM;
+  }
   mi_memid_t memid;
   void* start = _mi_os_alloc_aligned(size, MI_SEGMENT_ALIGN, commit, allow_large, &memid);
   if (start == NULL) return ENOMEM;
