@@ -9,7 +9,7 @@ terms of the MIT license. A copy of the license can be found in the file
 #define MIMALLOC_ATOMIC_H
 
 // include windows.h or pthreads.h
-#if defined(_WIN32)
+#if defined(_WIN32) && !MI_CRAN_COMPLIANT
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
