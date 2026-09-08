@@ -42,9 +42,6 @@ defined, undefined, or not accessible at all:
   #define mi_track_mem_noaccess(p,size)
 
 -------------------------------------------------------------------------------------------------------*/
-#if MI_CRAN_COMPLIANT
-#undef __INTRINSIC_GROUP_WINNT
-#endif
 
 #if MI_TRACK_VALGRIND
 // valgrind tool

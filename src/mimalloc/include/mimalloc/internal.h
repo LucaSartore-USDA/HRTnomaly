@@ -1125,35 +1125,34 @@ static inline size_t mi_popcount(size_t x) {
 // we happen to run on x86/x64 cpu's that have "fast short rep movsb" (FSRM) support
 // (AMD Zen3+ (~2020) or Intel Ice Lake+ (~2017). See also issue #201 and pr #253.
 // ---------------------------------------------------------------------------------
-
-// #if !MI_TRACK_ENABLED && defined(_WIN32) && (defined(_M_IX86) || defined(_M_X64)) && !MI_CRAN_COMPLIANT
-// #include <intrin.h>
-// extern mi_decl_hidden bool _mi_cpu_has_fsrm;
-// extern mi_decl_hidden bool _mi_cpu_has_erms;
-// static inline void _mi_memcpy(void* dst, const void* src, size_t n) {
-//   if (_mi_cpu_has_fsrm && n <= 127) { // || (_mi_cpu_has_erms && n > 128)) {
-//     __movsb((unsigned char*)dst, (const unsigned char*)src, n);
-//   }
-//   else {
-//     memcpy(dst, src, n);
-//   }
-// }
-// static inline void _mi_memzero(void* dst, size_t n) {
-//   if (_mi_cpu_has_fsrm && n <= 127) { // || (_mi_cpu_has_erms && n > 128)) {
-//     __stosb((unsigned char*)dst, 0, n);
-//   }
-//   else {
-//     memset(dst, 0, n);
-//   }
-// }
-// #else
+#if !MI_TRACK_ENABLED && defined(_WIN32) && (defined(_M_IX86) || defined(_M_X64)) && !MI_CRAN_COMPLIANT
+#include <intrin.h>
+extern mi_decl_hidden bool _mi_cpu_has_fsrm;
+extern mi_decl_hidden bool _mi_cpu_has_erms;
+static inline void _mi_memcpy(void* dst, const void* src, size_t n) {
+  if (_mi_cpu_has_fsrm && n <= 127) { // || (_mi_cpu_has_erms && n > 128)) {
+    __movsb((unsigned char*)dst, (const unsigned char*)src, n);
+  }
+  else {
+    memcpy(dst, src, n);
+  }
+}
+static inline void _mi_memzero(void* dst, size_t n) {
+  if (_mi_cpu_has_fsrm && n <= 127) { // || (_mi_cpu_has_erms && n > 128)) {
+    __stosb((unsigned char*)dst, 0, n);
+  }
+  else {
+    memset(dst, 0, n);
+  }
+}
+#else
 static inline void _mi_memcpy(void* dst, const void* src, size_t n) {
   memcpy(dst, src, n);
 }
 static inline void _mi_memzero(void* dst, size_t n) {
   memset(dst, 0, n);
 }
-// #endif
+#endif
 
 // -------------------------------------------------------------------------------
 // The `_mi_memcpy_aligned` can be used if the pointers are machine-word aligned

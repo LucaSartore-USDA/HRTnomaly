@@ -9,9 +9,6 @@ terms of the MIT license. A copy of the license can be found in the file
 #define MIMALLOC_STATS_H
 
 #include <mimalloc.h>
-#if MI_CRAN_COMPLIANT
-#undef __INTRINSIC_GROUP_WINNT
-#endif
 #include <stdint.h>
 
 #define MI_STAT_VERSION   4  // increased on every backward incompatible change

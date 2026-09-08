@@ -8,12 +8,8 @@ terms of the MIT license. A copy of the license can be found in the file
 #ifndef MIMALLOC_ATOMIC_H
 #define MIMALLOC_ATOMIC_H
 
-#if MI_CRAN_COMPLIANT
-#undef __INTRINSIC_GROUP_WINNT
-#endif
-
 // include windows.h or pthreads.h
-#if defined(_WIN32)
+#if defined(_WIN32) && !MI_CRAN_COMPLIANT
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
@@ -402,7 +398,7 @@ typedef _Atomic(uintptr_t) mi_atomic_guard_t;
 // Yield
 // ----------------------------------------------------------------------
 
-#if defined(_WIN32)
+#if defined(_WIN32) && !MI_CRAN_COMPLIANT
 static inline void mi_atomic_yield(void) {
   YieldProcessor();  // see issue #1215 and #1225 why this is preferred over __yield or SwitchToThread
 }
@@ -478,7 +474,7 @@ static inline void mi_atomic_yield(void) {
 }
 #endif
 
-#if defined(_WIN32)
+#if defined(_WIN32) && !MI_CRAN_COMPLIANT
 static inline void mi_sleep0(void) {
   Sleep(0);
 }
@@ -518,7 +514,7 @@ static inline void mi_atomic_yield_sleep( size_t* ticks, const size_t ticks_unti
 #define mi_lock_maybe(lock,acquire)    for(bool _mi_go = (acquire ? (mi_lock_acquire(lock),true) : true); _mi_go; _mi_go = (acquire ? (mi_lock_release(lock),false) : false) )
 
 
-#if defined(_WIN32)
+#if defined(_WIN32) && !MI_CRAN_COMPLIANT
 
 typedef struct mi_lock_s {
   SRWLOCK mutex;    // slim reader-writer lock

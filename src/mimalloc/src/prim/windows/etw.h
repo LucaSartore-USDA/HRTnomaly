@@ -48,9 +48,6 @@
 //
 //*****************************************************************************
 
-#if MI_CRAN_COMPLIANT
-#undef __INTRINSIC_GROUP_WINNT
-#endif
 
 #include <wmistr.h>
 #include <evntrace.h>

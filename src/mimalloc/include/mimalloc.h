@@ -14,10 +14,6 @@ terms of the MIT license. A copy of the license can be found in the file
 // Compiler specific attributes
 // ------------------------------------------------------
 
-#if MI_CRAN_COMPLIANT
-#undef __INTRINSIC_GROUP_WINNT
-#endif
-
 #ifdef __cplusplus
   #if (__cplusplus >= 201103L) || (_MSC_VER > 1900)  // C++11
     #define mi_attr_noexcept   noexcept
