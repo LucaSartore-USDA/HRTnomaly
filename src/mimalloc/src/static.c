@@ -13,11 +13,6 @@ terms of the MIT license. A copy of the license can be found in the file
 #undef _POSIX_C_SOURCE
 #endif
 
-#if defined(_WIN32) 
-#define __MINGW_INTRIN_INLINE
-#include "intrin-impl.h"
-#endif
-
 #include "mimalloc.h"
 #include "mimalloc/internal.h"
 

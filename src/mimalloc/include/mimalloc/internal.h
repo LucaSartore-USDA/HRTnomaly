@@ -1016,7 +1016,7 @@ static inline size_t mi_ctz(size_t x) {
 #elif defined(_MSC_VER)
 
 #include <limits.h>       // LONG_MAX
-#include <intrin.h>       // BitScanReverse64
+#include "../intrin.h"       // BitScanReverse64
 #define MI_HAVE_FAST_BITSCAN
 static inline size_t mi_clz(size_t x) {
   if (x==0) return MI_SIZE_BITS;
@@ -1128,7 +1128,7 @@ static inline size_t mi_popcount(size_t x) {
 // ---------------------------------------------------------------------------------
 
 #if !MI_TRACK_ENABLED && defined(_WIN32) && (defined(_M_IX86) || defined(_M_X64))
-#include <intrin.h>
+#include "../intrin.h"
 extern mi_decl_hidden bool _mi_cpu_has_fsrm;
 extern mi_decl_hidden bool _mi_cpu_has_erms;
 static inline void _mi_memcpy(void* dst, const void* src, size_t n) {

@@ -157,7 +157,7 @@ static inline void mi_atomic_maxi64_relaxed(volatile int64_t* p, int64_t x) {
 // Deprecated: MSVC plain C compilation wrapper that uses Interlocked operations to model C11 atomics.
 // It is recommended to always compile as C++ when using MSVC.
 
-#include <intrin.h>
+#include "../intrin.h"
 #ifdef _WIN64
 typedef LONG64        msc_intptr_t;
 #define MI_MSC_64(f)  f##64
