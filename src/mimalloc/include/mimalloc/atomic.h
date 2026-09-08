@@ -12,6 +12,7 @@ terms of the MIT license. A copy of the license can be found in the file
 #if defined(_WIN32)
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#define NOWINBASEINTERLOCK 1
 #endif
 #include <windows.h>
 #elif !defined(__wasi__) && (!defined(__EMSCRIPTEN__) || defined(__EMSCRIPTEN_PTHREADS__))

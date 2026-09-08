@@ -23,8 +23,6 @@ jobs:
       matrix:
         config:
           # macOS
-          - {os: macos-latest, r: 'release', compiler: 'gcc',   experimental: false}
-          - {os: macos-latest, r: 'devel',   compiler: 'gcc',   experimental: true}
           - {os: macos-latest, r: 'release', compiler: 'clang', experimental: false}
           - {os: macos-latest, r: 'devel',   compiler: 'clang', experimental: true}
 
