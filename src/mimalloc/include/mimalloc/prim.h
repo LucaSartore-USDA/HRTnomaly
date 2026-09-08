@@ -7,6 +7,10 @@ terms of the MIT license. A copy of the license can be found in the file
 #pragma once
 #ifndef MIMALLOC_PRIM_H
 #define MIMALLOC_PRIM_H
+
+#if MI_CRAN_COMPLIANT
+#undef __INTRINSIC_GROUP_WINNT
+#endif
 #include "internal.h"             // mi_decl_hidden
 
 // --------------------------------------------------------------------------
