@@ -8,13 +8,17 @@ terms of the MIT license. A copy of the license can be found in the file
 #ifndef MIMALLOC_ATOMIC_H
 #define MIMALLOC_ATOMIC_H
 
+#if MI_CRAN_COMPLIANT
+#undef __INTRINSIC_GROUP_WINNT
+#endif
+
 // include windows.h or pthreads.h
-#if defined(_WIN32) && !MI_CRAN_COMPLIANT
+#if defined(_WIN32)
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <windows.h>
-#elif !defined(__wasi__) && (!defined(__EMSCRIPTEN__) || defined(__EMSCRIPTEN_PTHREADS__)) && MI_CRAN_COMPLIANT
+#elif !defined(__wasi__) && (!defined(__EMSCRIPTEN__) || defined(__EMSCRIPTEN_PTHREADS__))
 #define  MI_USE_PTHREADS
 #include <pthread.h>
 #endif
@@ -156,7 +160,7 @@ static inline void mi_atomic_maxi64_relaxed(volatile int64_t* p, int64_t x) {
 
 // Deprecated: MSVC plain C compilation wrapper that uses Interlocked operations to model C11 atomics.
 // It is recommended to always compile as C++ when using MSVC.
-#if !MI_CRAN_COMPLIANT
+
 #include <intrin.h>
 #ifdef _WIN64
 typedef LONG64        msc_intptr_t;
@@ -366,7 +370,6 @@ static inline bool mi_atomic_casi64_strong_acq_rel(volatile _Atomic(int64_t)* p,
 #define mi_atomic_storei64_relaxed(p,x) mi_atomic(storei64_explicit)(p,x,mi_memory_order(relaxed))
 
 #endif
-#endif
 
 
 // Atomically add a signed value; returns the previous value.
@@ -403,7 +406,7 @@ typedef _Atomic(uintptr_t) mi_atomic_guard_t;
 static inline void mi_atomic_yield(void) {
   YieldProcessor();  // see issue #1215 and #1225 why this is preferred over __yield or SwitchToThread
 }
-#elif defined(__SSE2__) && !MI_CRAN_COMPLIANT
+#elif defined(__SSE2__)
 #include <emmintrin.h>
 static inline void mi_atomic_yield(void) {
   _mm_pause();

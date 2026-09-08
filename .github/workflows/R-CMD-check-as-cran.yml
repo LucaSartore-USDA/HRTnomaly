@@ -307,11 +307,21 @@ jobs:
           clang++ --version || true
           gfortran --version || true
 
-      - uses: r-lib/actions/setup-r-dependencies@v2
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          dependencies: '"hard"'
           extra-packages: any::rcmdcheck
           needs: check
+
+      - name: Install dependencies (non-macOS)
+        if: runner.os != 'macOS'
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+          dependencies: '"hard"'
+        
 
       - uses: r-lib/actions/check-r-package@v2
         with:
