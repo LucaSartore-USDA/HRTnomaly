@@ -182,6 +182,7 @@ jobs:
           CXX20=C:/msys64/ucrt64/bin/g++.exe
           FC=C:/msys64/ucrt64/bin/gfortran.exe
           F77=C:/msys64/ucrt64/bin/gfortran.exe
+          CFLAGS=-IC:/msys64/ucrt64/include
           CPPFLAGS=-IC:/msys64/ucrt64/include
           LDFLAGS=-LC:/msys64/ucrt64/lib
           EOF
@@ -200,6 +201,7 @@ jobs:
           CXX20=C:/msys64/clang64/bin/clang++.exe
           FC=C:/msys64/ucrt64/bin/gfortran.exe
           F77=C:/msys64/ucrt64/bin/gfortran.exe
+          CFLAGS=-IC:/msys64/clang64/include
           CPPFLAGS=-IC:/msys64/clang64/include
           LDFLAGS=-LC:/msys64/clang64/lib
           EOF
@@ -236,7 +238,7 @@ jobs:
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
         run: |
-          Rscript -e 'install.packages(c("rcmdcheck", "dplyr", "purrr", "tidyr", "knitr", "rmarkdown", "cellWise"), type = "both", Ncpus =  2L)'
+          Rscript -e 'install.packages(c("rcmdcheck", "dplyr", "purrr", "tidyr", "knitr", "rmarkdown", "cellWise"), type = "both", Ncpus =  4L)'
       - name: Install dependencies (non-macOS)
         if: runner.os != 'macOS'
         uses: r-lib/actions/setup-r-dependencies@v2
