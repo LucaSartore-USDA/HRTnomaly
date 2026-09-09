@@ -62,14 +62,14 @@ Depends: R (>= 4.5.0)
 Imports: dplyr, purrr, tidyr
 Suggests: knitr, rmarkdown, cellWise
 Encoding: UTF-8
-SystemRequirements: C11 compiler
+SystemRequirements: C11 compiler; mimalloc (>= 2.0); C++17 compiler; GNU make
 LazyLoad: yes
 NeedsCompilation: yes
 ByteCompile: TRUE
-Packaged: 2026-08-23 06:05:06 UTC; sartore
 Author: Luca Sartore [aut] (ORCID = "0000-0002-0446-1328"),
   Luca Sartore [cre] (ORCID = "0000-0002-0446-1328"),
   Lu Chen [aut] (ORCID = "0000-0003-3387-3484"),
   Justin van Wart [aut],
   Andrew Dau [aut] (ORCID = "0009-0008-9482-5316"),
   Valbona Bejleri [aut] (ORCID = "0000-0001-9828-968X")
+BugReports: https://github.com/drwolf85/HRTnomaly/issues
