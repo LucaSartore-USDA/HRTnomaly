@@ -1,2 +1,19 @@
 PKG_CFLAGS+=$(SHLIB_OPENMP_CFLAGS)
-PKG_LIBS+=$(SHLIB_OPENMP_CFLAGS) -lpthread -lpsapi -lbcrypt -lmimalloc
+PKG_LIBS+=$(SHLIB_OPENMP_CFLAGS) -lpthread -lpsapi -lbcrypt
+
+MIMALLOC_H_PATH:=$(shell find /ucrt64 /clang64 /mingw64 -type f -name mimalloc.h 2>/dev/null | head -n 1)
+MIMALLOC_DLL_PATH:=$(shell find /ucrt64 /clang64 /mingw64 -type f -name libmimalloc.dll 2>/dev/null | head -n 1)
+
+ifeq ($(strip $(MIMALLOC_H_PATH)),)
+$(error Could not find mimalloc.h under /ucrt64, /clang64, or /mingw64)
+endif
+
+ifeq ($(strip $(MIMALLOC_DLL_PATH)),)
+$(error Could not find libmimalloc.dll under /ucrt64, /clang64, or /mingw64)
+endif
+
+MIMALLOC_INCLUDE_DIR:=$(patsubst %/,%,$(dir $(MIMALLOC_H_PATH)))
+MIMALLOC_DLL_DIR:=$(patsubst %/,%,$(dir $(MIMALLOC_DLL_PATH)))
+
+PKG_CPPFLAGS+=-I$(MIMALLOC_INCLUDE_DIR)
+PKG_LIBS+=-L$(MIMALLOC_DLL_DIR) -l:libmimalloc.dll

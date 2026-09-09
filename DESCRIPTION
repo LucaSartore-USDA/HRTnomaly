@@ -62,7 +62,7 @@ Depends: R (>= 4.5.0)
 Imports: dplyr, purrr, tidyr
 Suggests: knitr, rmarkdown, cellWise
 Encoding: UTF-8
-SystemRequirements: C11 compiler; mimalloc (>= 2.0); C++17 compiler; GNU make
+SystemRequirements: mimalloc (>= 2.0); C++17 compiler; C11 compiler
 LazyLoad: yes
 NeedsCompilation: yes
 ByteCompile: TRUE
@@ -72,4 +72,5 @@ Author: Luca Sartore [aut] (ORCID = "0000-0002-0446-1328"),
   Justin van Wart [aut],
   Andrew Dau [aut] (ORCID = "0009-0008-9482-5316"),
   Valbona Bejleri [aut] (ORCID = "0000-0001-9828-968X")
+URL: https://drwolf85.r-universe.dev/HRTnomaly
 BugReports: https://github.com/drwolf85/HRTnomaly/issues
