@@ -5,9 +5,10 @@
     * Updated `inst/INSTALL.md` file with current GitHub version
     * Removed the folder `src/mimalloc/` and all its files
     * Included new "SystemRequirements" in `DESCRIPTION`
+    * Removed `src/Makevars.win`
+    * Created `src/Makevars.ucrt` to link to the "mimalloc" library
     * Updated `src/Makevars` to link to the "mimalloc" library
-    * Updated `src/Makevars.win` to link to the "mimalloc" library
-
+    
 2026-09-06 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 26.9.6 has been created
     * Updated `DESCRIPTION` file with current information
