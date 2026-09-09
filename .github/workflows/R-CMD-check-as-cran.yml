@@ -175,17 +175,17 @@ jobs:
           mkdir -p ~/.R
 
           cat > ~/.R/Makevars.win <<'EOF'
-          CC=C:/msys64/ucrt64/bin/gcc.exe
-          CXX=C:/msys64/ucrt64/bin/g++.exe
-          CXX11=C:/msys64/ucrt64/bin/g++.exe
-          CXX14=C:/msys64/ucrt64/bin/g++.exe
-          CXX17=C:/msys64/ucrt64/bin/g++.exe
-          CXX20=C:/msys64/ucrt64/bin/g++.exe
-          FC=C:/msys64/ucrt64/bin/gfortran.exe
-          F77=C:/msys64/ucrt64/bin/gfortran.exe
-          PKG_CFLAGS= -IC:/msys64/ucrt64/include
-          CPPFLAGS+= -IC:/msys64/ucrt64/include
-          LDFLAGS+= -LC:/msys64/ucrt64/lib
+          CC=D:/a/_temp/msys/ucrt64/bin/gcc.exe
+          CXX=D:/a/_temp/msys/ucrt64/bin/g++.exe
+          CXX11=D:/a/_temp/msys/ucrt64/bin/g++.exe
+          CXX14=D:/a/_temp/msys/ucrt64/bin/g++.exe
+          CXX17=D:/a/_temp/msys/ucrt64/bin/g++.exe
+          CXX20=D:/a/_temp/msys/ucrt64/bin/g++.exe
+          FC=D:/a/_temp/msys/ucrt64/bin/gfortran.exe
+          F77=D:/a/_temp/msys/ucrt64/bin/gfortran.exe
+          PKG_CFLAGS= -ID:/a/_temp/msys/ucrt64/include
+          CPPFLAGS+= -ID:/a/_temp/msys/ucrt64/include
+          LDFLAGS+= -LD:/a/_temp/msys/ucrt64/lib
           EOF
       - name: Configure R to use Clang and Mimalloc on Windows
         if: runner.os == 'Windows' && matrix.config.compiler == 'clang'
@@ -196,17 +196,17 @@ jobs:
           R_MAKECONF_WIN="$(Rscript -e 'p <- file.path(R.home("etc"), "x64", "Makeconf"); if (!file.exists(p)) p <- file.path(R.home("etc"), "Makeconf"); cat(normalizePath(p, winslash = "/", mustWork = TRUE))')"
 
           cat > ~/.R/Makevars.win <<'EOF'
-          CC=C:/msys64/clang64/bin/clang.exe
-          CXX=C:/msys64/clang64/bin/clang++.exe
-          CXX11=C:/msys64/clang64/bin/clang++.exe
-          CXX14=C:/msys64/clang64/bin/clang++.exe
-          CXX17=C:/msys64/clang64/bin/clang++.exe
-          CXX20=C:/msys64/clang64/bin/clang++.exe
-          FC=C:/msys64/ucrt64/bin/gfortran.exe
-          F77=C:/msys64/ucrt64/bin/gfortran.exe
-          PKG_CFLAGS= -IC:/msys64/clang64/include
-          CPPFLAGS+= -IC:/msys64/clang64/include
-          LDFLAGS+= -LC:/msys64/clang64/lib
+          CC=D:/a/_temp/msys/clang64/bin/clang.exe
+          CXX=D:/a/_temp/msys/clang64/bin/clang++.exe
+          CXX11=D:/a/_temp/msys/clang64/bin/clang++.exe
+          CXX14=D:/a/_temp/msys/clang64/bin/clang++.exe
+          CXX17=D:/a/_temp/msys/clang64/bin/clang++.exe
+          CXX20=D:/a/_temp/msys/clang64/bin/clang++.exe
+          FC=D:/a/_temp/msys/ucrt64/bin/gfortran.exe
+          F77=D:/a/_temp/msys/ucrt64/bin/gfortran.exe
+          PKG_CFLAGS= -ID:/a/_temp/msys/clang64/include
+          CPPFLAGS+= -ID:/a/_temp/msys/clang64/include
+          LDFLAGS+= -LD:/a/_temp/msys/clang64/lib
           EOF
 
       - name: Show selected compiler configuration
