@@ -173,7 +173,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p ~/.R
-          cat > ~/.R/Makevars.win <<'EOF'
+          cat > ~/.R/Makevars.ucrt <<'EOF'
           CC=C:/msys64/ucrt64/bin/gcc.exe
           CXX=C:/msys64/ucrt64/bin/g++.exe
           CXX11=C:/msys64/ucrt64/bin/g++.exe
@@ -191,7 +191,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p ~/.R
-          cat > ~/.R/Makevars.win <<'EOF'
+          cat > ~/.R/Makevars.ucrt <<'EOF'
           CC=C:/msys64/clang64/bin/clang.exe
           CXX=C:/msys64/clang64/bin/clang++.exe
           CXX11=C:/msys64/clang64/bin/clang++.exe
@@ -212,8 +212,8 @@ jobs:
           echo
 
           if [ "$RUNNER_OS" = "Windows" ]; then
-            if [ -f "$HOME/.R/Makevars.win" ]; then
-              cat "$HOME/.R/Makevars.win"
+            if [ -f "$HOME/.R/Makevars.ucrt" ]; then
+              cat "$HOME/.R/Makevars.ucrt"
             fi
 
             where.exe clang64 || true
