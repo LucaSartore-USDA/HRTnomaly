@@ -131,10 +131,9 @@ jobs:
           brew update
           brew install llvm libomp mimalloc
 
-          export CPATH="$(brew --prefix)/include"
-          export LIBRARY_PATH="$(brew --prefix)/lib"
-
           LLVM_PREFIX="$(brew --prefix llvm)"
+          BREW_PREFIX="$(brew --prefix)"
+          MIMALLOC_PREFIX="$(brew --prefix mimalloc)"
 
           echo "${LLVM_PREFIX}/bin" >> "${GITHUB_PATH}"
 
@@ -146,8 +145,8 @@ jobs:
           CXX14=${LLVM_PREFIX}/bin/clang++
           CXX17=${LLVM_PREFIX}/bin/clang++
           CXX20=${LLVM_PREFIX}/bin/clang++
-          CPPFLAGS=-I${LLVM_PREFIX}/include
-          LDFLAGS=-L${LLVM_PREFIX}/lib
+          CPPFLAGS=-I${LLVM_PREFIX}/include -I${BREW_PREFIX}/include -I${MIMALLOC_PREFIX}/include
+          LDFLAGS=-L${LLVM_PREFIX}/lib -L${BREW_PREFIX}/lib -L${MIMALLOC_PREFIX}/lib
           
       # --------------------------------------------------------------------
       # Windows compiler setup
