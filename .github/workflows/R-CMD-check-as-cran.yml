@@ -131,6 +131,9 @@ jobs:
           brew update
           brew install llvm libomp mimalloc
 
+          export CPATH="$(brew --prefix)/include"
+          export LIBRARY_PATH="$(brew --prefix)/lib"
+
           LLVM_PREFIX="$(brew --prefix llvm)"
 
           echo "${LLVM_PREFIX}/bin" >> "${GITHUB_PATH}"
@@ -145,12 +148,12 @@ jobs:
           CXX20=${LLVM_PREFIX}/bin/clang++
           CPPFLAGS=-I${LLVM_PREFIX}/include
           LDFLAGS=-L${LLVM_PREFIX}/lib
-
+          
       # --------------------------------------------------------------------
       # Windows compiler setup
       # --------------------------------------------------------------------
 
-      - name: Setup Mimalloc (Windows - GCC)
+      - name: Setup GCC and Mimalloc on Windows
         uses: msys2/setup-msys2@v2
         if: runner.os == 'Windows' && matrix.config.compiler == 'gcc'
         with:
@@ -158,7 +161,7 @@ jobs:
           update: true
           install: mingw-w64-ucrt-x86_64-toolchain mingw-w64-ucrt-x86_64-mimalloc
 
-      - name: Setup Mimalloc (Windows - Clang)
+      - name: Setup Clang and Mimalloc on Windows
         uses: msys2/setup-msys2@v2
         if: runner.os == 'Windows' && matrix.config.compiler == 'clang'
         with:
