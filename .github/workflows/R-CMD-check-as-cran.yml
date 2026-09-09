@@ -168,95 +168,42 @@ jobs:
           update: true
           install: mingw-w64-clang-x86_64-toolchain mingw-w64-clang-x86_64-mimalloc
 
-      # - name: Configure R to use GCC on Windows
-      #   if: runner.os == 'Windows' && matrix.config.compiler == 'gcc'
-      #   shell: pwsh
-      #   run: |
-      #     New-Item -ItemType Directory -Force "$HOME/.R" | Out-Null
+      - name: Configure R to use GCC and Mimalloc on Windows
+        if: runner.os == 'Windows' && matrix.config.compiler == 'gcc'
+        shell: bash
+        run: |
+          mkdir -p ~/.R
+          cat > ~/.R/Makevars.win <<'EOF'
+          CC=C:/msys64/ucrt64/bin/gcc.exe
+          CXX=C:/msys64/ucrt64/bin/g++.exe
+          CXX11=C:/msys64/ucrt64/bin/g++.exe
+          CXX14=C:/msys64/ucrt64/bin/g++.exe
+          CXX17=C:/msys64/ucrt64/bin/g++.exe
+          CXX20=C:/msys64/ucrt64/bin/g++.exe
+          FC=C:/msys64/ucrt64/bin/gfortran.exe
+          F77=C:/msys64/ucrt64/bin/gfortran.exe
+          CPPFLAGS=-IC:/msys64/ucrt64/include
+          LDFLAGS=-LC:/msys64/ucrt64/lib
+          EOF
 
-      #     @"
-      #     CC=gcc
-      #     CXX=g++
-      #     CXX11=g++
-      #     CXX14=g++
-      #     CXX17=g++
-      #     CXX20=g++
-      #     FC=gfortran
-      #     F77=gfortran
-      #     "@ | Out-File -FilePath "$HOME/.R/Makevars.win" -Encoding ASCII
-
-      # - name: Install LLVM 23 on Windows
-      #   if: runner.os == 'Windows' && matrix.config.compiler == 'clang'
-      #   shell: pwsh
-      #   run: |
-      #     $llvmVersion = '23.1.0'
-      #     $installer = Join-Path $env:RUNNER_TEMP "LLVM-$llvmVersion-win64.msi"
-      #     $wrapperDir = Join-Path $env:RUNNER_TEMP 'llvm23-bin'
-
-      #     Invoke-WebRequest `
-      #       -Uri "https://github.com/llvm/llvm-project/releases/download/llvmorg-$llvmVersion/LLVM-$llvmVersion-win64.msi" `
-      #       -OutFile $installer
-
-      #     Start-Process msiexec.exe `
-      #       -ArgumentList '/i', $installer, '/qn', '/norestart', 'ADDLOCAL=ALL' `
-      #       -Wait
-
-      #     New-Item -ItemType Directory -Force $wrapperDir | Out-Null
-
-      #     @"
-      #     @echo off
-      #     "C:\Program Files\LLVM\bin\clang.exe" --target=x86_64-w64-windows-gnu %*
-      #     "@ | Out-File -FilePath (Join-Path $wrapperDir 'clang23.cmd') -Encoding ASCII
-
-      #     @"
-      #     @echo off
-      #     "C:\Program Files\LLVM\bin\clang++.exe" --target=x86_64-w64-windows-gnu %*
-      #     "@ | Out-File -FilePath (Join-Path $wrapperDir 'clang++23.cmd') -Encoding ASCII
-
-      #     $wrapperDir | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
-      #     'C:\Program Files\LLVM\bin' | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
-
-      # - name: Configure R to use Clang 23 on Windows
-      #   if: runner.os == 'Windows' && matrix.config.compiler == 'clang'
-      #   shell: pwsh
-      #   run: |
-      #     New-Item -ItemType Directory -Force "$HOME/.R" | Out-Null
-
-      #     @"
-      #     CC=clang23
-      #     CXX=clang++23
-      #     CXX11=clang++23
-      #     CXX14=clang++23
-      #     CXX17=clang++23
-      #     CXX20=clang++23
-      #     FC=gfortran
-      #     F77=gfortran
-      #     AR=llvm-ar
-      #     NM=llvm-nm
-      #     RANLIB=llvm-ranlib
-      #     SHLIB_LD=clang23
-      #     SHLIB_CXXLD=clang++23
-      #     "@ | Out-File -FilePath "$HOME/.R/Makevars.win" -Encoding ASCII
-      #     @"
-      #     CC=clang23
-      #     CXX=clang++23
-      #     CXX11=clang++23
-      #     CXX14=clang++23
-      #     CXX17=clang++23
-      #     CXX20=clang++23
-      #     FC=gfortran
-      #     F77=gfortran
-      #     AR=llvm-ar
-      #     NM=llvm-nm
-      #     RANLIB=llvm-ranlib
-      #     SHLIB_LD=clang23
-      #     SHLIB_CXXLD=clang++23
-      #     "@ | Out-File -FilePath "$HOME/.R/Makevars" -Encoding ASCII
-          
-      # --------------------------------------------------------------------
-      # Diagnostic step
-      # --------------------------------------------------------------------
-
+      - name: Configure R to use Clang and Mimalloc on Windows
+        if: runner.os == 'Windows' && matrix.config.compiler == 'clang'
+        shell: bash
+        run: |
+          mkdir -p ~/.R
+          cat > ~/.R/Makevars.win <<'EOF'
+          CC=C:/msys64/clang64/bin/clang.exe
+          CXX=C:/msys64/clang64/bin/clang++.exe
+          CXX11=C:/msys64/clang64/bin/clang++.exe
+          CXX14=C:/msys64/clang64/bin/clang++.exe
+          CXX17=C:/msys64/clang64/bin/clang++.exe
+          CXX20=C:/msys64/clang64/bin/clang++.exe
+          FC=C:/msys64/ucrt64/bin/gfortran.exe
+          F77=C:/msys64/ucrt64/bin/gfortran.exe
+          CPPFLAGS=-IC:/msys64/clang64/include
+          LDFLAGS=-LC:/msys64/clang64/lib
+          EOF
+      
       - name: Show selected compiler configuration
         shell: bash
         run: |
@@ -269,8 +216,8 @@ jobs:
               cat "$HOME/.R/Makevars.win"
             fi
 
-            where.exe clang23 || true
-            where.exe clang++23 || true
+            where.exe clang64 || true
+            where.exe clang++64 || true
             where.exe llvm-ar || true
           else
             if [ -f "$HOME/.R/Makevars" ]; then
