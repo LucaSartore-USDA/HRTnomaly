@@ -152,21 +152,21 @@ jobs:
       # Windows compiler setup
       # --------------------------------------------------------------------
 
-      - name: Setup GCC and Mimalloc on Windows
-        uses: msys2/setup-msys2@v2
-        if: runner.os == 'Windows' && matrix.config.compiler == 'gcc'
-        with:
-          msystem: UCRT64
-          update: true
-          install: mingw-w64-ucrt-x86_64-toolchain mingw-w64-ucrt-x86_64-mimalloc
+      # - name: Setup GCC and Mimalloc on Windows
+      #   uses: msys2/setup-msys2@v2
+      #   if: runner.os == 'Windows' && matrix.config.compiler == 'gcc'
+      #   with:
+      #     msystem: UCRT64
+      #     update: true
+      #     install: mingw-w64-ucrt-x86_64-toolchain mingw-w64-ucrt-x86_64-mimalloc
 
-      - name: Setup Clang and Mimalloc on Windows
-        uses: msys2/setup-msys2@v2
-        if: runner.os == 'Windows' && matrix.config.compiler == 'clang'
-        with:
-          msystem: UCRT64
-          update: true
-          install: mingw-w64-clang-x86_64-toolchain mingw-w64-clang-x86_64-mimalloc
+      # - name: Setup Clang and Mimalloc on Windows
+      #   uses: msys2/setup-msys2@v2
+      #   if: runner.os == 'Windows' && matrix.config.compiler == 'clang'
+      #   with:
+      #     msystem: UCRT64
+      #     update: true
+      #     install: mingw-w64-clang-x86_64-toolchain mingw-w64-clang-x86_64-mimalloc
 
       - name: Configure R to use GCC and Mimalloc on Windows
         if: runner.os == 'Windows' && matrix.config.compiler == 'gcc'
@@ -209,6 +209,21 @@ jobs:
           LDFLAGS+= -LD:/a/_temp/msys/clang64/lib
           EOF
 
+      - name: Install mimalloc in Rtools Pacman (GCC Windows)
+        if: runner.os == 'Windows' && matrix.config.compiler == 'gcc'
+        run: |
+          # Dynamically find the active Rtools pacman binary and install mimalloc
+          & "${env:RTOOLS44_HOME}\usr\bin\pacman.exe" --noconfirm -Syu mingw-w64-ucrt-x86_64-mimalloc
+        shell: powershell
+        
+      - name: Install mimalloc in Rtools Pacman (Clang Windows)
+        if: runner.os == 'Windows' && matrix.config.compiler == 'clang'
+        run: |
+          # Dynamically find the active Rtools pacman binary and install mimalloc
+          & "${env:RTOOLS44_HOME}\usr\bin\pacman.exe" --noconfirm -Syu mingw-w64-clang-x86_64-mimalloc
+        shell: powershell
+
+        
       - name: Show selected compiler configuration
         shell: bash
         run: |
