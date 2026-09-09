@@ -47,19 +47,6 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v2
 
-      - name: Install mimalloc (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt update
-          sudo apt install -y libmimalloc-dev
-      - name: Clone and Build mimalloc (non-Linux)
-        if: runner.os != 'Linux'
-        run: |
-          git clone https://github.com/microsoft/mimalloc.git
-          cd mimalloc && mkdir build && cd build
-          cmake .. -DMI_OVERRIDE=ON -DMI_BUILD_SHARED=ON -DMI_BUILD_STATIC=ON
-          cmake --build . --config Release 
-
       - uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ matrix.config.r }}
@@ -76,7 +63,8 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc g++ gfortran
+          sudo apt-get upgrade -y
+          sudo apt-get install -y gcc g++ gfortran libmimalloc-dev
 
       - name: Configure R to use GCC on Linux
         if: runner.os == 'Linux' && matrix.config.compiler == 'gcc'
@@ -107,7 +95,8 @@ jobs:
           echo "deb [signed-by=/usr/share/keyrings/llvm-archive-keyring.gpg] http://apt.llvm.org/${UBUNTU_CODENAME}/ llvm-toolchain-${UBUNTU_CODENAME}-23 main" | \
             sudo tee /etc/apt/sources.list.d/llvm.list > /dev/null
           sudo apt-get update
-          sudo apt-get install -y clang-23 libomp-23-dev
+          sudo apt-get upgrade -y
+          sudo apt-get install -y clang-23 libomp-23-dev libmimalloc-dev
 
       - name: Configure R to use Clang with OpenMP on Linux
         if: runner.os == 'Linux' && matrix.config.compiler == 'clang'
@@ -135,51 +124,12 @@ jobs:
       # --------------------------------------------------------------------
       # macOS compiler setup
       # --------------------------------------------------------------------
-
-      - name: Install and configure GCC on macOS
-        if: runner.os == 'macOS' && matrix.config.compiler == 'gcc'
-        shell: bash
-        run: |
-          brew update
-          brew install gcc
-
-          GCC_BIN="$(python3 - <<'PY'
-          import glob, re
-          paths = glob.glob('/opt/homebrew/bin/gcc-*') + glob.glob('/usr/local/bin/gcc-*')
-          paths = [p for p in paths if re.search(r'gcc-[0-9]+$', p)]
-          if not paths:
-              raise SystemExit("No Homebrew gcc-* binary found")
-          def version(path):
-              return int(re.search(r'gcc-([0-9]+)$', path).group(1))
-          print(max(paths, key=version))
-          PY
-          )"
-
-          GXX_BIN="${GCC_BIN/gcc-/g++-}"
-          GFORTRAN_BIN="${GCC_BIN/gcc-/gfortran-}"
-
-          echo "Using GCC:      ${GCC_BIN}"
-          echo "Using G++:      ${GXX_BIN}"
-          echo "Using gfortran: ${GFORTRAN_BIN}"
-
-          mkdir -p ~/.R
-          cat > ~/.R/Makevars <<EOF
-          CC=${GCC_BIN}
-          CXX=${GXX_BIN}
-          CXX11=${GXX_BIN}
-          CXX14=${GXX_BIN}
-          CXX17=${GXX_BIN}
-          CXX20=${GXX_BIN}
-          FC=${GFORTRAN_BIN}
-          F77=${GFORTRAN_BIN}
-          EOF
-
       - name: Install and configure Clang on macOS
         if: runner.os == 'macOS' && matrix.config.compiler == 'clang'
         shell: bash
         run: |
           brew update
-          brew install llvm libomp
+          brew install llvm libomp mimalloc
 
           LLVM_PREFIX="$(brew --prefix llvm)"
 
