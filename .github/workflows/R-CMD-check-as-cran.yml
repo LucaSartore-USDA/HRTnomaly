@@ -183,7 +183,7 @@ jobs:
           CXX20=C:/msys64/ucrt64/bin/g++.exe
           FC=C:/msys64/ucrt64/bin/gfortran.exe
           F77=C:/msys64/ucrt64/bin/gfortran.exe
-          CFLAGS+= -IC:/msys64/ucrt64/include
+          PKG_CFLAGS= -IC:/msys64/ucrt64/include
           CPPFLAGS+= -IC:/msys64/ucrt64/include
           LDFLAGS+= -LC:/msys64/ucrt64/lib
           EOF
@@ -204,11 +204,11 @@ jobs:
           CXX20=C:/msys64/clang64/bin/clang++.exe
           FC=C:/msys64/ucrt64/bin/gfortran.exe
           F77=C:/msys64/ucrt64/bin/gfortran.exe
-          CFLAGS+= -IC:/msys64/clang64/include
+          PKG_CFLAGS= -IC:/msys64/clang64/include
           CPPFLAGS+= -IC:/msys64/clang64/include
           LDFLAGS+= -LC:/msys64/clang64/lib
           EOF
-          
+
       - name: Show selected compiler configuration
         shell: bash
         run: |
