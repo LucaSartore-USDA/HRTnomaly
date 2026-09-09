@@ -1,15 +1,16 @@
 PKG_CFLAGS+=$(SHLIB_OPENMP_CFLAGS)
 PKG_LIBS+=$(SHLIB_OPENMP_CFLAGS) -lpthread -lpsapi -lbcrypt
 
-MIMALLOC_H_PATH:=$(shell find /ucrt64 /clang64 /mingw64 -type f -name mimalloc.h 2>/dev/null | head -n 1)
-MIMALLOC_DLL_PATH:=$(shell find /ucrt64 /clang64 /mingw64 -type f -name libmimalloc.dll 2>/dev/null | head -n 1)
+
+MIMALLOC_H_PATH:=$(firstword $(wildcard C:/msys64/ucrt64/include/mimalloc.h C:/msys64/clang64/include/mimalloc.h C:/msys64/mingw64/include/mimalloc.h))
+MIMALLOC_DLL_PATH:=$(firstword $(wildcard C:/msys64/ucrt64/lib/libmimalloc.dll C:/msys64/clang64/lib/libmimalloc.dll C:/msys64/mingw64/lib/libmimalloc.dll))
 
 ifeq ($(strip $(MIMALLOC_H_PATH)),)
-$(error Could not find mimalloc.h under /ucrt64, /clang64, or /mingw64)
+$(error Could not find mimalloc.h under C:/msys64/ucrt64, C:/msys64/clang64, or C:/msys64/mingw64)
 endif
 
 ifeq ($(strip $(MIMALLOC_DLL_PATH)),)
-$(error Could not find libmimalloc.dll under /ucrt64, /clang64, or /mingw64)
+$(error Could not find libmimalloc.dll under C:/msys64/ucrt64, C:/msys64/clang64, or C:/msys64/mingw64)
 endif
 
 MIMALLOC_INCLUDE_DIR:=$(patsubst %/,%,$(dir $(MIMALLOC_H_PATH)))
