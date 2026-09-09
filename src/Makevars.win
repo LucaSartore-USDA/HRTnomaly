@@ -1,20 +1,2 @@
 PKG_CFLAGS+=$(SHLIB_OPENMP_CFLAGS)
-PKG_LIBS+=$(SHLIB_OPENMP_CFLAGS) -lpthread -lpsapi -lbcrypt
-
-
-MIMALLOC_H_PATH:=$(firstword $(wildcard C:/msys64/ucrt64/include/mimalloc.h C:/msys64/clang64/include/mimalloc.h C:/msys64/mingw64/include/mimalloc.h C:/ucrt64/include/mimalloc.h C:/clang64/include/mimalloc.h C:/mingw64/include/mimalloc.h))
-MIMALLOC_DLL_PATH:=$(firstword $(wildcard C:/msys64/ucrt64/bin/libmimalloc.dll C:/msys64/clang64/bin/libmimalloc.dll C:/msys64/mingw64/bin/libmimalloc.dll C:/ucrt64/bin/libmimalloc.dll C:/clang64/bin/libmimalloc.dll C:/mingw64/bin/libmimalloc.dll))
-
-ifeq ($(strip $(MIMALLOC_H_PATH)),)
-    $(error Could not find mimalloc.h)
-else 
-    MIMALLOC_INCLUDE_DIR:=$(patsubst %/,%,$(dir $(MIMALLOC_H_PATH)))
-    PKG_CPPFLAGS+=-I$(MIMALLOC_INCLUDE_DIR)
-endif
-
-ifeq ($(strip $(MIMALLOC_DLL_PATH)),)
-    $(error Could not find libmimalloc.dll)
-else
-    MIMALLOC_DLL_DIR:=$(patsubst %/,%,$(dir $(MIMALLOC_DLL_PATH)))
-    PKG_LIBS+=-L$(MIMALLOC_DLL_DIR) -l:libmimalloc.dll
-endif
+PKG_LIBS+=$(SHLIB_OPENMP_CFLAGS) -lpthread -lpsapi -lbcrypt -lmimalloc
