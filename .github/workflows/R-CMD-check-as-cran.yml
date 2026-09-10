@@ -152,21 +152,21 @@ jobs:
       # Windows compiler setup
       # --------------------------------------------------------------------
 
-      # - name: Setup GCC and Mimalloc on Windows
-      #   uses: msys2/setup-msys2@v2
-      #   if: runner.os == 'Windows' && matrix.config.compiler == 'gcc'
-      #   with:
-      #     msystem: UCRT64
-      #     update: true
-      #     install: mingw-w64-ucrt-x86_64-toolchain mingw-w64-ucrt-x86_64-mimalloc
+      - name: Setup GCC and Mimalloc on Windows
+        uses: msys2/setup-msys2@v2
+        if: runner.os == 'Windows' && matrix.config.compiler == 'gcc'
+        with:
+          msystem: UCRT64
+          update: true
+          install: mingw-w64-ucrt-x86_64-toolchain mingw-w64-ucrt-x86_64-mimalloc
 
-      # - name: Setup Clang and Mimalloc on Windows
-      #   uses: msys2/setup-msys2@v2
-      #   if: runner.os == 'Windows' && matrix.config.compiler == 'clang'
-      #   with:
-      #     msystem: UCRT64
-      #     update: true
-      #     install: mingw-w64-clang-x86_64-toolchain mingw-w64-clang-x86_64-mimalloc
+      - name: Setup Clang and Mimalloc on Windows
+        uses: msys2/setup-msys2@v2
+        if: runner.os == 'Windows' && matrix.config.compiler == 'clang'
+        with:
+          msystem: UCRT64
+          update: true
+          install: mingw-w64-clang-x86_64-toolchain mingw-w64-clang-x86_64-mimalloc
 
       - name: Configure R to use GCC and Mimalloc on Windows
         if: runner.os == 'Windows' && matrix.config.compiler == 'gcc'
@@ -174,7 +174,7 @@ jobs:
         run: |
           mkdir -p ~/.R
 
-          cat > ~/.R/Makevars.win <<'EOF'
+          cat > ~/.R/Makevars.ucrt <<'EOF'
           CC=D:/a/_temp/msys/ucrt64/bin/gcc.exe
           CXX=D:/a/_temp/msys/ucrt64/bin/g++.exe
           CXX11=D:/a/_temp/msys/ucrt64/bin/g++.exe
@@ -193,7 +193,7 @@ jobs:
         run: |
           mkdir -p ~/.R
 
-          cat > ~/.R/Makevars.win <<'EOF'
+          cat > ~/.R/Makevars.ucrt <<'EOF'
           CC=D:/a/_temp/msys/clang64/bin/clang.exe
           CXX=D:/a/_temp/msys/clang64/bin/clang++.exe
           CXX11=D:/a/_temp/msys/clang64/bin/clang++.exe
@@ -214,8 +214,8 @@ jobs:
           echo
 
           if [ "$RUNNER_OS" = "Windows" ]; then
-            if [ -f "$HOME/.R/Makevars.win" ]; then
-              cat "$HOME/.R/Makevars.win"
+            if [ -f "$HOME/.R/Makevars.ucrt" ]; then
+              cat "$HOME/.R/Makevars.ucrt"
             fi
 
             where.exe clang64 || true
