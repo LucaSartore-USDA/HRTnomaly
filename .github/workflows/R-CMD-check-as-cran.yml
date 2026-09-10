@@ -193,8 +193,6 @@ jobs:
         run: |
           mkdir -p ~/.R
 
-          R_MAKECONF_WIN="$(Rscript -e 'p <- file.path(R.home("etc"), "x64", "Makeconf"); if (!file.exists(p)) p <- file.path(R.home("etc"), "Makeconf"); cat(normalizePath(p, winslash = "/", mustWork = TRUE))')"
-
           cat > ~/.R/Makevars.win <<'EOF'
           CC=D:/a/_temp/msys/clang64/bin/clang.exe
           CXX=D:/a/_temp/msys/clang64/bin/clang++.exe
@@ -208,22 +206,6 @@ jobs:
           CPPFLAGS+= -ID:/a/_temp/msys/clang64/include
           LDFLAGS+= -LD:/a/_temp/msys/clang64/lib
           EOF
-
-      - name: Install mimalloc in Rtools Pacman (GCC Windows)
-        if: runner.os == 'Windows' && matrix.config.compiler == 'gcc'
-        run: |
-          # Dynamically find the active Rtools pacman binary and install mimalloc
-          & "${env:RTOOLS44_HOME}\usr\bin\pacman.exe" --noconfirm -Syu mingw-w64-ucrt-x86_64-mimalloc
-        shell: powershell
-        
-      - name: Install mimalloc in Rtools Pacman (Clang Windows)
-        if: runner.os == 'Windows' && matrix.config.compiler == 'clang'
-        run: |
-          # Dynamically find the active Rtools pacman binary and install mimalloc
-          & "${env:RTOOLS44_HOME}\usr\bin\pacman.exe" --noconfirm -Syu mingw-w64-clang-x86_64-mimalloc
-        shell: powershell
-
-        
       - name: Show selected compiler configuration
         shell: bash
         run: |
