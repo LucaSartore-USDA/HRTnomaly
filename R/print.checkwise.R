@@ -5,8 +5,8 @@
 #' The function prints the confusion matrix and accuracy results previously computed with the function \code{class_check}.
 #' @usage \method{print}{checkwise}(x, confusion = FALSE, ...)
 #' @param x An S3 object of the class \code{checkwise}, typically computed with the function \code{class_check}.
-#' @param confusion A logical value, which is \code{FALSE} by default. If \code{TRUE}, the confusion matrix is printed after showing all accuracy metrics.
 #' @param ... Additional arguments to pass to the function \code{cat}.
+#' @param confusion A logical value, which is \code{FALSE} by default. If \code{TRUE}, the confusion matrix is printed after showing all accuracy metrics.
 #' @details
 #' The function computes the confusion matrix using the function \code{table}. True positive and false negative are successively evaluated to compute overall accuracy, recall, precision, and F1-scores.
 #' @return An S3 class named \code{checkwise} with the confusion matrix, and other accuracy metrics appended as attribues.
@@ -28,7 +28,7 @@
 #' @keywords distribution
 #' @keywords probability
 #' @export
-print.checkwise <- function(x, confusion = FALSE, ...) {
+print.checkwise <- function(x, ..., confusion = FALSE) {
 
   cat("  Overall accuracy:\n", ...)
   cat(attr(x, "overall"), "\n", sep = "", ...)
