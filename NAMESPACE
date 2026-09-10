@@ -8,7 +8,7 @@ importFrom("stats", "sd")
 exportPattern("^[[:alpha:]]+")
 useDynLib(HRTnomaly, .registration = TRUE)
 if(getRversion() >= "3.6.0") {
-    S3method(HRTnomaly::print, checkwise)
+    S3method(print, checkwise)
 } else {
     S3method(print, checkwise)
 }
