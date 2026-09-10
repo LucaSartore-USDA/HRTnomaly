@@ -1,5 +1,4 @@
-R_TOOLS_VERSION := $(shell Rscript -e 'grep("RTOOLS.*HOME", names(Sys.getenv()), value = TRUE)')
-R_TOOLS_SOFT := $(shell Rscript -e 'cat(normalizePath(Sys.getenv($(R_TOOLS_VERSION))), winslash = "/")')
+R_TOOLS_SOFT := $(BINPREF)/..
 
 PKG_CFLAGS += $(SHLIB_OPENMP_CFLAGS) -I$(R_TOOLS_SOFT)/include
 PKG_LIBS += $(SHLIB_OPENMP_CFLAGS) -lpthread -lpsapi -lbcrypt
