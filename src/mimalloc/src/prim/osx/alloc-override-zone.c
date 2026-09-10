@@ -207,14 +207,6 @@ static void intro_reinit_lock(malloc_zone_t* zone) {
   At process start, override the default allocator
 ------------------------------------------------------ */
 
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
-#endif
-
-#if defined(__clang__)
-#pragma clang diagnostic ignored "-Wc99-extensions"
-#endif
-
 static malloc_introspection_t mi_introspect = {
   .enumerator = &intro_enumerator,
   .good_size = &intro_good_size,

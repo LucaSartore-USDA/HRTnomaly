@@ -471,7 +471,11 @@ static void mi_recurse_exit(void) {
 }
 
 void _mi_fputs(mi_output_fun* out, void* arg, const char* prefix, const char* message) {
-  if (out==NULL || (void*)out==(void*)stdout || (void*)out==(void*)stderr) { // todo: use mi_out_stderr for stderr?
+  if (out==NULL 
+    #if !defined(MI_CRAN_COMPLIANT)
+    || (void*)out==(void*)stdout || (void*)out==(void*)stderr
+    #endif
+  ) { // todo: use mi_out_stderr for stderr?
     if (!mi_recurse_enter()) return;
     out = mi_out_get_default(&arg);
     if (prefix != NULL) out(prefix, arg);
@@ -556,7 +560,7 @@ void _mi_warning_message(const char* fmt, ...) {
 }
 
 
-#if MI_DEBUG
+#if MI_DEBUG && !defined(MI_CRAN_COMPLIANT)
 mi_decl_noreturn mi_decl_cold void _mi_assert_fail(const char* assertion, const char* fname, unsigned line, const char* func ) mi_attr_noexcept {
   _mi_fprintf(NULL, NULL, "mimalloc: assertion failed: at \"%s\":%u, %s\n  assertion: \"%s\"\n", fname, line, (func==NULL?"":func), assertion);
   abort();
@@ -572,7 +576,7 @@ static _Atomic(void*) mi_error_arg;     // = NULL
 
 static void mi_error_default(int err) {
   MI_UNUSED(err);
-  #if (MI_DEBUG>0)
+  #if (MI_DEBUG>0) && !defined(MI_CRAN_COMPLIANT)
     if (err==EFAULT) {
       #ifdef _MSC_VER
       __debugbreak();
@@ -580,12 +584,12 @@ static void mi_error_default(int err) {
       abort();
     }
   #endif
-  #if (MI_SECURE>0)
+  #if (MI_SECURE>0) && !defined(MI_CRAN_COMPLIANT)
     if (err==EFAULT) {  // abort on serious errors in secure mode (corrupted meta-data)
       abort();
     }
   #endif
-  #if defined(MI_XMALLOC)
+  #if defined(MI_XMALLOC) && !defined(MI_CRAN_COMPLIANT)
     if (err==ENOMEM || err==EOVERFLOW || err==EINVAL) { // abort on memory allocation fails in xmalloc mode
       abort();
     }

@@ -865,7 +865,11 @@ void _mi_prim_process_info(mi_process_info_t* pinfo)
 //----------------------------------------------------------------
 
 void _mi_prim_out_stderr( const char* msg ) {
+  #if !defined(MI_CRAN_COMPLIANT)
   fputs(msg,stderr);
+  #else
+  return;
+  #endif
 }
 
 
