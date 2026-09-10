@@ -29,6 +29,7 @@ typedef void* mi_nothrow_t;
 #if (defined(__GNUC__) || defined(__clang__)) && !defined(__APPLE__) && !MI_TRACK_ENABLED
   // gcc, clang: use aliasing to alias the exported function to one of our `mi_` functions
   #if (defined(__GNUC__) && __GNUC__ >= 9)
+    #pragma GCC diagnostic ignored "-Wattributes"  // or we get warnings that nodiscard is ignored on a forward
     #define MI_FORWARD(fun)      __attribute__((alias(#fun), used, visibility("default"), copy(fun)));
   #else
     #define MI_FORWARD(fun)      __attribute__((alias(#fun), used, visibility("default")));
@@ -46,7 +47,6 @@ typedef void* mi_nothrow_t;
   #define MI_FORWARD0(fun,x)      { fun(x); }
   #define MI_FORWARD02(fun,x,y)   { fun(x,y); }
 #endif
-
 
 #if defined(__APPLE__) && defined(MI_SHARED_LIB_EXPORT) && defined(MI_OSX_INTERPOSE)
   // define MI_OSX_IS_INTERPOSED as we should not provide forwarding definitions for
@@ -127,7 +127,7 @@ typedef void* mi_nothrow_t;
 #elif defined(_MSC_VER)
   _Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(_Size) _ACRTIMP _CRTALLOCATOR _CRT_HYBRIDPATCHABLE
   void* __cdecl _expand(_Pre_notnull_ void* _Block, _In_ _CRT_GUARDOVERFLOW size_t _Size) {
-    return mi_expand(_Block, _Size);
+    return mi__expand(_Block, _Size);
   }
   _Check_return_ _ACRTIMP 
   size_t __cdecl _msize_base(_Pre_notnull_ void* _Block) _CRT_NOEXCEPT {
@@ -324,14 +324,25 @@ typedef void* mi_nothrow_t;
 extern "C" {
 #endif
 
+// defined here instead alloc-posix so we can alias it
+mi_decl_nodiscard size_t mi_malloc_size(const void* p) mi_attr_noexcept {
+  if (!mi_is_in_heap_region(p)) return 0;
+  return mi_usable_size(p);
+}
+
+mi_decl_nodiscard size_t mi_malloc_usable_size(const void *p) mi_attr_noexcept {
+  if (!mi_is_in_heap_region(p)) return 0;
+  return mi_usable_size(p);
+}
+
 #ifndef MI_OSX_IS_INTERPOSED
   // Forward Posix/Unix calls as well
   void*  reallocf(void* p, size_t newsize) MI_FORWARD2(mi_reallocf,p,newsize)
-  size_t malloc_size(const void* p)        MI_FORWARD1(mi_usable_size,p)
+  size_t malloc_size(const void* p)        MI_FORWARD1(mi_malloc_size,p)
   #if !defined(__ANDROID__) && !defined(__FreeBSD__) && !defined(__DragonFly__)
-  size_t malloc_usable_size(void *p)       MI_FORWARD1(mi_usable_size,p)
+  size_t malloc_usable_size(void *p)       MI_FORWARD1(mi_malloc_usable_size,p)
   #else
-  size_t malloc_usable_size(const void *p) MI_FORWARD1(mi_usable_size,p)
+  size_t malloc_usable_size(const void *p) MI_FORWARD1(mi_malloc_usable_size,p)
   #endif
 
   // No forwarding here due to aliasing/name mangling issues
