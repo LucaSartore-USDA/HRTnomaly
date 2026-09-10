@@ -1,20 +1,2 @@
 PKG_CFLAGS += $(SHLIB_OPENMP_CFLAGS)
-PKG_LIBS += $(SHLIB_OPENMP_CFLAGS) -lpthread -lpsapi -lbcrypt
-
-MIMALLOC_LIB := $(firstword $(wildcard $(RTOOLS45_HOME)/lib/libmimalloc.a))
-PACMAN := $(RTOOLS45_HOME)/usr/bin/pacman.exe
-
-ifeq ($(strip $(MIMALLOC_LIB)),)
-$(info libmimalloc.a not found under $(RTOOLS45_HOME)/lib; attempting pacman install)
-ifeq ($(wildcard $(PACMAN)),)
-$(error pacman not found at $(PACMAN); check RTOOLS45_HOME)
-endif
-$(shell "$(PACMAN)" -S --noconfirm --needed mingw-w64-ucrt-x86_64-mimalloc >/dev/null 2>&1)
-MIMALLOC_LIB := $(firstword $(wildcard $(RTOOLS45_HOME)/lib/libmimalloc.a))
-endif
-
-ifeq ($(strip $(MIMALLOC_LIB)),)
-$(error libmimalloc.a still missing under $(RTOOLS45_HOME)/lib after pacman install attempt)
-endif
-
-PKG_LIBS += -L$(dir $(MIMALLOC_LIB)) -lmimalloc
+PKG_LIBS += $(SHLIB_OPENMP_CFLAGS) -lpthread -lpsapi -lbcrypt -lmimalloc

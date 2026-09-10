@@ -22,22 +22,66 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          # macOS
-          - {os: macos-latest, r: 'release', compiler: 'clang', experimental: false}
-          - {os: macos-latest, r: 'devel',   compiler: 'clang', experimental: true}
+          - { os: macos-latest,  r: 'release', compiler: 'clang', experimental: false }
+          - { os: macos-latest,  r: 'devel',   compiler: 'clang', experimental: true }
 
-          # Ubuntu
-          - {os: ubuntu-latest, r: 'release', compiler: 'gcc',   experimental: false}
-          - {os: ubuntu-latest, r: 'devel',   compiler: 'gcc',   experimental: false, http-user-agent: 'release'}
-          - {os: ubuntu-latest, r: 'release', compiler: 'clang', experimental: false}
-          - {os: ubuntu-latest, r: 'devel',   compiler: 'clang', experimental: false, http-user-agent: 'release'}
+          - { os: ubuntu-latest, r: 'release', compiler: 'gcc',   experimental: false }
+          - { os: ubuntu-latest, r: 'devel',   compiler: 'gcc',   experimental: false, http-user-agent: 'release' }
+          - { os: ubuntu-latest, r: 'release', compiler: 'clang', experimental: false }
+          - { os: ubuntu-latest, r: 'devel',   compiler: 'clang', experimental: false, http-user-agent: 'release' }
 
-          # Windows
-          - {os: windows-latest, r: 'release', compiler: 'gcc',   experimental: true}
-          - {os: windows-latest, r: 'devel',   compiler: 'gcc',   experimental: true}
-          - {os: windows-latest, r: 'release', compiler: 'clang', experimental: true}
-          - {os: windows-latest, r: 'devel',   compiler: 'clang', experimental: true}
-
+          - {
+              os: windows-latest,
+              r: 'release',
+              compiler: 'gcc',
+              experimental: true,
+              msystem: 'UCRT64',
+              prefix: 'ucrt64',
+              c_compiler: 'gcc.exe',
+              cxx_compiler: 'g++.exe',
+              fc_compiler: 'gfortran.exe',
+              toolchain_pkg: 'mingw-w64-ucrt-x86_64-toolchain',
+              mimalloc_pkg: 'mingw-w64-ucrt-x86_64-mimalloc'
+            }
+          - {
+              os: windows-latest,
+              r: 'devel',
+              compiler: 'gcc',
+              experimental: true,
+              msystem: 'UCRT64',
+              prefix: 'ucrt64',
+              c_compiler: 'gcc.exe',
+              cxx_compiler: 'g++.exe',
+              fc_compiler: 'gfortran.exe',
+              toolchain_pkg: 'mingw-w64-ucrt-x86_64-toolchain',
+              mimalloc_pkg: 'mingw-w64-ucrt-x86_64-mimalloc'
+            }
+          - {
+              os: windows-latest,
+              r: 'release',
+              compiler: 'clang',
+              experimental: true,
+              msystem: 'CLANG64',
+              prefix: 'clang64',
+              c_compiler: 'clang.exe',
+              cxx_compiler: 'clang++.exe',
+              fc_compiler: 'gfortran.exe',
+              toolchain_pkg: 'mingw-w64-clang-x86_64-toolchain',
+              mimalloc_pkg: 'mingw-w64-clang-x86_64-mimalloc'
+            }
+          - {
+              os: windows-latest,
+              r: 'devel',
+              compiler: 'clang',
+              experimental: true,
+              msystem: 'CLANG64',
+              prefix: 'clang64',
+              c_compiler: 'clang.exe',
+              cxx_compiler: 'clang++.exe',
+              fc_compiler: 'gfortran.exe',
+              toolchain_pkg: 'mingw-w64-clang-x86_64-toolchain',
+              mimalloc_pkg: 'mingw-w64-clang-x86_64-mimalloc'
+            }
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
@@ -153,59 +197,41 @@ jobs:
       # Windows compiler setup
       # --------------------------------------------------------------------
 
-      - name: Setup GCC and Mimalloc on Windows
+      - name: Setup MSYS2 toolchain on Windows
+        id: msys2
+        if: runner.os == 'Windows'
         uses: msys2/setup-msys2@v2
-        if: runner.os == 'Windows' && matrix.config.compiler == 'gcc'
         with:
-          msystem: UCRT64
+          msystem: ${{ matrix.config.msystem }}
           update: true
-          install: mingw-w64-ucrt-x86_64-toolchain mingw-w64-ucrt-x86_64-mimalloc
+          install: >-
+            ${{ matrix.config.toolchain_pkg }}
+            ${{ matrix.config.mimalloc_pkg }}
 
-      - name: Setup Clang and Mimalloc on Windows
-        uses: msys2/setup-msys2@v2
-        if: runner.os == 'Windows' && matrix.config.compiler == 'clang'
-        with:
-          msystem: UCRT64
-          update: true
-          install: mingw-w64-clang-x86_64-toolchain mingw-w64-clang-x86_64-mimalloc
-
-      - name: Configure R to use GCC and Mimalloc on Windows
-        if: runner.os == 'Windows' && matrix.config.compiler == 'gcc'
+      - name: Configure R on Windows
+        if: runner.os == 'Windows'
         shell: bash
+        env:
+          MSYS2_ROOT: ${{ steps.msys2.outputs.msys2-location }}
+          MSYS2_PREFIX: ${{ matrix.config.prefix }}
+          CC_NAME: ${{ matrix.config.c_compiler }}
+          CXX_NAME: ${{ matrix.config.cxx_compiler }}
+          FC_NAME: ${{ matrix.config.fc_compiler }}
         run: |
           mkdir -p ~/.R
 
-          cat > ~/.R/Makevars.ucrt <<'EOF'
-          CC=D:/a/_temp/msys/ucrt64/bin/gcc.exe
-          CXX=D:/a/_temp/msys/ucrt64/bin/g++.exe
-          CXX11=D:/a/_temp/msys/ucrt64/bin/g++.exe
-          CXX14=D:/a/_temp/msys/ucrt64/bin/g++.exe
-          CXX17=D:/a/_temp/msys/ucrt64/bin/g++.exe
-          CXX20=D:/a/_temp/msys/ucrt64/bin/g++.exe
-          FC=D:/a/_temp/msys/ucrt64/bin/gfortran.exe
-          F77=D:/a/_temp/msys/ucrt64/bin/gfortran.exe
-          PKG_CFLAGS= -ID:/a/_temp/msys/ucrt64/include
-          CPPFLAGS+= -ID:/a/_temp/msys/ucrt64/include
-          LDFLAGS+= -LD:/a/_temp/msys/ucrt64/lib
-          EOF
-      - name: Configure R to use Clang and Mimalloc on Windows
-        if: runner.os == 'Windows' && matrix.config.compiler == 'clang'
-        shell: bash
-        run: |
-          mkdir -p ~/.R
-
-          cat > ~/.R/Makevars.ucrt <<'EOF'
-          CC=D:/a/_temp/msys/clang64/bin/clang.exe
-          CXX=D:/a/_temp/msys/clang64/bin/clang++.exe
-          CXX11=D:/a/_temp/msys/clang64/bin/clang++.exe
-          CXX14=D:/a/_temp/msys/clang64/bin/clang++.exe
-          CXX17=D:/a/_temp/msys/clang64/bin/clang++.exe
-          CXX20=D:/a/_temp/msys/clang64/bin/clang++.exe
-          FC=D:/a/_temp/msys/ucrt64/bin/gfortran.exe
-          F77=D:/a/_temp/msys/ucrt64/bin/gfortran.exe
-          PKG_CFLAGS= -ID:/a/_temp/msys/clang64/include
-          CPPFLAGS+= -ID:/a/_temp/msys/clang64/include
-          LDFLAGS+= -LD:/a/_temp/msys/clang64/lib
+          cat > ~/.R/Makevars.ucrt <<EOF
+          CC=${MSYS2_ROOT}/${MSYS2_PREFIX}/bin/${CC_NAME}
+          CXX=${MSYS2_ROOT}/${MSYS2_PREFIX}/bin/${CXX_NAME}
+          CXX11=${MSYS2_ROOT}/${MSYS2_PREFIX}/bin/${CXX_NAME}
+          CXX14=${MSYS2_ROOT}/${MSYS2_PREFIX}/bin/${CXX_NAME}
+          CXX17=${MSYS2_ROOT}/${MSYS2_PREFIX}/bin/${CXX_NAME}
+          CXX20=${MSYS2_ROOT}/${MSYS2_PREFIX}/bin/${CXX_NAME}
+          FC=${MSYS2_ROOT}/${MSYS2_PREFIX}/bin/${FC_NAME}
+          F77=${MSYS2_ROOT}/${MSYS2_PREFIX}/bin/${FC_NAME}
+          PKG_CFLAGS+=-I${MSYS2_ROOT}/${MSYS2_PREFIX}/include
+          CPPFLAGS+= -I${MSYS2_ROOT}/${MSYS2_PREFIX}/include
+          LDFLAGS+= -L${MSYS2_ROOT}/${MSYS2_PREFIX}/lib
           EOF
       - name: Show selected compiler configuration
         shell: bash
