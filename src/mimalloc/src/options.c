@@ -491,7 +491,7 @@ void _mi_fputs(mi_output_fun* out, void* arg, const char* prefix, const char* me
 // Define our own limited `fprintf` that avoids memory allocation.
 // We do this using `_mi_vsnprintf` with a limited buffer.
 static void mi_vfprintf( mi_output_fun* out, void* arg, const char* prefix, const char* fmt, va_list args ) {
-  char buf[992];
+  char buf[992] = {0};
   if (fmt==NULL) return;
   if (!mi_recurse_enter()) return;
   _mi_vsnprintf(buf, sizeof(buf)-1, fmt, args);
@@ -507,6 +507,9 @@ void _mi_fprintf( mi_output_fun* out, void* arg, const char* fmt, ... ) {
 }
 
 static void mi_vfprintf_thread(mi_output_fun* out, void* arg, const char* prefix, const char* fmt, va_list args) {
+  #if defined(MI_CRAN_COMPLIANT)
+  return;
+  #else
   if (prefix != NULL && _mi_strnlen(prefix,33) <= 32) { // && !_mi_is_main_thread()) {
     char tprefix[64];
     _mi_snprintf(tprefix, sizeof(tprefix), "%sthread 0x%tx: ", prefix, (uintptr_t)_mi_thread_id());
@@ -515,6 +518,7 @@ static void mi_vfprintf_thread(mi_output_fun* out, void* arg, const char* prefix
   else {
     mi_vfprintf(out, arg, prefix, fmt, args);
   }
+  #endif
 }
 
 void _mi_raw_message(const char* fmt, ...) {

@@ -162,7 +162,7 @@ static inline void mi_prim_tls_slot_set(size_t slot, void* value) {
 ---------------------------------------------------------------------------------------- */
 
 // Get a unique id for the current thread.
-#if defined(MI_PRIM_THREAD_ID)
+#if defined(MI_PRIM_THREAD_ID) || defined(MI_CRAN_COMPLIANT)
 static inline mi_threadid_t __mi_prim_thread_id(void) {
   return MI_PRIM_THREAD_ID();  // used for example by CPython for a free threaded build (see python/cpython#115488)
 }
