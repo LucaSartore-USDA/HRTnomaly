@@ -62,7 +62,7 @@ Depends: R (>= 4.5.0)
 Imports: dplyr, purrr, tidyr
 Suggests: knitr, rmarkdown, cellWise
 Encoding: UTF-8
-SystemRequirements: mimalloc (>= 2.0); C++17 compiler; C11 compiler
+SystemRequirements: C11 compiler
 LazyLoad: yes
 NeedsCompilation: yes
 ByteCompile: TRUE

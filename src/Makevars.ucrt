@@ -1,2 +1,15 @@
-PKG_CFLAGS += $(SHLIB_OPENMP_CFLAGS) $(C_INCLUDE_PATH)
-PKG_LIBS += $(SHLIB_OPENMP_CFLAGS) $(LIBRARY_PATH) -lpthread -lpsapi -lbcrypt -lmimalloc
+PKG_CFLAGS=$(SHLIB_OPENMP_CFLAGS) -I./mimalloc/include -DMI_OVERRIDE=0 -DMI_STATIC_LIB -DMI_XMALLOC=0 -DMI_SHOW_ERRORS=0 -DMI_SECURE=1 -DMI_CRAN_COMPLIANT=1
+PKG_LIBS=$(SHLIB_OPENMP_CFLAGS) -lpthread -lpsapi -lbcrypt
+PKG_CFLAGS += -Warray-bounds=0
+PKG_CXXFLAGS += -Warray-bounds=0
+
+SOURCES=HRTnomaly.c cellwise.c fuzzyHRT.c pif.c bayes_hppc.c dif.c gif.c post_thresh.c
+
+OBJECTS=mimalloc/static.o $(SOURCES:.c=.o)
+
+all: $(SHLIB)
+
+mimalloc/static.o: mimalloc/src/static.c
+	$(CC) -c $(ALL_CPPFLAGS) $(ALL_CFLAGS) $< -o $@
+
+$(SHLIB): mimalloc/static.o

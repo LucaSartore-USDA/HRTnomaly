@@ -2,8 +2,11 @@
     * The HRTnomaly package VERSION 26.9.10 has been created
     * Updated `DESCRIPTION` file with current information
     * Updated `README.md` file with current GitHub version
-    * Updated `inst/INSTALL.md` file with current GitHub version
     * Updated `src/Makevars.ucrt` to link to the "mimalloc" library
+    * The source code of the library `mimalloc` and its `LICENSE` file have
+      been reincluded in the `src` folder
+    * Updated `inst/INSTALL.md` file with current GitHub version and
+      third-party notice for including the library `mimalloc`
 
 2026-09-09 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 26.9.9 has been created

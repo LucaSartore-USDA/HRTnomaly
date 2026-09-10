@@ -67,3 +67,7 @@ To remove **HRTnomaly** from the list of R packages, it is necessary to type the
 ```{R}
 remove.packages("HRTnomaly")
 ```
+
+## Third-party notice
+
+The library [mimalloc](https://www.github.com/microsoft/mimalloc) is included in the source code folder [`src`](https://github.com/drwolf85/HRTnomaly/tree/master/src) and redistributed under [MTI license](https://github.com/drwolf85/HRTnomaly/blob/master/src/mimalloc/LICENSE).

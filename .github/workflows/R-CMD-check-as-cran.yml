@@ -30,58 +30,10 @@ jobs:
           - { os: ubuntu-latest, r: 'release', compiler: 'clang', experimental: false }
           - { os: ubuntu-latest, r: 'devel',   compiler: 'clang', experimental: false, http-user-agent: 'release' }
 
-          - {
-              os: windows-latest,
-              r: 'release',
-              compiler: 'gcc',
-              experimental: true,
-              msystem: 'UCRT64',
-              prefix: 'ucrt64',
-              c_compiler: 'gcc.exe',
-              cxx_compiler: 'g++.exe',
-              fc_compiler: 'gfortran.exe',
-              toolchain_pkg: 'mingw-w64-ucrt-x86_64-toolchain',
-              mimalloc_pkg: 'mingw-w64-ucrt-x86_64-mimalloc'
-            }
-          - {
-              os: windows-latest,
-              r: 'devel',
-              compiler: 'gcc',
-              experimental: true,
-              msystem: 'UCRT64',
-              prefix: 'ucrt64',
-              c_compiler: 'gcc.exe',
-              cxx_compiler: 'g++.exe',
-              fc_compiler: 'gfortran.exe',
-              toolchain_pkg: 'mingw-w64-ucrt-x86_64-toolchain',
-              mimalloc_pkg: 'mingw-w64-ucrt-x86_64-mimalloc'
-            }
-          - {
-              os: windows-latest,
-              r: 'release',
-              compiler: 'clang',
-              experimental: true,
-              msystem: 'CLANG64',
-              prefix: 'clang64',
-              c_compiler: 'clang.exe',
-              cxx_compiler: 'clang++.exe',
-              fc_compiler: 'gfortran.exe',
-              toolchain_pkg: 'mingw-w64-clang-x86_64-toolchain',
-              mimalloc_pkg: 'mingw-w64-clang-x86_64-mimalloc'
-            }
-          - {
-              os: windows-latest,
-              r: 'devel',
-              compiler: 'clang',
-              experimental: true,
-              msystem: 'CLANG64',
-              prefix: 'clang64',
-              c_compiler: 'clang.exe',
-              cxx_compiler: 'clang++.exe',
-              fc_compiler: 'gfortran.exe',
-              toolchain_pkg: 'mingw-w64-clang-x86_64-toolchain',
-              mimalloc_pkg: 'mingw-w64-clang-x86_64-mimalloc'
-            }
+          - { os: windows-latest, r: 'release', compiler: 'gcc',   experimental: false }
+          - { os: windows-latest, r: 'devel',   compiler: 'gcc',   experimental: false}
+          - { os: windows-latest, r: 'release', compiler: 'clang', experimental: false }
+          - { os: windows-latest, r: 'devel',   compiler: 'clang', experimental: false }
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
@@ -109,7 +61,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get upgrade -y
-          sudo apt-get install -y gcc g++ gfortran libmimalloc-dev
+          sudo apt-get install -y gcc g++ gfortran 
+          # sudo apt-get install -y libmimalloc-dev
 
       - name: Configure R to use GCC on Linux
         if: runner.os == 'Linux' && matrix.config.compiler == 'gcc'
@@ -141,7 +94,8 @@ jobs:
             sudo tee /etc/apt/sources.list.d/llvm.list > /dev/null
           sudo apt-get update
           sudo apt-get upgrade -y
-          sudo apt-get install -y clang-23 libomp-23-dev libmimalloc-dev
+          sudo apt-get install -y clang-23 libomp-23-dev
+          # sudo apt-get install -y libmimalloc-dev
 
       - name: Configure R to use Clang with OpenMP on Linux
         if: runner.os == 'Linux' && matrix.config.compiler == 'clang'
@@ -174,11 +128,12 @@ jobs:
         shell: bash
         run: |
           brew update
-          brew install llvm libomp mimalloc
+          brew install llvm libomp 
+          # brew install mimalloc
 
           LLVM_PREFIX="$(brew --prefix llvm)"
           BREW_PREFIX="$(brew --prefix)"
-          MIMALLOC_PREFIX="$(brew --prefix mimalloc)"
+          # MIMALLOC_PREFIX="$(brew --prefix mimalloc)"
 
           echo "${LLVM_PREFIX}/bin" >> "${GITHUB_PATH}"
 
@@ -190,54 +145,13 @@ jobs:
           CXX14=${LLVM_PREFIX}/bin/clang++
           CXX17=${LLVM_PREFIX}/bin/clang++
           CXX20=${LLVM_PREFIX}/bin/clang++
-          CPPFLAGS=-I${LLVM_PREFIX}/include -I${BREW_PREFIX}/include -I${MIMALLOC_PREFIX}/include
-          LDFLAGS=-L${LLVM_PREFIX}/lib -L${BREW_PREFIX}/lib -L${MIMALLOC_PREFIX}/lib
+          # CPPFLAGS=-I${LLVM_PREFIX}/include -I${BREW_PREFIX}/include -I${MIMALLOC_PREFIX}/include
+          # LDFLAGS=-L${LLVM_PREFIX}/lib -L${BREW_PREFIX}/lib -L${MIMALLOC_PREFIX}/lib
           
       # --------------------------------------------------------------------
       # Windows compiler setup
       # --------------------------------------------------------------------
 
-      - name: Setup MSYS2 toolchain on Windows
-        id: msys2
-        if: runner.os == 'Windows'
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: ${{ matrix.config.msystem }}
-          update: true
-          install: >-
-            ${{ matrix.config.toolchain_pkg }}
-            ${{ matrix.config.mimalloc_pkg }}
-
-      - name: Configure R on Windows
-        if: runner.os == 'Windows'
-        shell: bash
-        env:
-          MSYS2_ROOT: ${{ steps.msys2.outputs.msys2-location }}
-          MSYS2_PREFIX: ${{ matrix.config.prefix }}
-          CC_NAME: ${{ matrix.config.c_compiler }}
-          CXX_NAME: ${{ matrix.config.cxx_compiler }}
-          FC_NAME: ${{ matrix.config.fc_compiler }}
-        run: |
-          mkdir -p ~/.R
-
-          cat > ~/.R/Makevars.ucrt <<EOF
-          CC=${MSYS2_ROOT}/${MSYS2_PREFIX}/bin/${CC_NAME}
-          CXX=${MSYS2_ROOT}/${MSYS2_PREFIX}/bin/${CXX_NAME}
-          CXX11=${MSYS2_ROOT}/${MSYS2_PREFIX}/bin/${CXX_NAME}
-          CXX14=${MSYS2_ROOT}/${MSYS2_PREFIX}/bin/${CXX_NAME}
-          CXX17=${MSYS2_ROOT}/${MSYS2_PREFIX}/bin/${CXX_NAME}
-          CXX20=${MSYS2_ROOT}/${MSYS2_PREFIX}/bin/${CXX_NAME}
-          FC=${MSYS2_ROOT}/${MSYS2_PREFIX}/bin/${FC_NAME}
-          F77=${MSYS2_ROOT}/${MSYS2_PREFIX}/bin/${FC_NAME}
-          PKG_CFLAGS+=-I${MSYS2_ROOT}/${MSYS2_PREFIX}/include
-          CPPFLAGS+= -I${MSYS2_ROOT}/${MSYS2_PREFIX}/include
-          LDFLAGS+= -L${MSYS2_ROOT}/${MSYS2_PREFIX}/lib
-          EOF
-
-          export C_INCLUDE_PATH="${C_INCLUDE_PATH};${MSYS2_ROOT}/${MSYS2_PREFIX}/include"
-          export CPLUS_INCLUDE_PATH="${CPLUS_INCLUDE_PATH};${MSYS2_ROOT}/${MSYS2_PREFIX}/include"
-          export LIBRARY_PATH="${LIBRARY_PATH};${MSYS2_ROOT}/${MSYS2_PREFIX}/lib"
-          
       - name: Show selected compiler configuration
         shell: bash
         run: |
