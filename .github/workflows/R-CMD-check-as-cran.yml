@@ -233,6 +233,10 @@ jobs:
           CPPFLAGS+= -I${MSYS2_ROOT}/${MSYS2_PREFIX}/include
           LDFLAGS+= -L${MSYS2_ROOT}/${MSYS2_PREFIX}/lib
           EOF
+
+          export C_INCLUDE_PATH="${C_INCLUDE_PATH};${MSYS2_ROOT}/${MSYS2_PREFIX}/include"
+          export CPLUS_INCLUDE_PATH="${CPLUS_INCLUDE_PATH};${MSYS2_ROOT}/${MSYS2_PREFIX}/include"
+          export LIBRARY_PATH="${LIBRARY_PATH};${MSYS2_ROOT}/${MSYS2_PREFIX}/lib"
       - name: Show selected compiler configuration
         shell: bash
         run: |
