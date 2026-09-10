@@ -311,6 +311,9 @@ static void mi_out_num(uintmax_t x, size_t base, char prefix, char** out, char* 
 #define MI_NEXTC()  c = *in; if (c==0) break; in++;
 
 int _mi_vsnprintf(char* buf, size_t bufsize, const char* fmt, va_list args) {
+  #if defined(MI_CRAN_COMPLIANT)
+  return 0;  // disable vsnprintf for CRAN compliance
+  #endif
   if (buf == NULL || bufsize == 0 || fmt == NULL) return 0;
   buf[bufsize - 1] = 0;
   char* const end = buf + (bufsize - 1);
