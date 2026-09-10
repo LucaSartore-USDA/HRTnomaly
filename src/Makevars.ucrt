@@ -1,3 +1,13 @@
 PKG_CFLAGS+=$(SHLIB_OPENMP_CFLAGS) -I$(R_TOOLS_SOFT)/include
 PKG_LIBS+=$(SHLIB_OPENMP_CFLAGS) -lpthread -lpsapi -lbcrypt
-PKG_LIBS += -L$(R_TOOLS_SOFT)/lib$(R_ARCH) -lmimalloc
+
+MIMALLOC_LIB := $(firstword $(wildcard $(R_TOOLS_SOFT)/lib/libmimalloc.a) $(wildcard $(R_TOOLS_SOFT)/lib/libmimalloc.a))
+
+ifeq ($(MIMALLOC_LIB),)
+$(R_TOOLS_SOFT)/bin/pacman -S --needed mingw-w64-ucrt-x86_64-mimalloc
+MIMALLOC_LIB := $(firstword $(wildcard $(R_TOOLS_SOFT)/lib/libmimalloc.a) $(wildcard $(R_TOOLS_SOFT)/lib/libmimalloc.a))
+endif
+
+ifneq ($(MIMALLOC_LIB),)
+PKG_LIBS += -L$(dir $(MIMALLOC_LIB)) -lmimalloc
+endif
