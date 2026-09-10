@@ -1,2 +1,2 @@
-PKG_CFLAGS += $(SHLIB_OPENMP_CFLAGS)
-PKG_LIBS += $(SHLIB_OPENMP_CFLAGS) -lpthread -lpsapi -lbcrypt -lmimalloc
+PKG_CFLAGS += $(SHLIB_OPENMP_CFLAGS) $(C_INCLUDE_PATH)
+PKG_LIBS += $(SHLIB_OPENMP_CFLAGS) $(LIBRARY_PATH) -lpthread -lpsapi -lbcrypt -lmimalloc
