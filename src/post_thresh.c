@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <math.h>
-#include <mimalloc.h>
+#include "allocator.h"
 #include "myomp.h"
 
 #define RAND_MAX_PCG32 (~(uint32_t) 0)

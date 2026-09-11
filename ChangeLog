@@ -3,7 +3,10 @@
     * Updated `DESCRIPTION` file with current information
     * Updated `README.md` file with current GitHub version
     * Updated `inst/INSTALL.md` file with current GitHub version
-    * Updated `src/Makevars.ucrt` to link to the "mimalloc" library
+    * Replaced the external "mimalloc" dependency with the standard C allocator
+      to support portable source installation
+    * Removed package-manager calls from the Windows build configuration
+    * Corrected native DLL selectors in `dif()`, `gif()`, and `pif()`
 
 2026-09-09 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 26.9.9 has been created

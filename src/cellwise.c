@@ -4,7 +4,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
-#include <mimalloc.h>
+#include "allocator.h"
 #include "myomp.h"
 
 #define EPS_TOLL 1e-10
