@@ -1,5 +1,6 @@
 #' @name print.checkwise
 #' @aliases print.checkwise
+#' @rdname print.checkwise
 #' @title A Method to Print the Accuracy of Outlier Classification Results
 #' @description
 #' The function prints the confusion matrix and accuracy results previously computed with the function \code{class_check}.
