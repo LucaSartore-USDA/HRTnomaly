@@ -13,8 +13,8 @@ terms of the MIT license. A copy of the license can be found in the file
 #include <stdio.h>   // fputs, stderr
 #include <stdlib.h>  // atexit
 
-#ifdef MI_CRAN_COMPLIANT
-#include "mimalloc/HRTteb.h"  // for MYCurrentTeb
+#if defined(MI_CRAN_COMPLIANT) && defined(_WIN32)
+#include <HRTteb.h>  // for MYCurrentTeb
 #endif
 
 
@@ -746,7 +746,7 @@ bool _mi_prim_thread_is_in_threadpool(void) {
   if (win_major_version >= 6) {
     // check if this thread belongs to a windows threadpool
     // see: <https://www.geoffchappell.com/studies/windows/km/ntoskrnl/inc/api/pebteb/teb/index.htm>
-    #if defined(MI_CRAN_COMPLIANT)
+    #if defined(MI_CRAN_COMPLIANT) && defined(_WIN32)
     uint8_t* const teb = MyCurrentTeb();
     uint8_t* const step = (uint8_t*)(MI_SIZE_BITS == 32 ? 0x0F90 : 0x1778);
     void* const pool_data = *(void**)(teb + step);
@@ -803,7 +803,7 @@ static void NTAPI mi_win_main(PVOID module, DWORD reason, LPVOID reserved) {
 
 #if defined(MI_WIN_INIT_USE_CRT_TLS)
   #if !defined(__MINGW32__) || defined(MI_MINGW_UCRT64)  // on mingw without UCRT use the constructor attribute (in `src/prim/prim.c`)
-  #define MI_PRIM_HAS_PROCESS_ATTACH  1   
+  #define MI_PRIM_HAS_PROCESS_ATTACH  1
   #endif
 
   // nothing to do since `_mi_thread_done` is handled through the DLL_THREAD_DETACH event.
@@ -1210,4 +1210,3 @@ static void NTAPI mi_win_main(PVOID module, DWORD reason, LPVOID reserved) {
     mi_allocator_done();
   }
 #endif
-

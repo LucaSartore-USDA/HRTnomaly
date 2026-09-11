@@ -11,8 +11,8 @@ terms of the MIT license. A copy of the license can be found in the file
 #include "types.h"
 #include "internal.h"             // mi_decl_hidden
 
-#if defined(MI_CRAN_COMPLIANT)
-#include "HRTteb.h"
+#if defined(MI_CRAN_COMPLIANT) && defined(_WIN32)
+#include <HRTteb.h>
 #endif
 
 // --------------------------------------------------------------------------
@@ -285,7 +285,7 @@ static inline mi_theap_t* _mi_theap_default(void) {
   pthread_key_t key = mi_atomic_load_relaxed(&_mi_theap_default_key);
   #if defined(__APPLE__) && defined(__aarch64__) && MI_HAS_TLS_SLOT
   // on apple arm64, the pthread specific slots are direct slots; inline it to avoid a stack frame setup in `mi_malloc`
-  // todo: this is probably also the case on x64 and power pc?  
+  // todo: this is probably also the case on x64 and power pc?
   if (key == MI_PTHREAD_KEY_INVALID) return NULL;
   return (mi_theap_t*)mi_prim_tls_slot(key);
   #else
