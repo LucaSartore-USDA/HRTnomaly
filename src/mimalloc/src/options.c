@@ -491,27 +491,19 @@ void _mi_fputs(mi_output_fun* out, void* arg, const char* prefix, const char* me
 // Define our own limited `fprintf` that avoids memory allocation.
 // We do this using `_mi_vsnprintf` with a limited buffer.
 static void mi_vfprintf( mi_output_fun* out, void* arg, const char* prefix, const char* fmt, va_list args ) {
-  #if defined(MI_CRAN_COMPLIANT)
-  return;
-  #else
   char buf[992] = {0};
   if (fmt==NULL) return;
   if (!mi_recurse_enter()) return;
   _mi_vsnprintf(buf, sizeof(buf)-1, fmt, args);
   mi_recurse_exit();
   _mi_fputs(out,arg,prefix,buf);
-  #endif
 }
 
 void _mi_fprintf( mi_output_fun* out, void* arg, const char* fmt, ... ) {
-  #if defined(MI_CRAN_COMPLIANT)
-  return;
-  #else
   va_list args;
   va_start(args,fmt);
   mi_vfprintf(out,arg,NULL,fmt,args);
   va_end(args);
-  #endif
 }
 
 static void mi_vfprintf_thread(mi_output_fun* out, void* arg, const char* prefix, const char* fmt, va_list args) {
@@ -530,38 +522,26 @@ static void mi_vfprintf_thread(mi_output_fun* out, void* arg, const char* prefix
 }
 
 void _mi_raw_message(const char* fmt, ...) {
-  #if defined(MI_CRAN_COMPLIANT)
-  return;
-  #else
   va_list args;
   va_start(args, fmt);
   mi_vfprintf(NULL, NULL, NULL, fmt, args);
   va_end(args);
-  #endif
 }
 
 void _mi_trace_message(const char* fmt, ...) {
-  #if defined(MI_CRAN_COMPLIANT)
-  return;
-  #else
   if (mi_option_get(mi_option_verbose) <= 1) return;  // only with verbose level 2 or higher
   va_list args;
   va_start(args, fmt);
   mi_vfprintf_thread(NULL, NULL, "mimalloc: ", fmt, args);
   va_end(args);
-  #endif
 }
 
 void _mi_verbose_message(const char* fmt, ...) {
-  #if defined(MI_CRAN_COMPLIANT)
-  return;
-  #else
   if (!mi_option_is_enabled(mi_option_verbose)) return;
   va_list args;
   va_start(args,fmt);
   mi_vfprintf(NULL, NULL, "mimalloc: ", fmt, args);
   va_end(args);
-  #endif
 }
 
 static void mi_show_error_message(const char* fmt, va_list args) {
@@ -569,17 +549,10 @@ static void mi_show_error_message(const char* fmt, va_list args) {
     if (!mi_option_is_enabled(mi_option_show_errors)) return;
     if (mi_max_error_count >= 0 && (long)mi_atomic_increment_acq_rel(&error_count) > mi_max_error_count) return;
   }
-  #if defined(MI_CRAN_COMPLIANT)
-  return;
-  #else
   mi_vfprintf_thread(NULL, NULL, "mimalloc: error: ", fmt, args);
-  #endif
 }
 
 void _mi_warning_message(const char* fmt, ...) {
-  #if defined(MI_CRAN_COMPLIANT)
-  return;
-  #else
   if (!mi_option_is_enabled(mi_option_verbose)) {
     if (!mi_option_is_enabled(mi_option_show_errors)) return;
     if (mi_max_warning_count >= 0 && (long)mi_atomic_increment_acq_rel(&warning_count) > mi_max_warning_count) return;
@@ -588,7 +561,6 @@ void _mi_warning_message(const char* fmt, ...) {
   va_start(args,fmt);
   mi_vfprintf_thread(NULL, NULL, "mimalloc: warning: ", fmt, args);
   va_end(args);
-  #endif
 }
 
 
