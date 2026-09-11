@@ -4,7 +4,7 @@
 \alias{bayeswise}
 \title{Calculate Cellwise Flags for Anomaly Detection Using Robust Bayesian Methods}
 \usage{
-bayeswise(a, prior = NULL, epochs = 1000L, weighted = NULL, ...)
+bayeswise(a, prior = NULL, epochs = 1000L, weighted = NULL, \dots)
 }
 \arguments{
 \item{a}{A long-format \code{data.frame} object with survey data. For details see information on the data format.}
@@ -15,7 +15,7 @@ bayeswise(a, prior = NULL, epochs = 1000L, weighted = NULL, ...)
 
 \item{weighted}{A string indicating the isolation forest algorithm (\code{"\link{dif}"}, \code{"\link{gif}"} or \code{"\link{pif}"}) to use for weighted calculations. If \code{NULL}, the algorithm will use unweighted calculations by default.}
 
-\item{...}{Additional arguments that are passed to the functions executing the isolation algorihtms (or not used if \code{weighted = NULL}).}
+\item{\dots}{Additional arguments that are passed to the functions executing the isolation algorihtms (or not used if \code{weighted = NULL}).}
 }
 \value{
 A data frame with the same columns as the input data frame, plus the following additional columns:

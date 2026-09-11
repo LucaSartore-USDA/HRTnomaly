@@ -7,11 +7,13 @@
 #' The first vector contains the anomaly scores as numbers between zero and one, and the second vector provides 
 #' a set of logical values indicating whether the data entry is an outlier (\code{TRUE}) or not (\code{FALSE}).
 #'
+#' @usage cellwise(a, contamination = 0.08, epochs = 1000L, weighted = NULL, \dots)
+#' 
 #' @param a A long-format \code{data.frame} object with survey data. For details see information on the data format.
 #' @param contamination A number between zero and one used as a threshold when identifying outliers from the fuzzy scores. By default, the algorithm will identify 8\% of the records as anomalies.
 #' @param epochs Number of epochs used to train a nontrivial robust linear model via the lion algorithm. By default, the algorithm will run 1000 iterations.
 #' @param weighted A string indicating the isolation forest algorithm (\code{"\link{dif}"}, \code{"\link{gif}"} or \code{"\link{pif}"}) to use for weighted calculations. If \code{NULL}, the algorithm will use unweighted calculations by default.
-#' @param ... Additional arguments that are passed to the functions executing the isolation algorihtms (or not used if \code{weighted = NULL}).
+#' @param \dots Additional arguments that are passed to the functions executing the isolation algorihtms (or not used if \code{weighted = NULL}).
 #'
 #' @details The argument \code{a} is proivded as an object of class \code{data.frame}.
 #' This object is considered as a long-format \code{data.frame}, and it must have at least five columns with the following names:
@@ -37,7 +39,9 @@
 #'     \item{outlier}{A boolean indicating whether the cell is an outlier.}
 #'     \item{anomaly_flag}{A character string indicating the type of anomaly detected, if any.}
 #'   }
+#' 
 #' @author Luca Sartore \email{drwolf85@gmail.com}
+#' 
 #' @examples
 #' # Load the package
 #' library(HRTnomaly)

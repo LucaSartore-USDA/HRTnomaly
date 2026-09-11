@@ -1,15 +1,19 @@
 #' @name bootHRT
 #' @aliases bootHRT
 #' @title Calculate Cellwise Flags for Anomaly Detection Using Bayesian Bootstrap
+#' 
 #' @description
 #' The function uses Bayesian bootstrap to determine if a data entry is an outlier or not.
 #' The function takes a long-format \code{data.frame} object as input and returns it with appended vectors.
 #' The output includes flags for different quantiles and means of the contamination threshold distribution.
+#' 
 #' @usage bootHRT(a, contamination = 0.08, boot_max_it = 1000L)
+#' 
 #' @param a A long-format \code{data.frame} object with survey data. For details see information on the data format.
 #' @param contamination A number between zero and one used as a threshold when identifying outliers from the fuzzy scores.
 #' By default, the algorithm will identify approximately 8\% of the data entries as anomalies.
 #' @param boot_max_it An integer number determining the iterations performed by Bayesian bootstrap algorithm. It is set to \code{1000} by default.
+#' 
 #' @details
 #' The argument \code{a} is provided as an object of class \code{data.frame}.
 #' This object is considered as a long-format \code{data.frame}, and it must have at least five columns with the following names:
@@ -22,6 +26,7 @@
 #' The \code{data.frame} object in input can have more columns, but the extra columns would be ignored in the analyses.
 #' However, these extra columns would be preserved in the system memory and returned along with the results from the cellwise outlier-detection analysis.
 #' The use of the R-packages \code{dplyr}, \code{purrr}, and \code{tidyr} is highly recommended to simplify the conversion of datasets between long and wide formats.
+#' 
 #' @return A data frame with the same columns as the input data frame, plus the following additional columns:
 #'   \describe{
 #'     \item{score}{The raw anomaly score for each cell.}
@@ -34,7 +39,9 @@
 #'     \item{anomaly_flag}{A character string indicating the type of anomaly detected, if any (e.g., "h", "t", "r").}
 #'   }
 #'   The returned object also includes an attribute \code{"thresholds"} which is a numeric vector of length \code{boot_max_it} containing samples from the posterior distribution of the contamination threshold.
+#' 
 #' @author Luca Sartore \email{drwolf85@gmail.com}
+#' 
 #' @examples
 #' # Load the package
 #' library(HRTnomaly)
@@ -43,6 +50,7 @@
 #' data(toy)
 #' # Detect cellwise outliers
 #' res <- bootHRT(toy, boot_max_it = 10)
+#' 
 #' @keywords outliers distribution probability
 #' @export
 bootHRT <- function(a, contamination = 0.08, boot_max_it = 1000L) {

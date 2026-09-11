@@ -16,10 +16,24 @@
     * Include a header file in `src/mimalloc/HRTteb.h` to replace the
       function `NTCurrentTEB()` with `MyCurrentTEB()`
     * Included roxygen2 code for package documentation in `R/HRTnomaly.R`
-    * Updated `NAMESPACE` to export S3 class `checkwise` and related
-      S3method `HRTnomaly::print.checkwise`
+    * Updated `NAMESPACE` accordingly to the new CRAN guidelines
+    * Created `R/toy.R` to include the roxygen2 documentation for the dataset
+      in `data/toy.rda`
+    * Updated `man/toy.Rd` to include link to the "source" of the dataset
+    * Updated `man/bayeswise.Rd` by replacing `...` with `\dots`
+    * Updated `man/print.checkwise.Rd` by replacing `...` with `\dots` and
+      the string `\method` with `\S3method`
     * Included the roxygen2-tag `@rdname` for the S3method in the
       file `R/print.checkwise.R`
+    * Updated roxygen2 code in `R/bayeswise.R`
+    * Updated roxygen2 code in `R/bootHRT.R`
+    * Updated roxygen2 code in `R/cellwise.R`
+    * Updated roxygen2 code in `R/class_check.R`
+    * Updated roxygen2 code in `R/dif.R`
+    * Updated roxygen2 code in `R/fuzzyHRT.R`
+    * Updated roxygen2 code in `R/git.R`
+    * Updated roxygen2 code in `R/pif.R`
+    * Updated roxygen2 code in `R/setCores.R`
 
 2026-09-10 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 26.9.10 has been created

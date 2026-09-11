@@ -6,7 +6,7 @@
 \title{Toy dataset}
 
 \description{
-Synthetically produced data are provided to test the FuzzyHRT algorithm.
+Synthetically produced data are provided to test the algorithms in the package.
 }
 
 \usage{data(toy)}
@@ -21,6 +21,8 @@ Synthetically produced data are provided to test the FuzzyHRT algorithm.
   \item{\code{pred_value}}{a numeric value with the previously synthetic observation}
  }
 }
+
+\source{\href{https://www.github.com/drwolf85/HRTnomaly/blob/master/data/toy.rda}{HRTnomaly} R package.}
 
 \examples{
 # Load the package

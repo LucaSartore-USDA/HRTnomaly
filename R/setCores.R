@@ -15,7 +15,9 @@
 #' @return The total number of CPU cores in use will be returned and a message will be displayed. If the package was not complied with the library OpenMP (>= 3.0), the value one will be returned.
 #' 
 #' @references SunTM ONE Studio 8 (2003) \emph{OpenMP API User's Guide}. Sun Microsystems Inc., Santa Clara, U.S.A.
+#' 
 #' @author Luca Sartore \email{drwolf85@gmail.com}
+#' 
 #' @examples \donttest{
 #' #Display the number of CPU cores in use
 #' setCores()
@@ -27,7 +29,7 @@
 #' setCores(1)
 #' }
 #' @keywords programming
-NULL
+#' @export 
 setCores <-
 function(n) {
 

@@ -1,14 +1,16 @@
-#' @import dplyr
-#' @import purrr
-#' @import tidyr
-#' @importFrom stats quantile
-#' @importFrom stats model.matrix
-#' @importFrom stats na.omit
-#' @importFrom stats sd
-#' @useDynLib HRTnomaly, .registration = TRUE
-#' @exportPattern ^[[:alpha:]]+
-#' @exportS3Method print checkwise
-#' 
+#' @rawNamespace import(dplyr)
+#' @rawNamespace import(purrr)
+#' @rawNamespace import(tidyr)
+#' @rawNamespace importFrom("stats", "quantile")
+#' @rawNamespace importFrom("stats", "model.matrix")
+#' @rawNamespace importFrom("stats", "na.omit")
+#' @rawNamespace importFrom("stats", "sd")
+#' @rawNamespace exportPattern("^[^.]")
+#' @rawNamespace export(.onLoad)
+#' @rawNamespace export(.onAttach)
+#' @rawNamespace useDynLib(HRTnomaly, .registration = TRUE, .fixes = "F_HRT_")
+#' @rawNamespace S3method(HRTnomaly::print, checkwise)
+#'
 #' @name HRTnomaly-package
 #' 
 #' @docType package
