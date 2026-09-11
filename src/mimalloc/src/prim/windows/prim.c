@@ -747,7 +747,7 @@ bool _mi_prim_thread_is_in_threadpool(void) {
     // check if this thread belongs to a windows threadpool
     // see: <https://www.geoffchappell.com/studies/windows/km/ntoskrnl/inc/api/pebteb/teb/index.htm>
     #if defined(MI_CRAN_COMPLIANT) && defined(_WIN32)
-    uint8_t* const teb = MyCurrentTeb();
+    uint8_t* const teb = MYCurrentTeb();
     uint8_t* const step = (uint8_t*)(MI_SIZE_BITS == 32 ? 0x0F90 : 0x1778);
     void* const pool_data = *(void**)(teb + step);
     #else
