@@ -35,7 +35,7 @@ jobs:
           - { os: windows-latest, r: 'release', compiler: 'clang', experimental: false }
           - { os: windows-latest, r: 'devel',   compiler: 'clang', experimental: false }
     env:
-      NOT_CRAN: false
+      NOT_CRAN: true
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
 
