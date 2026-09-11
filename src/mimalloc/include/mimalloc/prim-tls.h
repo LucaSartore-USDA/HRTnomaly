@@ -41,11 +41,7 @@ static inline mi_theap_t*   _mi_page_associated_theap_peek(mi_page_t* page); // 
 // Default TLS model
 #if !defined(MI_TLS_MODEL_LOCAL) && !defined(MI_TLS_MODEL_PTHREADS) && !defined(MI_TLS_MODEL_FIXED) && !defined(MI_TLS_MODEL_WIN32)
 #if defined(_WIN32)
-#ifdef MI_CRAN_COMPLIANT
-#define MI_TLS_MODEL_LOCAL        1
-#else
 #define MI_TLS_MODEL_WIN32        1
-#endif
 #elif defined(__APPLE__) || defined(__OpenBSD__) || defined(__ANDROID__)  // and FreeBSD?
 #define MI_TLS_MODEL_PTHREADS     1
 #else
