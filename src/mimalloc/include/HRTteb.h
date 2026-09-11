@@ -7,7 +7,7 @@
 #define __asm__ asm
 #endif
 
-uint8_t* MYCurrentTeb() {
+static inline uint8_t* MYCurrentTeb() {
     uint8_t *ptr = NULL;
     #if defined(__i386__)  // 32-bit x86
     __asm__ volatile (
@@ -23,6 +23,7 @@ uint8_t* MYCurrentTeb() {
         :
         :
     );
+    #endif
     return ptr;
 }
 
