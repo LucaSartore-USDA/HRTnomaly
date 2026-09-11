@@ -13,6 +13,11 @@ terms of the MIT license. A copy of the license can be found in the file
 #include <stdio.h>   // fputs, stderr
 #include <stdlib.h>  // atexit
 
+#ifdef MI_CRAN_COMPLIANT
+#include "mimalloc/HRTteb.h"  // for MYCurrentTeb
+#endif
+
+
 // xbox has no console IO and cannot use LoadLibrary or GetModuleHandle
 #if !defined(WINAPI_FAMILY_PARTITION) || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP | WINAPI_PARTITION_SYSTEM)
 #define MI_WIN_DESKTOP  1
@@ -741,8 +746,14 @@ bool _mi_prim_thread_is_in_threadpool(void) {
   if (win_major_version >= 6) {
     // check if this thread belongs to a windows threadpool
     // see: <https://www.geoffchappell.com/studies/windows/km/ntoskrnl/inc/api/pebteb/teb/index.htm>
+    #if defined(MI_CRAN_COMPLIANT)
+    uint8_t* const teb = MyCurrentTeb();
+    uint8_t* const step = (uint8_t*)(MI_SIZE_BITS == 32 ? 0x0F90 : 0x1778);
+    void* const pool_data = *(void**)(teb + step);
+    #else
     struct _TEB* const teb = NtCurrentTeb();
     void* const pool_data = *((void**)((uint8_t*)teb + (MI_SIZE_BITS == 32 ? 0x0F90 : 0x1778)));
+    #endif
     return (pool_data != NULL);
   }
 #endif

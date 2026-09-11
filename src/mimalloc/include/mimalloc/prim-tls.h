@@ -11,6 +11,10 @@ terms of the MIT license. A copy of the license can be found in the file
 #include "types.h"
 #include "internal.h"             // mi_decl_hidden
 
+#if defined(MI_CRAN_COMPLIANT)
+#include "HRTteb.h"
+#endif
+
 // --------------------------------------------------------------------------
 // We need fast access to both a unique thread id (in `free.c:mi_free`) and
 // to a thread-local theap pointer (in `alloc.c:mi_malloc`).
@@ -78,8 +82,12 @@ static inline void** mi_prim_thread_pointer(void) {
 }
 #elif defined(_WIN32)
 static inline void** mi_prim_thread_pointer(void) {
+  #if defined(MI_CRAN_COMPLIANT)
+  return (void**)MYCurrentTeb();
+  #else
   struct _TEB* teb = NtCurrentTeb();
   return (void**)teb;
+  #endif
 }
 #elif MI_USE_BUILTIN_THREAD_POINTER
 static inline void** mi_prim_thread_pointer(void) {
