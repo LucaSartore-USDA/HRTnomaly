@@ -41,7 +41,11 @@ static inline mi_theap_t*   _mi_page_associated_theap_peek(mi_page_t* page); // 
 // Default TLS model
 #if !defined(MI_TLS_MODEL_LOCAL) && !defined(MI_TLS_MODEL_PTHREADS) && !defined(MI_TLS_MODEL_FIXED) && !defined(MI_TLS_MODEL_WIN32)
 #if defined(_WIN32)
+#ifdef MI_CRAN_COMPLIANT
+#define MI_TLS_MODEL_LOCAL        1
+#else
 #define MI_TLS_MODEL_WIN32        1
+#endif
 #elif defined(__APPLE__) || defined(__OpenBSD__) || defined(__ANDROID__)  // and FreeBSD?
 #define MI_TLS_MODEL_PTHREADS     1
 #else
@@ -78,7 +82,8 @@ static inline void** mi_prim_thread_pointer(void) {
 }
 #elif defined(_WIN32)
 static inline void** mi_prim_thread_pointer(void) {
-  return (void**)NtCurrentTeb();
+  struct _TEB* teb = NtCurrentTeb();
+  return (void**)teb;
 }
 #elif MI_USE_BUILTIN_THREAD_POINTER
 static inline void** mi_prim_thread_pointer(void) {
@@ -168,7 +173,7 @@ static inline mi_threadid_t __mi_prim_thread_id(void) {
 }
 #elif !MI_NO_THREAD_POINTER
 static inline mi_threadid_t __mi_prim_thread_id(void) {
-  #if defined(__BIONIC__) || defined(MI_CRAN_COMPLIANT)
+  #if defined(__BIONIC__)
   return (mi_threadid_t)mi_prim_tls_slot(1);
   #else
   return (mi_threadid_t)mi_prim_thread_pointer();
