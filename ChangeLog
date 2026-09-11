@@ -15,6 +15,9 @@
       in `src/mimalloc/src/prim.c`
     * Include a header file in `src/mimalloc/HRTteb.h` to replace the
       function `NTCurrentTEB()` with `MyCurrentTEB()`
+    * Included roxygen2 code for package documentation in `R/HRTnomaly.R`
+    * Updated `NAMESPACE` to export S3 class `checkwise` and related
+      S3method `HRTnomaly::print.checkwise`
 
 2026-09-10 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 26.9.10 has been created
