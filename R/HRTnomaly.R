@@ -7,7 +7,6 @@
 #' @importFrom stats sd
 #' @useDynLib HRTnomaly, .registration = TRUE
 #' @exportPattern ^[[:alpha:]]+
-#' @exportClass checkwise
 #' @exportS3Method print checkwise
 #' 
 #' @name HRTnomaly-package
@@ -19,6 +18,7 @@
 #' @title HRTnomaly
 #' 
 #' @description
+#' \if{html}{\figure{logo.svg}{options: style='float:right;width:166px;height:192px;padding:2px;'}}
 #' Enhanced Anomaly Detection for Historical, Relational, and Tail Cellwise Outlier
 #' 
 #' @details 

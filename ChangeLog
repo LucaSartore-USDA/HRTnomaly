@@ -18,6 +18,8 @@
     * Included roxygen2 code for package documentation in `R/HRTnomaly.R`
     * Updated `NAMESPACE` to export S3 class `checkwise` and related
       S3method `HRTnomaly::print.checkwise`
+    * Included the roxygen2-tag `@rdname` for the S3method in the
+      file `R/print.checkwise.R`
 
 2026-09-10 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 26.9.10 has been created
