@@ -28,7 +28,7 @@
     * Updated roxygen2 code in `R/bayeswise.R` and its .C/.Call interfaces
     * Updated roxygen2 code in `R/bootHRT.R` and its .C/.Call interfaces
     * Updated roxygen2 code in `R/cellwise.R` and its .C/.Call interfaces
-    * Updated roxygen2 code in `R/class_check.R` and its .C/.Call interfaces
+    * Updated roxygen2 code in `R/class_check.R`
     * Updated roxygen2 code in `R/dif.R` and its .C/.Call interfaces
     * Updated roxygen2 code in `R/fuzzyHRT.R` and its .C/.Call interfaces
     * Updated roxygen2 code in `R/git.R` and its .C/.Call interfaces
