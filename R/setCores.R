@@ -40,17 +40,17 @@ function(n) {
   if (!missing(n)) {
     if (is.numeric(n)) {
       n <- as.integer(ceiling(n))
-      n <- .C('setNThreads', n = as.integer(n), PACKAGE = "HRTnomaly")$n
+      n <- .C(C_setNThreads, n = as.integer(n))$n
     }
   }
   n <- 0L
   crTot <- 0L
-  n <- .C('getNThreads', n = as.integer(n), PACKAGE = "HRTnomaly")$n
+  n <- .C(C_getNThreads, n = as.integer(n))$n
   if (n == 1L) {
-    if (.Call("isOmp", PACKAGE = "HRTnomaly")) packageStartupMessage("Parallel computation will not perform. CPU cores in use: 1.")
+    if (.Call(C_isOmp)) packageStartupMessage("Parallel computation will not perform. CPU cores in use: 1.")
   }
   else if (n > 1L){
-    crTot <- .C('getNCores', n = as.integer(crTot), PACKAGE = "HRTnomaly")$n
+    crTot <- .C(C_getNCores, n = as.integer(crTot))$n
     packageStartupMessage("Parallel computation will perform.")
     packageStartupMessage("  Total CPU cores available: ", crTot, ".", sep = "")
     packageStartupMessage("  CPU cores in use: ", n, ".", sep = "")

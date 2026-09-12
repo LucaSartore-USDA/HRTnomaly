@@ -55,10 +55,10 @@
 #' @export
 bootHRT <- function(a, contamination = 0.08, boot_max_it = 1000L) {
   ## Historical and zero check
-  hScore <- .C("history_check", double(nrow(a)), double(nrow(a)),
+  hScore <- .C(C_history_check, double(nrow(a)), double(nrow(a)),
                as.double(a$current_value_num),
                as.double(a$pred_value), nrow(a),
-               NAOK = TRUE, DUP = TRUE, PACKAGE = "HRTnomaly")[1L:2L]
+               NAOK = TRUE, DUP = TRUE)[1L:2L]
   zScore <- hScore[[2L]]
   hScore <- hScore[[1L]]
 
@@ -70,18 +70,18 @@ bootHRT <- function(a, contamination = 0.08, boot_max_it = 1000L) {
   
   gr <- factor(dtac$strata)
   
-  tScore <- .C("tail_check", as.double(dtal), dim(dtal),
+  tScore <- .C(C_tail_check, as.double(dtal), dim(dtal),
                 gr, nlevels(gr), res = double(prod(dim(dtal))),
-                NAOK = TRUE, PACKAGE = "HRTnomaly")$res
+                NAOK = TRUE)$res
   
   ## Relational-check
   rScore <- 1
-  dtae <- .C("normalize", as.double(dtal), dim(dtal),
+  dtae <- .C(C_normalize, as.double(dtal), dim(dtal),
               gr, nlevels(gr), res = double(prod(dim(dtal))),
-              NAOK = TRUE, PACKAGE = "HRTnomaly")$res
+              NAOK = TRUE)$res
   dtae[is.na(dtae)] <- 0
-  rScore <- .C("relat_check", dtae = as.double(dtae),
-                dim(dtal), PACKAGE = "HRTnomaly")$dtae
+  rScore <- .C(C_relat_check, dtae = as.double(dtae),
+                dim(dtal))$dtae
   rScore <- array(rScore, dim = dim(dtal))
   
   ## Putting things together using a Fuzzy-Logic-Inspired procedure
@@ -97,9 +97,9 @@ bootHRT <- function(a, contamination = 0.08, boot_max_it = 1000L) {
 	storage.mode(contamination) <- "double"
 	storage.mode(finScores) <- "double"
 	storage.mode(boot_max_it) <- "integer"
-	th_v <-.C("bayes_boot", th = double(boot_max_it), 
+	th_v <-.C(C_bayes_boot, th = double(boot_max_it), 
             boot_max_it, finScores, length(finScores), 
-            contamination, PACKAGE = "HRTnomaly")$th
+            contamination)$th
   mth <- mean(th_v)
   th_s <- c(quantile(th_v, c(0.25, 0.5, 0.75)), mth, mth + c(-1, 1) * sd(th_v))
   outly <- sapply(th_s, function(th) a$score < th & a$score != 0)

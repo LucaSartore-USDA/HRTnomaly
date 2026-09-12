@@ -25,15 +25,23 @@
       the string `\method` with `\S3method`
     * Included the roxygen2-tag `@rdname` for the S3method in the
       file `R/print.checkwise.R`
-    * Updated roxygen2 code in `R/bayeswise.R`
-    * Updated roxygen2 code in `R/bootHRT.R`
-    * Updated roxygen2 code in `R/cellwise.R`
-    * Updated roxygen2 code in `R/class_check.R`
-    * Updated roxygen2 code in `R/dif.R`
-    * Updated roxygen2 code in `R/fuzzyHRT.R`
-    * Updated roxygen2 code in `R/git.R`
-    * Updated roxygen2 code in `R/pif.R`
-    * Updated roxygen2 code in `R/setCores.R`
+    * Updated roxygen2 code in `R/bayeswise.R` and its .C/.Call interfaces
+    * Updated roxygen2 code in `R/bootHRT.R` and its .C/.Call interfaces
+    * Updated roxygen2 code in `R/cellwise.R` and its .C/.Call interfaces
+    * Updated roxygen2 code in `R/class_check.R` and its .C/.Call interfaces
+    * Updated roxygen2 code in `R/dif.R` and its .C/.Call interfaces
+    * Updated roxygen2 code in `R/fuzzyHRT.R` and its .C/.Call interfaces
+    * Updated roxygen2 code in `R/git.R` and its .C/.Call interfaces
+    * Updated roxygen2 code in `R/pif.R` and its .C/.Call interfaces
+    * Updated roxygen2 code in `R/setCores.R` and its .C/.Call interfaces
+    * Updated the .C/.Call interfaces in `R/zzz.R`
+    * Updated `src/HRTnomaly.c` to remove the registration of native routines
+      and to make explicit `extern` its functions
+    * Created a file `src/init.c` for enforcing the registration of native
+      routines
+    * Updated `src/Makevars` to allow for the compilation of `src/init.c`
+    * Updated `src/Makevars.ucrt` to allow for the compilation of `src/init.c`
+    * Made explicit `extern` functions in `src/fuzzyHRT.c`
 
 2026-09-10 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 26.9.10 has been created

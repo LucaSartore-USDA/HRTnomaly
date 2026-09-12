@@ -71,7 +71,7 @@ gif <- function(dta, nt = 100L, nss = NULL, threshold = 0.95) {
 	dtnum <- cbind(dtnum, dtchr)
 	dimD <- dim(dtnum)
 	storage.mode(dtnum) <- "double"
-	s <- .C("gif", s = double(dimD[1]), dtnum, dimD, nt, nss, NAOK = FALSE, PACKAGE = "HRTnomaly")$s
+	s <- .C(C_gif, s = double(dimD[1]), dtnum, dimD, nt, nss, NAOK = FALSE)$s
 	dta <- cbind.data.frame(dta, scores = s, flags = s > quantile(s, prob = threshold))
 	return(dta)
 }

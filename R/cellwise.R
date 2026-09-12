@@ -85,13 +85,13 @@ cellwise <- function(a, contamination = 0.08, epochs = 1000L, weighted = NULL, .
                   NULL)
   }
   if (is.null(rls)) {
-    scores <- .C("cellwise", s = s, z = z, h = h, r = r, t = t, xc, xp,
-                 dim(xc), epochs, NAOK = TRUE, PACKAGE = "HRTnomaly")
+    scores <- .C(C_cellwise, s = s, z = z, h = h, r = r, t = t, xc, xp,
+                 dim(xc), epochs, NAOK = TRUE)
   } else {
     rls[!is.finite(rls)] <- 0.5
     storage.mode(rls) <- "double"
-    scores <- .C("wcellwise", s = s, z = z, h = h, r = r, t = t, xc, xp,
-                 dim(xc), rls, epochs, NAOK = TRUE, PACKAGE = "HRTnomaly")
+    scores <- .C(C_wcellwise, s = s, z = z, h = h, r = r, t = t, xc, xp,
+                 dim(xc), rls, epochs, NAOK = TRUE)
   }
   scores$s <- as.data.frame(scores$s)
   scores$z <- as.data.frame(scores$z)

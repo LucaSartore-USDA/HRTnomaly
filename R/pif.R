@@ -89,9 +89,8 @@ pif <- function(dta, nt = 100L, nss = NULL,
     nss <- length(dta)
   rnv <- new.env()
   rnv <- parent.env(rnv)
-  s <- .Call("pif", dta, prx, nt, nss, max_depth,
-             quote(dist_fun(dta[[i]], dta[[j]])),
-             rnv, PACKAGE = "HRTnomaly")
+  s <- .Call(C_pif, dta, prx, nt, nss, max_depth,
+             quote(dist_fun(dta[[i]], dta[[j]])), rnv)
   attr(dta, "flag") <- s > quantile(s, prob = threshold)
   attr(dta, "scores") <- s
   return(dta)

@@ -113,13 +113,13 @@ bayeswise <- function(a, prior = NULL, epochs = 1000L, weighted = NULL, ...) {
                   NULL)
   }
   if (is.null(rls)) {
-    scores <- .C("bayeswise", s = s, G = g, z = z, h = h, r = r, t = t, xc, xp,
-                 dim(xc), epochs, NAOK = TRUE, PACKAGE = "HRTnomaly")
+    scores <- .C(C_bayeswise, s = s, G = g, z = z, h = h, r = r, t = t, xc, xp,
+                 dim(xc), epochs, NAOK = TRUE)
   } else {
     rls[!is.finite(rls)] <- 0.5
     storage.mode(rls) <- "double"
-    scores <- .C("wbayeswise", s = s, G = g, z = z, h = h, r = r, t = t, xc, xp,
-                 dim(xc), rls, epochs, NAOK = TRUE, PACKAGE = "HRTnomaly")
+    scores <- .C(C_wbayeswise, s = s, G = g, z = z, h = h, r = r, t = t, xc, xp,
+                 dim(xc), rls, epochs, NAOK = TRUE)
   }
   scores$s <- as.data.frame(scores$s)
   scores$G <- as.data.frame(scores$G)

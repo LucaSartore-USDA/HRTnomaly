@@ -45,10 +45,10 @@
 fuzzyHRT <- function(a, contamination = 0.08) {
 
   ## Historical and zero check
-  hScore <- .C("history_check", double(nrow(a)), double(nrow(a)),
+  hScore <- .C(C_history_check, double(nrow(a)), double(nrow(a)),
                as.double(a$current_value_num),
                as.double(a$pred_value), nrow(a),
-               NAOK = TRUE, DUP = TRUE, PACKAGE = "HRTnomaly")[1L:2L]
+               NAOK = TRUE, DUP = TRUE)[1L:2L]
   zScore <- hScore[[2L]]
   hScore <- hScore[[1L]]
 
@@ -61,18 +61,18 @@ fuzzyHRT <- function(a, contamination = 0.08) {
 
   gr <- factor(dtac$strata)
   # Smat <- double(prod(dim(dtal)))
-  tScore <- .C("tail_check", as.double(dtal), dim(dtal),
+  tScore <- .C(C_tail_check, as.double(dtal), dim(dtal),
                gr, nlevels(gr), res = double(prod(dim(dtal))),
-               NAOK = TRUE, PACKAGE = "HRTnomaly")$res
+               NAOK = TRUE)$res
 
   ## Relational-check
   rScore <- 1
-  dtae <- .C("normalize", as.double(dtal), dim(dtal),
+  dtae <- .C(C_normalize, as.double(dtal), dim(dtal),
              gr, nlevels(gr), res = double(prod(dim(dtal))),
-             NAOK = TRUE, PACKAGE = "HRTnomaly")$res
+             NAOK = TRUE)$res
   dtae[is.na(dtae)] <- 0
-  rScore <- .C("relat_check", dtae = as.double(dtae),
-               dim(dtal), PACKAGE = "HRTnomaly")$dtae
+  rScore <- .C(C_relat_check, dtae = as.double(dtae),
+               dim(dtal))$dtae
   rScore <- array(rScore, dim = dim(dtal))
 
   ## Putting things together using a Fuzzy-Logic-Inspired procedure

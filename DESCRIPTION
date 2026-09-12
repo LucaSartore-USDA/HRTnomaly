@@ -74,3 +74,4 @@ Author: Luca Sartore [aut] (ORCID = "0000-0002-0446-1328"),
   Valbona Bejleri [aut] (ORCID = "0000-0001-9828-968X")
 URL: https://drwolf85.r-universe.dev/HRTnomaly
 BugReports: https://github.com/drwolf85/HRTnomaly/issues
+Config/roxygen2/version: 8.1.0
