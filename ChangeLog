@@ -1,23 +1,43 @@
+2026-09-10 Luca Sartore <drwolf85@gmail.com>
+    * The HRTnomaly package VERSION 26.9.10 has been created
+    * Updated `DESCRIPTION` file with current information
+    * Updated `README.md` file with current GitHub version
+    * Updated `inst/INSTALL.md` file with current GitHub version
+    * Replaced the external "mimalloc" dependency with the standard C allocator
+      to support portable source installation
+    * Removed package-manager calls from the Windows build configuration
+    * Corrected native DLL selectors in `dif()`, `gif()`, and `pif()`
+
+2026-09-09 Luca Sartore <drwolf85@gmail.com>
+    * The HRTnomaly package VERSION 26.9.9 has been created
+    * Updated `DESCRIPTION` file with current information
+    * Updated `README.md` file with current GitHub version
+    * Updated `inst/INSTALL.md` file with current GitHub version
+    * Removed the folder `src/mimalloc/` and all its files
+    * Included new "SystemRequirements" in `DESCRIPTION`
+    * Removed `src/Makevars.win`
+    * Created `src/Makevars.ucrt` to link to the "mimalloc" library
+    * Updated `src/Makevars` to link to the "mimalloc" library
+
 2026-09-06 Luca Sartore <drwolf85@gmail.com>
-    * The HRTnomaly package VERSION 26.09.06 has been created
+    * The HRTnomaly package VERSION 26.9.6 has been created
     * Updated `DESCRIPTION` file with current information
     * Updated `README.md` file with current GitHub version
     * Updated `inst/INSTALL.md` file with current GitHub version
     * Updated `src/Makefile.win` file to remove nonstandard flags
-    * Removed false positive warnings from `src/mimalloc/src/init.c` 
-    * Updated pragmas in `src/mimalloc/include/mimalloc/internal.h` 
-    * Updated pragmas in `src/mimalloc/include/mimalloc/atomic.h` 
-
+    * Removed false positive warnings from `src/mimalloc/src/init.c`
+    * Updated pragmas in `src/mimalloc/include/mimalloc/internal.h`
+    * Updated pragmas in `src/mimalloc/include/mimalloc/atomic.h`
 
 2026-09-05 Luca Sartore <drwolf85@gmail.com>
-    * The HRTnomaly package VERSION 26.09.05 has been created
+    * The HRTnomaly package VERSION 26.9.5 has been created
     * Updated `README.md` file with current GitHub version
     * Updated `inst/INSTALL.md` file with current GitHub version
     * Updated `src/Makefile.win` file to include compiling flags
     * Updated `DESCRIPTION` file with current information
 
 2026-08-22 Luca Sartore <drwolf85@gmail.com>
-    * The HRTnomaly package VERSION 26.08.22 has been created
+    * The HRTnomaly package VERSION 26.8.22 has been created
     * Replaced `master` with `masked` in OpenMP statements in
       the file `src/HRTnomaly.c`
     * Updated dependencies to `R (>= 4.5.0)`
@@ -25,7 +45,7 @@
     * Updated `inst/INSTALL.md` file with current GitHub version
 
 2026-04-20 Luca Sartore <drwolf85@gmail.com>
-    * The HRTnomaly package VERSION 26.04.20 has been created
+    * The HRTnomaly package VERSION 26.4.20 has been created
     * Syncronized the content of the folder `src/mimalloc/` with its most
       recent version available on GitHub
     * Updated `DESCRIPTION` file with current information
@@ -33,11 +53,11 @@
     * Updated `inst/INSTALL.md` file with current GitHub version
 
 2026-02-24 Luca Sartore <drwolf85@gmail.com>
-    * The HRTnomaly package VERSION 26.02.24 has been created
+    * The HRTnomaly package VERSION 26.2.24 has been created
     * Update the example in the `README.md` file
 
 2026-02-22 Luca Sartore <drwolf85@gmail.com>
-    * The HRTnomaly package VERSION 26.02.22 has been created
+    * The HRTnomaly package VERSION 26.2.22 has been created
     * The field `SystemRequirements` in `DESCRIPTION` is now requiring a
       compiler supporting the C11 standard
     * The source code of the library `mimalloc` and its `LICENSE` file have
@@ -65,13 +85,13 @@
     * Corrected typos in `R\pif.R`
 
 2025-12-04 Luca Sartore <drwolf85@gmail.com>
-    * The HRTnomaly package VERSION 25.12.04 has been created
+    * The HRTnomaly package VERSION 25.12.4 has been created
     * Enforced storage mode of data-derived matrices in `R\cellwise.R`
     * Enforced storage mode of data-derived matrices in `R\bayeswise.R`
     * Add a badge in `README.md` with GitHub version 
 
 2025-12-01 Luca Sartore <drwolf85@gmail.com>
-    * The HRTnomaly package VERSION 25.12.01 has been created
+    * The HRTnomaly package VERSION 25.12.1 has been created
     * Modified the lion algorithm by setting an adaptive learning rate
       in `src\cellwise.c`
 

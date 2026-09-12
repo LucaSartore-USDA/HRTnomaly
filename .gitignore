@@ -1,0 +1,22 @@
+.vscode/
+.Rproj.user/
+*.Rproj
+
+# R session state
+.Rhistory
+.RData
+.Ruserdata
+
+# Package build and check output
+*.Rcheck/
+*.tar.gz
+*.tgz
+*.zip
+
+# Native compilation output
+src/*.o
+src/*.so
+src/*.dll
+src/*.a
+src/*.d
+src/symbols.rds

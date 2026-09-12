@@ -63,7 +63,7 @@ dif <- function(dta, nt = 100L, nss = NULL, threshold = 0.95) {
 	dtnum <- cbind(dtnum, dtchr)
 	dimD <- dim(dtnum)
 	storage.mode(dtnum) <- "double"
-	s <- .C("dif", s = double(dimD[1]), dtnum, dimD, nt, nss, NAOK = FALSE, package = "HRTnomaly")$s
+	s <- .C("dif", s = double(dimD[1]), dtnum, dimD, nt, nss, NAOK = FALSE, PACKAGE = "HRTnomaly")$s
 	dta <- cbind.data.frame(dta, scores = s, flags = s > quantile(s, prob = threshold))
 	return(dta)
 }

@@ -23,8 +23,6 @@ jobs:
       matrix:
         config:
           # macOS
-          - {os: macos-latest, r: 'release', compiler: 'gcc',   experimental: false}
-          - {os: macos-latest, r: 'devel',   compiler: 'gcc',   experimental: true}
           - {os: macos-latest, r: 'release', compiler: 'clang', experimental: false}
           - {os: macos-latest, r: 'devel',   compiler: 'clang', experimental: true}
 
@@ -54,8 +52,9 @@ jobs:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
-          Ncpus: '2'
-
+          update-rtools: true
+          Ncpus: '4'
+      
       # --------------------------------------------------------------------
       # Linux compiler setup
       # --------------------------------------------------------------------
@@ -65,7 +64,8 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc g++ gfortran
+          sudo apt-get upgrade -y
+          sudo apt-get install -y gcc g++ gfortran libmimalloc-dev
 
       - name: Configure R to use GCC on Linux
         if: runner.os == 'Linux' && matrix.config.compiler == 'gcc'
@@ -96,7 +96,8 @@ jobs:
           echo "deb [signed-by=/usr/share/keyrings/llvm-archive-keyring.gpg] http://apt.llvm.org/${UBUNTU_CODENAME}/ llvm-toolchain-${UBUNTU_CODENAME}-23 main" | \
             sudo tee /etc/apt/sources.list.d/llvm.list > /dev/null
           sudo apt-get update
-          sudo apt-get install -y clang-23 libomp-23-dev
+          sudo apt-get upgrade -y
+          sudo apt-get install -y clang-23 libomp-23-dev libmimalloc-dev
 
       - name: Configure R to use Clang with OpenMP on Linux
         if: runner.os == 'Linux' && matrix.config.compiler == 'clang'
@@ -124,53 +125,16 @@ jobs:
       # --------------------------------------------------------------------
       # macOS compiler setup
       # --------------------------------------------------------------------
-
-      - name: Install and configure GCC on macOS
-        if: runner.os == 'macOS' && matrix.config.compiler == 'gcc'
-        shell: bash
-        run: |
-          brew update
-          brew install gcc
-
-          GCC_BIN="$(python3 - <<'PY'
-          import glob, re
-          paths = glob.glob('/opt/homebrew/bin/gcc-*') + glob.glob('/usr/local/bin/gcc-*')
-          paths = [p for p in paths if re.search(r'gcc-[0-9]+$', p)]
-          if not paths:
-              raise SystemExit("No Homebrew gcc-* binary found")
-          def version(path):
-              return int(re.search(r'gcc-([0-9]+)$', path).group(1))
-          print(max(paths, key=version))
-          PY
-          )"
-
-          GXX_BIN="${GCC_BIN/gcc-/g++-}"
-          GFORTRAN_BIN="${GCC_BIN/gcc-/gfortran-}"
-
-          echo "Using GCC:      ${GCC_BIN}"
-          echo "Using G++:      ${GXX_BIN}"
-          echo "Using gfortran: ${GFORTRAN_BIN}"
-
-          mkdir -p ~/.R
-          cat > ~/.R/Makevars <<EOF
-          CC=${GCC_BIN}
-          CXX=${GXX_BIN}
-          CXX11=${GXX_BIN}
-          CXX14=${GXX_BIN}
-          CXX17=${GXX_BIN}
-          CXX20=${GXX_BIN}
-          FC=${GFORTRAN_BIN}
-          F77=${GFORTRAN_BIN}
-          EOF
-
       - name: Install and configure Clang on macOS
         if: runner.os == 'macOS' && matrix.config.compiler == 'clang'
         shell: bash
         run: |
           brew update
-          brew install llvm libomp
+          brew install llvm libomp mimalloc
 
           LLVM_PREFIX="$(brew --prefix llvm)"
+          BREW_PREFIX="$(brew --prefix)"
+          MIMALLOC_PREFIX="$(brew --prefix mimalloc)"
 
           echo "${LLVM_PREFIX}/bin" >> "${GITHUB_PATH}"
 
@@ -182,109 +146,67 @@ jobs:
           CXX14=${LLVM_PREFIX}/bin/clang++
           CXX17=${LLVM_PREFIX}/bin/clang++
           CXX20=${LLVM_PREFIX}/bin/clang++
-          CPPFLAGS=-I${LLVM_PREFIX}/include
-          LDFLAGS=-L${LLVM_PREFIX}/lib
-          EOF
-
-      - name: Use default macOS toolchain on R-devel
-        if: runner.os == 'macOS' && matrix.config.r == 'devel'
-        shell: bash
-        run: |
-          echo "Using default toolchain for macOS R-devel to avoid Homebrew toolchain incompatibilities."
-
+          CPPFLAGS=-I${LLVM_PREFIX}/include -I${BREW_PREFIX}/include -I${MIMALLOC_PREFIX}/include
+          LDFLAGS=-L${LLVM_PREFIX}/lib -L${BREW_PREFIX}/lib -L${MIMALLOC_PREFIX}/lib
+          
       # --------------------------------------------------------------------
       # Windows compiler setup
       # --------------------------------------------------------------------
 
-      - name: Configure R to use GCC on Windows
+      - name: Setup GCC and Mimalloc on Windows
+        uses: msys2/setup-msys2@v2
         if: runner.os == 'Windows' && matrix.config.compiler == 'gcc'
-        shell: pwsh
-        run: |
-          New-Item -ItemType Directory -Force "$HOME/.R" | Out-Null
+        with:
+          msystem: UCRT64
+          update: true
+          install: mingw-w64-ucrt-x86_64-toolchain mingw-w64-ucrt-x86_64-mimalloc
 
-          @"
-          CC=gcc
-          CXX=g++
-          CXX11=g++
-          CXX14=g++
-          CXX17=g++
-          CXX20=g++
-          FC=gfortran
-          F77=gfortran
-          "@ | Out-File -FilePath "$HOME/.R/Makevars.win" -Encoding ASCII
-
-      - name: Install LLVM 23 on Windows
+      - name: Setup Clang and Mimalloc on Windows
+        uses: msys2/setup-msys2@v2
         if: runner.os == 'Windows' && matrix.config.compiler == 'clang'
-        shell: pwsh
+        with:
+          msystem: UCRT64
+          update: true
+          install: mingw-w64-clang-x86_64-toolchain mingw-w64-clang-x86_64-mimalloc
+
+      - name: Configure R to use GCC and Mimalloc on Windows
+        if: runner.os == 'Windows' && matrix.config.compiler == 'gcc'
+        shell: bash
         run: |
-          $llvmVersion = '23.1.0'
-          $installer = Join-Path $env:RUNNER_TEMP "LLVM-$llvmVersion-win64.msi"
-          $wrapperDir = Join-Path $env:RUNNER_TEMP 'llvm23-bin'
+          mkdir -p ~/.R
 
-          Invoke-WebRequest `
-            -Uri "https://github.com/llvm/llvm-project/releases/download/llvmorg-$llvmVersion/LLVM-$llvmVersion-win64.msi" `
-            -OutFile $installer
-
-          Start-Process msiexec.exe `
-            -ArgumentList '/i', $installer, '/qn', '/norestart', 'ADDLOCAL=ALL' `
-            -Wait
-
-          New-Item -ItemType Directory -Force $wrapperDir | Out-Null
-
-          @"
-          @echo off
-          "C:\Program Files\LLVM\bin\clang.exe" --target=x86_64-w64-windows-gnu %*
-          "@ | Out-File -FilePath (Join-Path $wrapperDir 'clang23.cmd') -Encoding ASCII
-
-          @"
-          @echo off
-          "C:\Program Files\LLVM\bin\clang++.exe" --target=x86_64-w64-windows-gnu %*
-          "@ | Out-File -FilePath (Join-Path $wrapperDir 'clang++23.cmd') -Encoding ASCII
-
-          $wrapperDir | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
-          'C:\Program Files\LLVM\bin' | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
-
-      - name: Configure R to use Clang 23 on Windows
+          cat > ~/.R/Makevars.ucrt <<'EOF'
+          CC=D:/a/_temp/msys/ucrt64/bin/gcc.exe
+          CXX=D:/a/_temp/msys/ucrt64/bin/g++.exe
+          CXX11=D:/a/_temp/msys/ucrt64/bin/g++.exe
+          CXX14=D:/a/_temp/msys/ucrt64/bin/g++.exe
+          CXX17=D:/a/_temp/msys/ucrt64/bin/g++.exe
+          CXX20=D:/a/_temp/msys/ucrt64/bin/g++.exe
+          FC=D:/a/_temp/msys/ucrt64/bin/gfortran.exe
+          F77=D:/a/_temp/msys/ucrt64/bin/gfortran.exe
+          PKG_CFLAGS= -ID:/a/_temp/msys/ucrt64/include
+          CPPFLAGS+= -ID:/a/_temp/msys/ucrt64/include
+          LDFLAGS+= -LD:/a/_temp/msys/ucrt64/lib
+          EOF
+      - name: Configure R to use Clang and Mimalloc on Windows
         if: runner.os == 'Windows' && matrix.config.compiler == 'clang'
-        shell: pwsh
+        shell: bash
         run: |
-          New-Item -ItemType Directory -Force "$HOME/.R" | Out-Null
+          mkdir -p ~/.R
 
-          @"
-          CC=clang23
-          CXX=clang++23
-          CXX11=clang++23
-          CXX14=clang++23
-          CXX17=clang++23
-          CXX20=clang++23
-          FC=gfortran
-          F77=gfortran
-          AR=llvm-ar
-          NM=llvm-nm
-          RANLIB=llvm-ranlib
-          SHLIB_LD=clang23
-          SHLIB_CXXLD=clang++23
-          "@ | Out-File -FilePath "$HOME/.R/Makevars.win" -Encoding ASCII
-          @"
-          CC=clang23
-          CXX=clang++23
-          CXX11=clang++23
-          CXX14=clang++23
-          CXX17=clang++23
-          CXX20=clang++23
-          FC=gfortran
-          F77=gfortran
-          AR=llvm-ar
-          NM=llvm-nm
-          RANLIB=llvm-ranlib
-          SHLIB_LD=clang23
-          SHLIB_CXXLD=clang++23
-          "@ | Out-File -FilePath "$HOME/.R/Makevars" -Encoding ASCII
-          
-      # --------------------------------------------------------------------
-      # Diagnostic step
-      # --------------------------------------------------------------------
-
+          cat > ~/.R/Makevars.ucrt <<'EOF'
+          CC=D:/a/_temp/msys/clang64/bin/clang.exe
+          CXX=D:/a/_temp/msys/clang64/bin/clang++.exe
+          CXX11=D:/a/_temp/msys/clang64/bin/clang++.exe
+          CXX14=D:/a/_temp/msys/clang64/bin/clang++.exe
+          CXX17=D:/a/_temp/msys/clang64/bin/clang++.exe
+          CXX20=D:/a/_temp/msys/clang64/bin/clang++.exe
+          FC=D:/a/_temp/msys/ucrt64/bin/gfortran.exe
+          F77=D:/a/_temp/msys/ucrt64/bin/gfortran.exe
+          PKG_CFLAGS= -ID:/a/_temp/msys/clang64/include
+          CPPFLAGS+= -ID:/a/_temp/msys/clang64/include
+          LDFLAGS+= -LD:/a/_temp/msys/clang64/lib
+          EOF
       - name: Show selected compiler configuration
         shell: bash
         run: |
@@ -293,12 +215,12 @@ jobs:
           echo
 
           if [ "$RUNNER_OS" = "Windows" ]; then
-            if [ -f "$HOME/.R/Makevars.win" ]; then
-              cat "$HOME/.R/Makevars.win"
+            if [ -f "$HOME/.R/Makevars.ucrt" ]; then
+              cat "$HOME/.R/Makevars.ucrt"
             fi
 
-            where.exe clang23 || true
-            where.exe clang++23 || true
+            where.exe clang64 || true
+            where.exe clang++64 || true
             where.exe llvm-ar || true
           else
             if [ -f "$HOME/.R/Makevars" ]; then
@@ -314,12 +236,18 @@ jobs:
           clang++ --version || true
           gfortran --version || true
 
-      - uses: r-lib/actions/setup-r-dependencies@v2
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          Rscript -e 'install.packages(c("rcmdcheck", "dplyr", "purrr", "tidyr", "knitr", "rmarkdown", "cellWise"), type = "both", Ncpus =  4L)'
+      - name: Install dependencies (non-macOS)
+        if: runner.os != 'macOS'
+        uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          dependencies: '"hard"'
           extra-packages: any::rcmdcheck
           needs: check
-
+          dependencies: '"hard"'
+        
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-results: true
