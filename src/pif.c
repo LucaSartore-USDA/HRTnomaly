@@ -667,8 +667,7 @@ static inline double fuzzy_anomaly_score_pivotal(int x, node *forest,
  * @param Rnv S-Expression for an R environment used 
  * @return SEXP 
  */
-SEXP pif(SEXP dta, SEXP _prx, SEXP _nt, SEXP _nss, 
-         SEXP max_depth, SEXP dst_fun, SEXP Rnv) {
+extern SEXP pif(SEXP dta, SEXP _prx, SEXP _nt, SEXP _nss, SEXP max_depth, SEXP dst_fun, SEXP Rnv) {
 	SEXP res;
 	int n, prx, nt, nss, l;
 	int i;

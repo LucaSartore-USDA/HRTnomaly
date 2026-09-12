@@ -110,7 +110,7 @@ static double emp_per(int b, double *s, int N, double theta) {
 	return res;
 }
 
-void bayes_boot(double *th, int *B, double *s, int *nn, double *theta) {
+extern void bayes_boot(double *th, int *B, double *s, int *nn, double *theta) {
 	int const N = nn[0];
 	int b;
 	/* Checking for valid thresholds */

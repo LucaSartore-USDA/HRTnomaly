@@ -4,14 +4,14 @@
 \alias{print.checkwise}
 \title{A Method to Print the Accuracy of Outlier Classification Results}
 \usage{
-\method{print}{checkwise}(x, confusion = FALSE, ...)
+\S3method{print}{checkwise}(x, \dots, confusion = FALSE)
 }
 \arguments{
 \item{x}{An S3 object of the class \code{checkwise}, typically computed with the function \code{class_check}.}
 
-\item{confusion}{A logical value, which is \code{FALSE} by default. If \code{TRUE}, the confusion matrix is printed after showing all accuracy metrics.}
+\item{\dots}{Additional arguments to pass to the function \code{cat}.}
 
-\item{...}{Additional arguments to pass to the function \code{cat}.}
+\item{confusion}{A logical value, which is \code{FALSE} by default. If \code{TRUE}, the confusion matrix is printed after showing all accuracy metrics.}
 }
 \value{
 An S3 class named \code{checkwise} with the confusion matrix, and other accuracy metrics appended as attribues.

@@ -1,4 +1,5 @@
 #include "myomp.h"
+#include <stdlib.h>
 #include <R.h>
 #include <Rmath.h>
 #include <Rinternals.h>
@@ -10,7 +11,7 @@
  * @brief Get the max number of CPU cores
  * @param n Pointer to the number of CPU cores 
  */
-void getNCores(int *n) {
+extern void getNCores(int *n) {
   #if __VOPENMP
     *n = omp_get_num_procs();
   #else
@@ -22,7 +23,7 @@ void getNCores(int *n) {
  * @brief Get the number of threads to use
  * @param n Pointer to the number of threads
  */
-void getNThreads(int *n) {
+extern void getNThreads(int *n) {
   #if __VOPENMP
     #pragma omp parallel default(shared)
     {
@@ -38,7 +39,7 @@ void getNThreads(int *n) {
  * @brief Set the number of threads to use
  * @param n Pointer to the number of threads
  */
-void setNThreads(int *n) {
+extern void setNThreads(int *n) {
   #if __VOPENMP
     if (omp_get_num_procs() < *n) {
       *n = omp_get_num_procs();
@@ -56,7 +57,7 @@ void setNThreads(int *n) {
   #endif
 }
 
-SEXP isOmp(void) {
+extern SEXP isOmp(void) {
   SEXP ans;
   PROTECT(ans = allocVector(LGLSXP, 1));
   #if __VOPENMP
@@ -67,7 +68,8 @@ SEXP isOmp(void) {
   UNPROTECT(1);
   return ans;
 }
-SEXP openMP_version(void) {
+
+extern SEXP openMP_version(void) {
   SEXP ans;
   PROTECT(ans = allocVector(REALSXP, 1));
   #if __VOPENMP
@@ -77,10 +79,4 @@ SEXP openMP_version(void) {
   #endif
   UNPROTECT(1);
   return ans;
-}
-
-
-void R_init_HRTnomaly(DllInfo *info) {
-  R_registerRoutines(info, NULL, NULL, NULL, NULL);
-  R_useDynamicSymbols(info, TRUE);
 }

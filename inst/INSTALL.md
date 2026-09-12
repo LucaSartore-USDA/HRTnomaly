@@ -41,13 +41,13 @@ install.packages("HRTnomaly")
 The other alternative to install an R package is from its source-code compressed as a tarball archive. This can be done by entering the following command into a terminal session on **Linux** and **(Mac) OS X**  :
 
 ```{bash}
-R CMD INSTALL HRTnomaly_26.9.10.tar.gz
+R CMD INSTALL HRTnomaly_26.9.11.tar.gz
 ```
 
 On **Windows**, by opening the command prompt (`cmd.exe`), it is possible to point to the proper directory with `cd`, and then install the package via `Rcmd.exe` with the following command:
 
 ```{bash}
-Rcmd.exe INSTALL HRTnomaly_26.9.10.tar.gz
+Rcmd.exe INSTALL HRTnomaly_26.9.11.tar.gz
 ```
 
 More details can be found on the "Installing packages" section of the [R-admin](https://cran.r-project.org/doc/manuals/R-admin.html) manual.
@@ -67,3 +67,9 @@ To remove **HRTnomaly** from the list of R packages, it is necessary to type the
 ```{R}
 remove.packages("HRTnomaly")
 ```
+
+## Third-party notice
+
+The library [mimalloc](https://www.github.com/microsoft/mimalloc) is included in the source code folder [`src`](https://github.com/drwolf85/HRTnomaly/tree/master/src) and redistributed under [MTI license](https://github.com/drwolf85/HRTnomaly/blob/master/src/mimalloc/LICENSE).
+
+Snippets of code from the [pcg-c-basic](https://github.com/imneme/pcg-c-basic) is included in the file [`src/post_thresh.c`](https://github.com/drwolf85/HRTnomaly/tree/master/src/post_thresh.c) and redistributed under [APACHE-2.0 license](https://github.com/drwolf85/HRTnomaly/blob/master/inst/LICENSE-PCG32.txt).

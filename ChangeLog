@@ -1,12 +1,61 @@
+2026-09-11 Luca Sartore <drwolf85@gmail.com>
+    * The HRTnomaly package VERSION 26.9.11 has been created
+    * Updated `DESCRIPTION` file with current information
+    * Updated `README.md` file with current GitHub version
+    * Updated `inst/INSTALL.md` file with current GitHub version and an
+      additional notice for the PCG32 random number generator
+    * Included `inst/LICENSE-PCG32.txt`
+    * Corrected case-sensitive typos in `R/dif.R`
+    * Corrected case-sensitive typos in `R/gif.R`
+    * Corrected case-sensitive typos in `R/pif.R`
+    * Modified printing instructions in `src/mimalloc/src/options.c`
+    * Modified calls to function `NTCurrentTEB()`
+      in `src/mimalloc/include/mimalloc/prim-tls.h`
+    * Modified calls to function `NTCurrentTEB()`
+      in `src/mimalloc/src/prim.c`
+    * Include a header file in `src/mimalloc/HRTteb.h` to replace the
+      function `NTCurrentTEB()` with `MyCurrentTEB()`
+    * Included roxygen2 code for package documentation in `R/HRTnomaly.R`
+    * Updated `NAMESPACE` accordingly to the new CRAN guidelines
+    * Created `R/toy.R` to include the roxygen2 documentation for the dataset
+      in `data/toy.rda`
+    * Updated `man/toy.Rd` to include link to the "source" of the dataset
+    * Updated `man/bayeswise.Rd` by replacing `...` with `\dots`
+    * Updated `man/print.checkwise.Rd` by replacing `...` with `\dots` and
+      the string `\method` with `\S3method`
+    * Included the roxygen2-tag `@rdname` for the S3method in the
+      file `R/print.checkwise.R`
+    * Updated roxygen2 code in `R/bayeswise.R` and its .C/.Call interfaces
+    * Updated roxygen2 code in `R/bootHRT.R` and its .C/.Call interfaces
+    * Updated roxygen2 code in `R/cellwise.R` and its .C/.Call interfaces
+    * Updated roxygen2 code in `R/class_check.R` and its .C/.Call interfaces
+    * Updated roxygen2 code in `R/dif.R` and its .C/.Call interfaces
+    * Updated roxygen2 code in `R/fuzzyHRT.R` and its .C/.Call interfaces
+    * Updated roxygen2 code in `R/git.R` and its .C/.Call interfaces
+    * Updated roxygen2 code in `R/pif.R` and its .C/.Call interfaces
+    * Updated roxygen2 code in `R/setCores.R` and its .C/.Call interfaces
+    * Updated the .C/.Call interfaces in `R/zzz.R`
+    * Updated `src/HRTnomaly.c` to remove the registration of native routines
+      and to make explicit `extern` its functions
+    * Created a file `src/init.c` for enforcing the registration of native
+      routines
+    * Updated `src/Makevars` to allow for the compilation of `src/init.c`
+    * Updated `src/Makevars.ucrt` to allow for the compilation of `src/init.c`
+    * Made explicit `extern` functions in `src/fuzzyHRT.c`
+
 2026-09-10 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 26.9.10 has been created
     * Updated `DESCRIPTION` file with current information
     * Updated `README.md` file with current GitHub version
-    * Updated `inst/INSTALL.md` file with current GitHub version
-    * Replaced the external "mimalloc" dependency with the standard C allocator
-      to support portable source installation
-    * Removed package-manager calls from the Windows build configuration
-    * Corrected native DLL selectors in `dif()`, `gif()`, and `pif()`
+    * Updated `src/Makevars.ucrt` to link to the "mimalloc" library
+    * The source code of the library `mimalloc` and its `LICENSE` file have
+      been reincluded in the `src` folder
+    * Updated `inst/INSTALL.md` file with current GitHub version and
+      third-party notice for including the library `mimalloc`
+    * Replaced `HRTnomaly::print` with `print` in `NAMESPACE`
+    * Exchange the arguments of the function written in `R/print.checkwise.R`
+    * Exchange the arguments of the function documented
+      in `man/print.checkwise.Rd`
 
 2026-09-09 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 26.9.9 has been created
@@ -70,7 +119,7 @@
     * The HRTnomaly package VERSION 25.12.22 has been created.
     * The new functions `wscroring_tails()`, `wtail_check()`, `wcellwise()`
       and `wbayeswise()` are now implemented in `src\cellwise.c`
-    * The functions `init_param()` and `relat_check()` are updated for 
+    * The functions `init_param()` and `relat_check()` are updated for
       weighted regression in `src\cellwise.c`
     * The `cellwise()` function in `R\cellwise.R` was update for weighted
       calculations
@@ -88,7 +137,7 @@
     * The HRTnomaly package VERSION 25.12.4 has been created
     * Enforced storage mode of data-derived matrices in `R\cellwise.R`
     * Enforced storage mode of data-derived matrices in `R\bayeswise.R`
-    * Add a badge in `README.md` with GitHub version 
+    * Add a badge in `README.md` with GitHub version
 
 2025-12-01 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 25.12.1 has been created
@@ -97,7 +146,7 @@
 
 2025-11-24 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 25.11.24 has been created
-    * Updated `src/cellwise.c` to account for a more robust self-regression 
+    * Updated `src/cellwise.c` to account for a more robust self-regression
     * Removed `\dontrun{}` from the documentation in `man\class_check.Rd`
     * Removed `\dontrun{}` from the documentation in `man\dif.Rd`
     * Removed `\dontrun{}` from the documentation in `man\fuzzyHRT.Rd`
@@ -123,8 +172,8 @@
     * Included roxygen2 documentation to the file `R/gif.R`
     * Included roxygen2 documentation to the file `R/pif.R`
     * Included roxygen2 documentation to the file `R/print.checkwise.R`
-    * Included roxygen2 documentation to the file `R/setCores.R` 
-    * Updated the file `man/bayesHRT.R` using roxygen2 
+    * Included roxygen2 documentation to the file `R/setCores.R`
+    * Updated the file `man/bayesHRT.R` using roxygen2
     * Updated the file `man/bayeswise.R` using roxygen2
     * Updated the file `man/bootHRT.R` using roxygen2
     * Updated the file `man/cellwise.R` using roxygen2
@@ -175,7 +224,7 @@
     * Debugged the `median`, `group_normalize`, and `group_tail` functions
       in `src/fuzzyHRT.c` to fix clang undefined behaviour
     * Udpate markdown code for images in  `README.md`
-    * Modified precompiler code around the `bayeswise` function 
+    * Modified precompiler code around the `bayeswise` function
       in `src/cellwise.c` to fix standalone C tests
     * Fixed example code in `man/bayesHRT.Rd`
     * Fixed example code in `man/bootHRT.Rd`

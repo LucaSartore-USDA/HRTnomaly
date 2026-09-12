@@ -52,10 +52,10 @@ bayesHRT <- function(a, prior = NULL) {
     prior <- 1 - prior # This is cell-level prior probability for regular cases!!!
   }
   ## Historical residual and zero check
-  hRes <- .C("history_res", double(nrow(a)), double(nrow(a)),
+  hRes <- .C(C_history_res, double(nrow(a)), double(nrow(a)),
              as.double(a$current_value_num),
              as.double(a$pred_value), nrow(a),
-             NAOK = TRUE, DUP = TRUE, PACKAGE = "HRTnomaly")[1L:2L]
+             NAOK = TRUE, DUP = TRUE)[1L:2L]
   zScore <- hRes[[2L]] * prior # Used as priors for each cell
   hRes <- hRes[[1L]]
   dtah <- cbind.data.frame(a[, c("strata", "unit_id", "master_varname")], hRes, zScore)
@@ -71,25 +71,25 @@ bayesHRT <- function(a, prior = NULL) {
 
   gr <- factor(dtac$strata)
 
-  tRes <- .C("tail_res", as.double(dtal), dim(dtal),
+  tRes <- .C(C_tail_res, as.double(dtal), dim(dtal),
              gr, nlevels(gr), res = double(prod(dim(dtal))),
-             NAOK = TRUE, PACKAGE = "HRTnomaly")$res
+             NAOK = TRUE)$res
   tRes <- array(tRes, dim = dim(dtal))
   tRes[is.na(tRes)] <- 0
 
   ## Relational-check
   rRes <- 0
   dtae <- tRes
-  rRes <- .C("relat_res", dtae = as.double(dtae),
-             dim(dtal), PACKAGE = "HRTnomaly")$dtae
+  rRes <- .C(C_relat_res, dtae = as.double(dtae),
+             dim(dtal))$dtae
   rRes <- array(rRes, dim = dim(dtal))
 
   ## Putting things together using the highest posterior probability class
   pr_mat <- as.matrix(dtaz[, -1L:-2L])
   hRes <- as.matrix(dtah[, -1L:-2L])
-  finals <- .C("post_results", as.double(pr_mat), integer(prod(dim(dtal))),
+  finals <- .C(C_post_results, as.double(pr_mat), integer(prod(dim(dtal))),
                dim(dtal), as.double(hRes), as.double(rRes), as.double(tRes),
-               NAOK = TRUE, PACKAGE = "HRTnomaly")[1L:2L]
+               NAOK = TRUE)[1L:2L]
   pr_mat <- array(finals[[1L]], dim = dim(dtal)) # Outlier posterior probability!!!
   finals <- array(as.logical(finals[[2L]]), dim = dim(dtal)) # Outlier flag (if TRUE then outlier)
 

@@ -113,7 +113,7 @@ void group_normalize(double *res, double *dta, int *dim, int *gr, int g) {
 @param res pointer to the residual matrix
 		  (assumed to be already initialized to zeros)
 */
-void normalize(double *dta, int *dim, int *gr, int *ng, double *res) {
+extern void normalize(double *dta, int *dim, int *gr, int *ng, double *res) {
 	int i, g;
 	#if __VOPENMP
 	#pragma omp parallel for default(shared) private(i, g) collapse(2)
@@ -133,7 +133,7 @@ void normalize(double *dta, int *dim, int *gr, int *ng, double *res) {
  * @param w pointer to the vector of previous data
  * @param n size of the data vector
  */
-void history_check(double *hScore, double *zScore, double *x, double *w, int *n) {
+extern void history_check(double *hScore, double *zScore, double *x, double *w, int *n) {
 	double *hdta;
 	double tmp, vr = 0.0;
 	int i, nn = 0;
@@ -208,7 +208,7 @@ void group_tail(double *res, double *dta, int *dim, int *gr, int g) {
  * @param ng  pointer to total number of groups
  * @param tScore pointer to the scoring vector for tail outliers
  */
-void tail_check(double *dta, int *dim, int *gr, int *ng, double *tScore) {
+extern void tail_check(double *dta, int *dim, int *gr, int *ng, double *tScore) {
 	int i, g;
 	#if __VOPENMP
 	#pragma omp parallel for default(shared) private(i, g) collapse(2)
@@ -297,7 +297,7 @@ void col_check(double *E, double *A, int *dim, int s) {
  * @param A input matrix
  * @param dim size of input matrix
  */
-void relat_check(double *A, int *dim) { /** FIXME: introduce new pointer in input */
+extern void relat_check(double *A, int *dim) { /** FIXME: introduce new pointer in input */
 	int i;
 	double *E;
 
@@ -331,7 +331,7 @@ void relat_check(double *A, int *dim) { /** FIXME: introduce new pointer in inpu
  * @param w pointer to the vector of previous data
  * @param n size of the data vector
  */
-void history_res(double *hRes, double *zScore, double *x, double *w, int *n) {
+extern void history_res(double *hRes, double *zScore, double *x, double *w, int *n) {
 	double tmp, vr = 0.0;
 	int i, nn = 0;
 	#if __VOPENMP
@@ -364,7 +364,7 @@ void history_res(double *hRes, double *zScore, double *x, double *w, int *n) {
  * @param ng  pointer to total number of groups
  * @param tRes pointer to the residual vector for tail outliers
  */
-void tail_res(double *dta, int *dim, int *gr, int *ng, double *tRes) {
+extern void tail_res(double *dta, int *dim, int *gr, int *ng, double *tRes) {
 	int i, g;
 	#if __VOPENMP
 	#pragma omp parallel for default(shared) private(i, g) collapse(2)
@@ -449,7 +449,7 @@ void col_res(double *E, double *A, int *dim, int s) { /** FIXME: introduce new p
  * @param A input matrix
  * @param dim size of input matrix
  */
-void relat_res(double *A, int *dim) {
+extern void relat_res(double *A, int *dim) {
 	int i;
 	double *E;
 
