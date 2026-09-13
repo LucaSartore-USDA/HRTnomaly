@@ -4,6 +4,12 @@
     * Updated `README.md` file with current GitHub version
     * Updated `inst/INSTALL.md` file with current GitHub version
     * Updated `src/allocator.h` to react to the flag `MI_CRAN_COMPLIANT`
+    * Updated `src/cellwise.c` to include the header file `src/allocator.h`
+    * Updated `src/dif.c` to include the header file `src/allocator.h`
+    * Updated `src/fuzzyHRT.c` to include the header file `src/allocator.h`
+    * Updated `src/gif.c` to include the header file `src/allocator.h`
+    * Updated `src/pif.c` to include the header file `src/allocator.h`
+    * Updated `src/post_thresh.c` to include the header file `src/allocator.h`
 
 2026-09-11 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 26.9.11 has been created
