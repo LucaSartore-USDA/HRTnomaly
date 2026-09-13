@@ -5,7 +5,7 @@
 #include <math.h>
 #include <time.h>
 #include <complex.h>
-#include <mimalloc.h>
+#include "allocator.h"
 #include <R.h>
 #include <Rmath.h>
 
