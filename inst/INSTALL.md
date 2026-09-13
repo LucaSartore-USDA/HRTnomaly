@@ -4,7 +4,7 @@
 
 Most recent versions of the following software are always preferred, however the minimal requirements are also specified. The common software required by three main-stream operative systems are provided below, and any specific requirement is treated separately:
 
-* [R software](http://www.r-project.org/): the minimal requirement is R version 4.6.0.
+* [R software](http://www.r-project.org/): the minimal requirement is R version 4.5.0.
 
 * [R packages](http://cran.r-project.org/) (it is recommended if the most recent versions of the following packages are installed):
 

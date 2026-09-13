@@ -58,7 +58,7 @@ Description: The presence of outliers in a dataset can substantially bias the
     this publication are those of the authors and should not be construed to
     represent any official USDA, or US Government determination or policy.
 License: AGPL-3
-Depends: R (>= 4.6.0)
+Depends: R (>= 4.5.0)
 Imports: dplyr, purrr, tidyr
 Suggests: knitr, rmarkdown, cellWise
 Encoding: UTF-8
