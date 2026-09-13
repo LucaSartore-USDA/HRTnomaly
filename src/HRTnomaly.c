@@ -8,7 +8,7 @@
 #include <R_ext/Boolean.h>
 
 /**
- * @rdname C_getNCores
+ * @wrapper C_getNCores
  * @brief Get the max number of CPU cores
  * @param n Pointer to the number of CPU cores
  */
@@ -21,7 +21,7 @@ extern void getNCores(int *n) {
 }
 
 /**
- * @rdname C_getNThreads
+ * @wrapper C_getNThreads
  * @brief Get the number of threads to use
  * @param n Pointer to the number of threads
  */
@@ -38,7 +38,7 @@ extern void getNThreads(int *n) {
 }
 
 /**
- * @rdname C_setNThreads
+ * @wrapper C_setNThreads
  * @brief Set the number of threads to use
  * @param n Pointer to the number of threads
  */
@@ -61,7 +61,7 @@ extern void setNThreads(int *n) {
 }
 
 /**
- * @rdname C_isOmp
+ * @wrapper C_isOmp
  * @brief Check if the package allows for parallel computing via OpenMP
  * @return SEXP
  */
@@ -78,7 +78,7 @@ extern SEXP isOmp(void) {
 }
 
 /**
- * @rdname C_openMP_version
+ * @wrapper C_openMP_version
  * @brief Retrieve the OpenMP version
  * @return SEXP
  */

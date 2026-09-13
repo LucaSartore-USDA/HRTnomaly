@@ -124,7 +124,7 @@ static int post_calc(double *H_err, double *R_err, double *T_err, double *prior_
 }
 
 /**
- * @rdname C_post_results
+ * @wrapper C_post_results
  * @brief Posterior computations over the whole dataset
  *
  * @param H_err Matrix of errors/residuals from historical analyses

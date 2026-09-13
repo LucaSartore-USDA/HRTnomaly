@@ -256,7 +256,7 @@ static double path_length(double *x, uint32_t nv, iTrees *tree, uint8_t e) {
         for (i = 0; i < nv; i++) {
             prjx += x[i] * tree->lincon[i];
         }/**
-         * @rdname C_dif
+         * @wrapper C_dif
          * @brief Deep Isolation Forest
          * @param res Pointer to a vector of type `double` used to store the results
          * @param dta Pointer to a matrix of data (in column-major format)
@@ -322,7 +322,7 @@ static inline void free_forest(iTrees **Forest, int *t) {
 }
 
 /**
- * @rdname C_gif
+ * @wrapper C_gif
  * @brief Generalized Isolation Forest
  * @param res Pointer to a vector of type `double` used to store the results
  * @param dta Pointer to a matrix of data (in column-major format)

@@ -333,7 +333,7 @@ static void iso_model(uint32_t t, double *res, double complex *dta_row_maj, uint
 }
 
 /**
- * @rdname C_dif
+ * @wrapper C_dif
  * @brief Deep Isolation Forest
  * @param res Pointer to a vector of type `double` used to store the results
  * @param dta Pointer to a matrix of data (in column-major format)

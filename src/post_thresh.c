@@ -111,7 +111,7 @@ static double emp_per(int b, double *s, int N, double theta) {
 }
 
 /**
- * @rdname C_bayes_boot
+ * @wrapper C_bayes_boot
  * @brief Function to perform the Bayesian Bootstrap algorithm
  * @param th Pointer to a double-precision vector used to save the results
  * @param B Pointer to the number of bootstrapping replicates

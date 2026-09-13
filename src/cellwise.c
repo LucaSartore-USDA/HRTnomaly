@@ -647,7 +647,7 @@ static inline void relat_check(double *rScore, double *A, double *wt, int *dim) 
 }
 
 /**
- * @rdname C_cellwise
+ * @wrapper C_cellwise
  * @brief Cellwise anomaly for state-level wide datasets
  *
  * @param s Pointer to an empty vector where to store the final scores
@@ -678,7 +678,7 @@ extern void cellwise(double *s, double *z, double *h, double *r, double *t, doub
 }
 
 /**
- * @rdname C_wcellwise
+ * @wrapper C_wcellwise
  * @brief Weighted cellwise anomaly for state-level wide datasets
  *
  * @param s Pointer to an empty vector where to store the final scores
@@ -711,7 +711,7 @@ extern void wcellwise(double *s, double *z, double *h, double *r, double *t, dou
 }
 
 /**
- * @rdname C_bayeswise
+ * @wrapper C_bayeswise
  * @brief Cellwise anomaly for state-level wide datasets using Bayesian testing
  *
  * @param s Pointer to an empty vector where to store the final scores
@@ -745,7 +745,7 @@ extern void bayeswise(double *s, int *G, double *z, double *h, double *r, double
 }
 
 /**
- * @rdname C_wbayeswise
+ * @wrapper C_wbayeswise
  * @brief Weighted cellwise anomaly for state-level wide datasets using Bayesian testing
  *
  * @param s Pointer to an empty vector where to store the final scores

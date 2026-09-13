@@ -656,7 +656,7 @@ static inline double fuzzy_anomaly_score_pivotal(int x, node *forest,
 }
 
 /**
- * @rdname C_pif
+ * @wrapper C_pif
  * @brief R-warpper for Proximity Isolation Forests
  *
  * @param dta S-Expression for an input list of data
