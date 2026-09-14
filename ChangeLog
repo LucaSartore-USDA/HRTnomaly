@@ -26,6 +26,7 @@
     * Removed `man/C_isOmp.Rd`
     * Removed `man/C_relat_check.Rd`
     * Removed `man/C_wbayeswise.Rd`
+    * Corrected URL typos in `man/toy.Rd`
     * Updated C compilation flags in `src/Makevars`
     * Updated C compilation flags in `src/Makevars.ucrt`
     * Added `tests/namespace.R` to test exported objects
