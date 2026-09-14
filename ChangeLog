@@ -1,5 +1,34 @@
+2026-09-14 Luca Sartore <drwolf85@gmail.com>
+    * The HRTnomaly package VERSION 26.9.14 has been created
+    * Updated `DESCRIPTION` file with current information
+    * Updated `README.md` file with current GitHub version
+    * Updated `inst/INSTALL.md` file with current GitHub version
+    * Updated roxygen2 code in `R/HRTnomaly.R`
+    * Updated `NAMESPACE` to avoid exporting objects starting with `.` or `C`
+    * Removed `man/C_bayes_boot.Rd`
+    * Removed `man/C_getNThreads.Rd`
+    * Removed `man/C_normalize.Rd`
+    * Removed `man/C_relat_res.Rd`
+    * Removed `man/C_wcellwise.Rd`
+    * Removed `man/C_bayeswise.Rd`
+    * Removed `man/C_gif.Rd`
+    * Removed `man/C_openMP_version.Rd`
+    * Removed `man/C_setNThreads.Rd`
+    * Removed `man/C_cellwise.Rd`
+    * Removed `man/C_history_check.Rd`
+    * Removed `man/C_pif.Rd`
+    * Removed `man/C_tail_check.Rd`
+    * Removed `man/C_dif.Rd`
+    * Removed `man/C_history_res.Rd`
+    * Removed `man/C_post_results.Rd`
+    * Removed `man/C_tail_res.Rd`
+    * Removed `man/C_getNCores.Rd`
+    * Removed `man/C_isOmp.Rd`
+    * Removed `man/C_relat_check.Rd`
+    * Removed `man/C_wbayeswise.Rd`
+
 2026-09-13 Luca Sartore <drwolf85@gmail.com>
-    * The HRTnomaly package VERSION 26.9.12 has been created
+    * The HRTnomaly package VERSION 26.9.13 has been created
     * Updated `DESCRIPTION` file with current information
     * Updated `README.md` file with current GitHub version
     * Updated `inst/INSTALL.md` file with current GitHub version
