@@ -10,7 +10,6 @@ expected_exports <- c(
   "fuzzyHRT",
   "gif",
   "pif",
-  "print.checkwise",
   "setCores"
 )
 
