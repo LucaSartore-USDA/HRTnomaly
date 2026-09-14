@@ -65,6 +65,8 @@
     * Updated doxygen tags in `src/HRTnomaly.c`
     * Updated doxygen tags in `src/pif.c`
     * Updated doxygen tags in `src/post_thresh.c`
+    * Updated flags in `src/Makevars`
+    * Updated flags in `src/Makevars.ucrt`
 
 2026-09-12 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 26.9.12 has been created
