@@ -255,15 +255,7 @@ static double path_length(double *x, uint32_t nv, iTrees *tree, uint8_t e) {
     else {
         for (i = 0; i < nv; i++) {
             prjx += x[i] * tree->lincon[i];
-        }/**
-         * @wrapper C_dif
-         * @brief Deep Isolation Forest
-         * @param res Pointer to a vector of type `double` used to store the results
-         * @param dta Pointer to a matrix of data (in column-major format)
-         * @param dimD Pointer to the number of rows and columns of `dta`
-         * @param nt Pointer to the number of deep isolation trees to grow
-         * @param nss Pointer to the number of subsamples used for training
-         */
+        }
         e++;
         return path_length(x, nv, prjx <= tree->threshold ? tree->left : tree->right, e);
     }

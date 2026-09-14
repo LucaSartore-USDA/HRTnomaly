@@ -7,27 +7,27 @@
     * Updated `src/Makevars.ucrt` to avoid using mimalloc library
     * Updated `R/zzz.R` to document internal C-interfact wrappers
     * Updated `R/bootHRT.R` to correct a coding-style typo
-    * Added `man/C_bayes_boot.Rd` as a prototype to edit in the future
-    * Added `man/C_getNThreads.Rd` as a prototype to edit in the future
-    * Added `man/C_normalize.Rd` as a prototype to edit in the future
-    * Added `man/C_relat_res.Rd` as a prototype to edit in the future
-    * Added `man/C_wcellwise.Rd` as a prototype to edit in the future
-    * Added `man/C_bayeswise.Rd` as a prototype to edit in the future
-    * Added `man/C_gif.Rd` as a prototype to edit in the future
-    * Added `man/C_openMP_version.Rd` as a prototype to edit in the future
-    * Added `man/C_setNThreads.Rd` as a prototype to edit in the future
-    * Added `man/C_cellwise.Rd` as a prototype to edit in the future
-    * Added `man/C_history_check.Rd` as a prototype to edit in the future
-    * Added `man/C_pif.Rd` as a prototype to edit in the future
-    * Added `man/C_tail_check.Rd` as a prototype to edit in the future
-    * Added `man/C_dif.Rd` as a prototype to edit in the future
-    * Added `man/C_history_res.Rd` as a prototype to edit in the future
-    * Added `man/C_post_results.Rd` as a prototype to edit in the future
-    * Added `man/C_tail_res.Rd` as a prototype to edit in the future
-    * Added `man/C_getNCores.Rd` as a prototype to edit in the future
-    * Added `man/C_isOmp.Rd` as a prototype to edit in the future
-    * Added `man/C_relat_check.Rd` as a prototype to edit in the future
-    * Added `man/C_wbayeswise.Rd` as a prototype to edit in the future
+    * Added `man/C_bayes_boot.Rd` to document internal C-wrappers
+    * Added `man/C_getNThreads.Rd` to document internal C-wrappers
+    * Added `man/C_normalize.Rd` to document internal C-wrappers
+    * Added `man/C_relat_res.Rd` to document internal C-wrappers
+    * Added `man/C_wcellwise.Rd` to document internal C-wrappers
+    * Added `man/C_bayeswise.Rd` to document internal C-wrappers
+    * Added `man/C_gif.Rd` to document internal C-wrappers
+    * Added `man/C_openMP_version.Rd` to document internal C-wrappers
+    * Added `man/C_setNThreads.Rd` to document internal C-wrappers
+    * Added `man/C_cellwise.Rd` to document internal C-wrappers
+    * Added `man/C_history_check.Rd` to document internal C-wrappers
+    * Added `man/C_pif.Rd` to document internal C-wrappers
+    * Added `man/C_tail_check.Rd` to document internal C-wrappers
+    * Added `man/C_dif.Rd` to document internal C-wrappers
+    * Added `man/C_history_res.Rd` to document internal C-wrappers
+    * Added `man/C_post_results.Rd` to document internal C-wrappers
+    * Added `man/C_tail_res.Rd` to document internal C-wrappers
+    * Added `man/C_getNCores.Rd` to document internal C-wrappers
+    * Added `man/C_isOmp.Rd` to document internal C-wrappers
+    * Added `man/C_relat_check.Rd` to document internal C-wrappers
+    * Added `man/C_wbayeswise.Rd` to document internal C-wrappers
     * Updated doxygen tags in `src/bayes_hp`
     * Updated doxygen tags in `src/cellwise.c`
     * Updated doxygen tags in `src/dif.c`

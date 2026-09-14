@@ -6,16 +6,20 @@
 \description{
   These compiled symbols represent the direct entry points to the
   underlying C source code, masked behind the \code{C_} namespace fix.
+
+  The function \code{bayes_boot} performs the Bayesian bootstrap algorithm.
 }
 
-\usage{
-.C(C_my_c_plot, x)
-.Call(C_my_c_predict, object, newdata)
-}
-\arguments{
-  \item{x}{A vector formatted for native extraction.}
-  \item{object}{A reference memory pointer.}
-  \item{newdata}{A data matrix matrix.}
-}
+% \usage{
+%   .C(C_bayes_boot, th, B, s, nn, theta)
+% }
+%
+% \arguments{
+%   \item{th}{A double vector that will receive the results.}
+%   \item{B}{An integer number of bootstrap replicates.}
+%   \item{s}{A numerical vector with the observed data values.}
+%   \item{nn}{An integer corresponding to the length of \code{s}.}
+%   \item{theta}{A numeric threshold in \eqn{(0, 1)}{(0, 1)}.}
+% }
 \keyword{internal}
 

@@ -2,8 +2,8 @@ Package: HRTnomaly
 Type: Package
 Classification/MSC-2010: 62G86
 Title: Historical, Relational, and Tail Anomaly-Detection Algorithms 
-Version: 26.9.12
-Date: 2026-09-12
+Version: 26.9.13
+Date: 2026-09-13
 Authors@R: c(person(given = "Luca", 
                     family = "Sartore",
                     role = "aut",
@@ -66,12 +66,4 @@ SystemRequirements: C11 compiler
 LazyLoad: yes
 NeedsCompilation: yes
 ByteCompile: TRUE
-Author: Luca Sartore [aut] (ORCID = "0000-0002-0446-1328"),
-  Luca Sartore [cre] (ORCID = "0000-0002-0446-1328"),
-  Lu Chen [aut] (ORCID = "0000-0003-3387-3484"),
-  Justin van Wart [aut],
-  Andrew Dau [aut] (ORCID = "0009-0008-9482-5316"),
-  Valbona Bejleri [aut] (ORCID = "0000-0001-9828-968X")
-URL: https://drwolf85.r-universe.dev/HRTnomaly
-BugReports: https://github.com/drwolf85/HRTnomaly/issues
 

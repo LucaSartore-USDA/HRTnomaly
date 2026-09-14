@@ -648,7 +648,7 @@ static inline void relat_check(double *rScore, double *A, double *wt, int *dim) 
 
 /**
  * @wrapper C_cellwise
- * @brief Cellwise anomaly for state-level wide datasets
+ * @brief Cellwise anomaly detection for stratum-level wide datasets
  *
  * @param s Pointer to an empty vector where to store the final scores
  * @param z Pointer to an empty vector for data format anomaly scores
@@ -679,7 +679,7 @@ extern void cellwise(double *s, double *z, double *h, double *r, double *t, doub
 
 /**
  * @wrapper C_wcellwise
- * @brief Weighted cellwise anomaly for state-level wide datasets
+ * @brief Weighted cellwise anomaly detection for stratum-level wide datasets
  *
  * @param s Pointer to an empty vector where to store the final scores
  * @param z Pointer to an empty vector for data format anomaly scores
@@ -712,7 +712,7 @@ extern void wcellwise(double *s, double *z, double *h, double *r, double *t, dou
 
 /**
  * @wrapper C_bayeswise
- * @brief Cellwise anomaly for state-level wide datasets using Bayesian testing
+ * @brief Cellwise anomaly for stratum-level wide datasets using Bayesian testing
  *
  * @param s Pointer to an empty vector where to store the final scores
  * @param z Pointer to an empty vector for data format anomaly scores
@@ -746,7 +746,7 @@ extern void bayeswise(double *s, int *G, double *z, double *h, double *r, double
 
 /**
  * @wrapper C_wbayeswise
- * @brief Weighted cellwise anomaly for state-level wide datasets using Bayesian testing
+ * @brief Weighted cellwise anomaly for stratum-level wide datasets using Bayesian testing
  *
  * @param s Pointer to an empty vector where to store the final scores
  * @param z Pointer to an empty vector for data format anomaly scores
