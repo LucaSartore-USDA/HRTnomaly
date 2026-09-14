@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <math.h>
-#include <mimalloc.h>
+#include "allocator.h"
 #include <R.h>
 #include <Rmath.h>
 #include <Rinternals.h>
