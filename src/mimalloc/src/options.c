@@ -197,7 +197,9 @@ void _mi_options_init(void) {
   if (mi_option_get(mi_option_guarded_sample_rate) > 0) {
     if (mi_option_is_enabled(mi_option_allow_large_os_pages)) {
       mi_option_disable(mi_option_allow_large_os_pages);
+      #if !MI_CRAN_COMPLIANT
       _mi_warning_message("option 'allow_large_os_pages' is disabled to allow for guarded objects\n");
+      #endif
     }
   }
   #endif
@@ -218,6 +220,7 @@ mi_decl_export void mi_options_print_out(mi_output_fun* out, void* arg) mi_attr_
   const int vermajor = MI_MALLOC_VERSION/10000;
   const int verminor = (MI_MALLOC_VERSION%10000)/100;
   const int verpatch = (MI_MALLOC_VERSION%100);
+  #if !MI_CRAN_COMPLIANT
   _mi_fprintf(out, arg, "v%i.%i.%i%s%s\n", vermajor, verminor, verpatch,
       #if defined(MI_CMAKE_BUILD_TYPE)
       ", " mi_stringify(MI_CMAKE_BUILD_TYPE)
@@ -231,16 +234,20 @@ mi_decl_export void mi_options_print_out(mi_output_fun* out, void* arg) mi_attr_
       ""
       #endif
       );
+  #endif
 
   // show options
   for (int i = 0; i < _mi_option_last; i++) {
     mi_option_t option = (mi_option_t)i;
     long l = mi_option_get(option); MI_UNUSED(l); // possibly initialize
     mi_option_desc_t* desc = &mi_options[option];
+    #if !MI_CRAN_COMPLIANT
     _mi_fprintf(out, arg, "option '%s': %ld %s\n", desc->name, desc->value, (mi_option_has_size_in_kib(option) ? "KiB" : ""));
+    #endif
   }
 
   // show build configuration
+  #if !MI_CRAN_COMPLIANT
   _mi_fprintf(out, arg, "debug level : %d\n", MI_DEBUG );
   _mi_fprintf(out, arg, "secure level: %d\n", MI_SECURE );
   _mi_fprintf(out, arg, "mem tracking: %s\n", MI_TRACK_TOOL);
@@ -263,6 +270,7 @@ mi_decl_export void mi_options_print_out(mi_output_fun* out, void* arg) mi_attr_
   #endif
   #if MI_ENCODE_FREELIST
   _mi_fprintf(out, arg, "free lists: encoded with %d key(s)\n", MI_PAGE_KEY_COUNT);
+  #endif
   #endif
 }
 
@@ -407,8 +415,10 @@ static void mi_out_buf_flush(mi_output_fun* out, bool no_more_buf, void* arg) {
 // Once this module is loaded, switch to this routine
 // which outputs to stderr and the delayed output buffer.
 static void mi_cdecl mi_out_buf_stderr(const char* msg, void* arg) {
+  #if !MI_CRAN_COMPLIANT
   mi_out_stderr(msg,arg);
   mi_out_buf(msg,arg);
+  #endif
 }
 
 
@@ -479,7 +489,9 @@ void _mi_fputs(mi_output_fun* out, void* arg, const char* prefix, const char* me
     if (!mi_recurse_enter()) return;
     out = mi_out_get_default(&arg);
     if (prefix != NULL) out(prefix, arg);
+    #if !MI_CRAN_COMPLIANT
     out(message, arg);
+    #endif
     mi_recurse_exit();
   }
   else {
@@ -494,20 +506,26 @@ static void mi_vfprintf( mi_output_fun* out, void* arg, const char* prefix, cons
   char buf[992] = {0};
   if (fmt==NULL) return;
   if (!mi_recurse_enter()) return;
+  #if !MI_CRAN_COMPLIANT
   _mi_vsnprintf(buf, sizeof(buf)-1, fmt, args);
+  #endif
   mi_recurse_exit();
+  #if !MI_CRAN_COMPLIANT
   _mi_fputs(out,arg,prefix,buf);
+  #endif
 }
 
 void _mi_fprintf( mi_output_fun* out, void* arg, const char* fmt, ... ) {
   va_list args;
   va_start(args,fmt);
+  #if !MI_CRAN_COMPLIANT
   mi_vfprintf(out,arg,NULL,fmt,args);
+  #endif
   va_end(args);
 }
 
 static void mi_vfprintf_thread(mi_output_fun* out, void* arg, const char* prefix, const char* fmt, va_list args) {
-  #if defined(MI_CRAN_COMPLIANT)
+  #if MI_CRAN_COMPLIANT
   return;
   #else
   if (prefix != NULL && _mi_strnlen(prefix,33) <= 32) { // && !_mi_is_main_thread()) {
@@ -524,7 +542,9 @@ static void mi_vfprintf_thread(mi_output_fun* out, void* arg, const char* prefix
 void _mi_raw_message(const char* fmt, ...) {
   va_list args;
   va_start(args, fmt);
+  #if !MI_CRAN_COMPLIANT
   mi_vfprintf(NULL, NULL, NULL, fmt, args);
+  #endif
   va_end(args);
 }
 
@@ -532,7 +552,9 @@ void _mi_trace_message(const char* fmt, ...) {
   if (mi_option_get(mi_option_verbose) <= 1) return;  // only with verbose level 2 or higher
   va_list args;
   va_start(args, fmt);
+  #if !MI_CRAN_COMPLIANT
   mi_vfprintf_thread(NULL, NULL, "mimalloc: ", fmt, args);
+  #endif
   va_end(args);
 }
 
@@ -540,7 +562,9 @@ void _mi_verbose_message(const char* fmt, ...) {
   if (!mi_option_is_enabled(mi_option_verbose)) return;
   va_list args;
   va_start(args,fmt);
+  #if !MI_CRAN_COMPLIANT
   mi_vfprintf(NULL, NULL, "mimalloc: ", fmt, args);
+  #endif
   va_end(args);
 }
 
@@ -549,7 +573,9 @@ static void mi_show_error_message(const char* fmt, va_list args) {
     if (!mi_option_is_enabled(mi_option_show_errors)) return;
     if (mi_max_error_count >= 0 && (long)mi_atomic_increment_acq_rel(&error_count) > mi_max_error_count) return;
   }
+  #if !MI_CRAN_COMPLIANT
   mi_vfprintf_thread(NULL, NULL, "mimalloc: error: ", fmt, args);
+  #endif
 }
 
 void _mi_warning_message(const char* fmt, ...) {
@@ -559,12 +585,14 @@ void _mi_warning_message(const char* fmt, ...) {
   }
   va_list args;
   va_start(args,fmt);
+  #if !MI_CRAN_COMPLIANT
   mi_vfprintf_thread(NULL, NULL, "mimalloc: warning: ", fmt, args);
+  #endif
   va_end(args);
 }
 
 
-#if MI_DEBUG && !defined(MI_CRAN_COMPLIANT)
+#if MI_DEBUG && !MI_CRAN_COMPLIANT
 mi_decl_noreturn mi_decl_cold void _mi_assert_fail(const char* assertion, const char* fname, unsigned line, const char* func ) mi_attr_noexcept {
   _mi_fprintf(NULL, NULL, "mimalloc: assertion failed: at \"%s\":%u, %s\n  assertion: \"%s\"\n", fname, line, (func==NULL?"":func), assertion);
   abort();
@@ -580,7 +608,7 @@ static _Atomic(void*) mi_error_arg;     // = NULL
 
 static void mi_error_default(int err) {
   MI_UNUSED(err);
-  #if (MI_DEBUG>0) && !defined(MI_CRAN_COMPLIANT)
+  #if (MI_DEBUG>0) && !MI_CRAN_COMPLIANT
     if (err==EFAULT) {
       #ifdef _MSC_VER
       __debugbreak();
@@ -588,12 +616,12 @@ static void mi_error_default(int err) {
       abort();
     }
   #endif
-  #if (MI_SECURE>0) && !defined(MI_CRAN_COMPLIANT)
+  #if (MI_SECURE>0) && !MI_CRAN_COMPLIANT
     if (err==EFAULT) {  // abort on serious errors in secure mode (corrupted meta-data)
       abort();
     }
   #endif
-  #if defined(MI_XMALLOC) && !defined(MI_CRAN_COMPLIANT)
+  #if defined(MI_XMALLOC) && !MI_CRAN_COMPLIANT
     if (err==ENOMEM || err==EOVERFLOW || err==EINVAL) { // abort on memory allocation fails in xmalloc mode
       abort();
     }
@@ -612,8 +640,11 @@ void _mi_error_message(int err, const char* fmt, ...) {
   // show detailed error message
   va_list args;
   va_start(args, fmt);
+  #if !MI_CRAN_COMPLIANT
   mi_show_error_message(fmt, args);
+  #endif
   va_end(args);
+  #if !MI_CRAN_COMPLIANT
   // and call the error handler which may abort (or return normally, potentially setting errno)
   if (mi_error_handler != NULL) {
     mi_error_handler(err, mi_atomic_load_ptr_acquire(void,&mi_error_arg));
@@ -621,10 +652,13 @@ void _mi_error_message(int err, const char* fmt, ...) {
   else {
     mi_error_default(err);
   }
+  #endif
 }
 
 mi_decl_noinline mi_block_t* _mi_block_next_is_corrupted(const mi_page_t* page, const mi_block_t* block, const mi_block_t* next) {
+  #if !MI_CRAN_COMPLIANT
   _mi_error_message(EFAULT, "corrupted free list entry of size %zub at %p: value 0x%zx\n", mi_page_block_size(page), block, (uintptr_t)next);
+  #endif
   return NULL;
 }
     
@@ -647,7 +681,9 @@ static void mi_option_init(mi_option_desc_t* desc) {
     _mi_strlcat(buf, desc->legacy_name, sizeof(buf));
     err = _mi_getenv(buf, s, sizeof(s));
     if (err==0) {
+      #if !MI_CRAN_COMPLIANT
       _mi_warning_message("environment option \"mimalloc_%s\" is deprecated -- use \"mimalloc_%s\" instead.\n", desc->legacy_name, desc->name);
+      #endif
     }
   }
 
@@ -694,11 +730,15 @@ static void mi_option_init(mi_option_desc_t* desc) {
           // if the 'mimalloc_verbose' env var has a bogus value we'd never know
           // (since the value defaults to 'off') so in that case briefly enable verbose
           desc->value = 1;
+          #if !MI_CRAN_COMPLIANT
           _mi_warning_message("environment option mimalloc_%s has an invalid value.\n", desc->name);
+          #endif
           desc->value = 0;
         }
         else {
+          #if !MI_CRAN_COMPLIANT
           _mi_warning_message("environment option mimalloc_%s has an invalid value.\n", desc->name);
+          #endif
         }
       }
     }

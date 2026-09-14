@@ -174,7 +174,9 @@ static mi_decl_forceinline bool mi_ptr_page_is_valid_ex(const void* p, const cha
   MI_UNUSED_RELEASE(msg); MI_UNUSED(free_small);
   #if MI_DEBUG
   if mi_unlikely(((uintptr_t)p & (MI_INTPTR_SIZE - 1)) != 0 && !mi_option_is_enabled(mi_option_guarded_precise)) {
+    #if !MI_CRAN_COMPLIANT
     _mi_error_message(EINVAL, "%s: invalid (unaligned) pointer: %p\n", msg, p);
+    #endif
     return false;
   }
   #endif
@@ -191,12 +193,12 @@ static mi_decl_forceinline bool mi_ptr_page_is_valid_ex(const void* p, const cha
   #endif
   
   if mi_unlikely(check_p_for_null && page==NULL) {
-    #if MI_DEBUG
+    #if MI_DEBUG && !MI_CRAN_COMPLIANT
     if (p!=NULL) { _mi_error_message(EINVAL, "%s: invalid pointer: %p\n", msg, p); }
     #endif
     return false;
   }
-  #if MI_DEBUG
+  #if MI_DEBUG && !MI_CRAN_COMPLIANT
   mi_page_t* const cpage = _mi_checked_ptr_page(p);
   if mi_unlikely(cpage==NULL) { _mi_error_message(EINVAL, "%s: invalid pointer: %p\n", msg, p); }
   #endif
@@ -307,7 +309,7 @@ void _mi_free_subproc_safe(void* p) mi_attr_noexcept {
 
 void mi_free_size(void* p, size_t size) mi_attr_noexcept {
   MI_UNUSED_RELEASE(size);
-  #if MI_DEBUG
+  #if MI_DEBUG && !MI_CRAN_COMPLIANT
     const mi_page_t* const page = mi_ptr_page_validate(p,"mi_free_size");
     if (page==NULL) return;
     mi_assert(p!=NULL);
@@ -563,7 +565,7 @@ mi_decl_nodiscard size_t mi_usable_size(const void* p) mi_attr_noexcept {
 // This is somewhat expensive so only enabled for secure mode 4
 // ------------------------------------------------------
 
-#if MI_SECURE>=3 && !MI_PADDING   
+#if MI_SECURE>=3 && !MI_PADDING && !MI_CRAN_COMPLIANT
 // linear check if the free list contains a specific element
 static bool mi_list_contains(const mi_page_t* page, const mi_block_t* list, const mi_block_t* elem, const char* list_kind) {
   const size_t max_count = page->capacity;      // can never hold more blocks than the capacity
@@ -689,7 +691,7 @@ void _mi_padding_shrink(const mi_page_t* page, const mi_block_t* block, const si
 }
 #endif
 
-#if MI_PADDING
+#if MI_PADDING && !MI_CRAN_COMPLIANT
 
 static bool mi_verify_padding(const mi_page_t* page, const mi_block_t* block, size_t* size, size_t* wrong, bool* is_double_free) {
   size_t bsize;

@@ -163,12 +163,16 @@ static void mi_page_thread_collect_to_local(mi_page_t* page, mi_block_t* head)
 
   // if `count > max_count` there was a memory corruption (possibly infinite list due to double multi-threaded free)
   if mi_unlikely(count > max_count) {
+    #if !MI_CRAN_COMPLIANT
     _mi_error_message(EFAULT, "corrupted thread-free list (possibly due to a cross-thread double free)\n");
+    #endif
     return; // the thread-free items cannot be freed
   }
   // if `count > page->used` there was another kind memory corruption (either in the page meta-data or in the linked list)
   else if mi_unlikely(count > page->used) {
+    #if !MI_CRAN_COMPLIANT
     _mi_error_message(EFAULT, "corrupted meta-data in thread-free list\n");
+    #endif
     return; // the thread-free items cannot be freed
   }
 
@@ -950,7 +954,9 @@ static mi_page_t* mi_huge_page_alloc(mi_theap_t* theap, size_t size, size_t page
 static mi_page_t* mi_find_page(mi_theap_t* theap, size_t size, size_t huge_alignment) mi_attr_noexcept {
   const size_t req_size = size - MI_PADDING_SIZE;  // correct for padding_size in case of an overflow on `size`
   if mi_unlikely(req_size > MI_MAX_ALLOC_SIZE) {
+    #if !MI_CRAN_COMPLIANT
     _mi_error_message(EOVERFLOW, "allocation request is too large (%zu bytes)\n", req_size);
+    #endif
     return NULL;
   }
   mi_page_queue_t* pq = mi_page_queue(theap, (huge_alignment > 0 ? MI_LARGE_MAX_OBJ_SIZE+1 : size));
@@ -1060,7 +1066,9 @@ static mi_decl_noinline void* mi_malloc_generic_fallback(mi_theap_t* theap, size
 
   if mi_unlikely(page == NULL) { // out of memory
     const size_t req_size = size - MI_PADDING_SIZE;  // correct for padding_size in case of an overflow on `size`
+    #if !MI_CRAN_COMPLIANT
     _mi_error_message(ENOMEM, "unable to allocate memory (%zu bytes)\n", req_size);
+    #endif
     return NULL;
   }
 

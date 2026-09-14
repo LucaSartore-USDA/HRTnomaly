@@ -904,11 +904,15 @@ static void* mi_block_ptr_set_guarded(mi_block_t* block, size_t obj_size, size_t
   if (!page->memid.is_pinned && _mi_is_aligned(guard_page, os_page_size)) {
     const bool ok = _mi_os_protect(guard_page, os_page_size);
     if mi_unlikely(!ok) {
+      #if !MI_CRAN_COMPLIANT
       _mi_warning_message("failed to set a guard page behind an object (object %p of size %zu)\n", block, block_size);
+      #endif
     }
   }
   else {
+    #if !MI_CRAN_COMPLIANT
     _mi_warning_message("unable to set a guard page behind an object due to pinned memory (large OS pages?) (object %p of size %zu)\n", block, block_size);
+    #endif
   }
 
   // align pointer just in front of the guard page
@@ -931,7 +935,9 @@ mi_decl_restrict void* _mi_theap_malloc_guarded(mi_theap_t* theap, size_t size, 
   // allocate multiple of page size ending in a guard page
   // ensure minimal alignment requirement?
   if mi_unlikely(size >= MI_MAX_ALLOC_SIZE - MI_PADDING_SIZE) {  // check up front so the `req_size` won't overflow    
+    #if !MI_CRAN_COMPLIANT
     _mi_error_message(EOVERFLOW, "(guarded) allocation request is too large (%zu bytes)\n", size);
+    #endif
     return NULL;
   }
   const size_t os_page_size = _mi_os_page_size();

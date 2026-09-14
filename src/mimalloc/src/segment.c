@@ -478,7 +478,9 @@ static void mi_segment_commit_mask(mi_segment_t* segment, bool conservative, uin
 
   size_t bitcount = *full_size / MI_COMMIT_SIZE; // can be 0
   if (bitidx + bitcount > MI_COMMIT_MASK_BITS) {
+    #if !MI_CRAN_COMPLIANT
     _mi_warning_message("commit mask overflow: idx=%zu count=%zu start=%zx end=%zx p=0x%p size=%zu fullsize=%zu\n", bitidx, bitcount, start, end, p, size, *full_size);
+    #endif
   }
   mi_assert_internal((bitidx + bitcount) <= MI_COMMIT_MASK_BITS);
   mi_commit_mask_create(bitidx, bitcount, cm);
@@ -1242,7 +1244,9 @@ static mi_segment_t* mi_segment_reclaim(mi_segment_t* segment, mi_heap_t* heap, 
       mi_heap_t* target_heap = _mi_heap_by_tag(heap, page->heap_tag);  // allow custom heaps to separate objects
       if (target_heap == NULL) {
         target_heap = heap;
+        #if !MI_CRAN_COMPLIANT
         _mi_error_message(EFAULT, "page with tag %u cannot be reclaimed by a heap with the same tag (using heap tag %u instead)\n", page->heap_tag, heap->tag );
+        #endif
       }
       // associate the heap with this page, and allow heap thread delayed free again.
       mi_page_set_heap(page, target_heap);

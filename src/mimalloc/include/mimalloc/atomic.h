@@ -459,7 +459,9 @@ static inline bool mi_lock_try_acquire(mi_lock_t* lock) {
 static inline void mi_lock_acquire(mi_lock_t* lock) {
   const int err = pthread_mutex_lock(&lock->mutex);
   if (err != 0) {
+    #if !MI_CRAN_COMPLIANT
     _mi_error_message(err, "internal error: lock cannot be acquired (err %i)\n", err);
+    #endif
   }
 }
 static inline void mi_lock_release(mi_lock_t* lock) {
@@ -530,7 +532,9 @@ static inline void mi_lock_acquire(mi_lock_t* lock) {
     if (mi_lock_try_acquire(lock)) return;
     _mi_prim_thread_yield();
   }
+  #if !MI_CRAN_COMPLIANT
   _mi_error_message(EFAULT, "internal error: lock cannot be acquired (due to lack of native lock primitives)\n");
+  #endif
 }
 static inline void mi_lock_release(mi_lock_t* lock) {
   mi_atomic_store_release(&lock->mutex, (uintptr_t)0);

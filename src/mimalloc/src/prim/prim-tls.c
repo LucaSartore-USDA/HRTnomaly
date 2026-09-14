@@ -102,7 +102,9 @@ static bool mi_win_tls_slot_alloc(_Atomic(size_t)* slot, _Atomic(size_t)* extend
   #endif
   else {
     // to high an index for us
+    #if !MI_CRAN_COMPLIANT
     _mi_error_message(EFAULT, "returned TLS index was too high (%u)\n", index);
+    #endif
     TlsFree(index);
     *raw_index = TLS_OUT_OF_INDEXES;
     mi_atomic_store_release(slot, MI_TLS_ERROR_SLOT);
@@ -127,7 +129,9 @@ void _mi_tls_slots_init(void) {
       ok = mi_win_tls_slot_alloc(&_mi_theap_cached_slot, &_mi_theap_cached_expansion_slot, &mi_tls_raw_index_cached);
     }
     if (!ok) {
+      #if !MI_CRAN_COMPLIANT
       _mi_error_message(EFAULT, "unable to allocate a fast TLS user slot.\n");
+      #endif
     }
   }
 }

@@ -326,7 +326,9 @@ static void* unix_mmap_prim_aligned(void* addr, size_t size, size_t try_alignmen
       p = unix_mmap_prim(addr, size, protect_flags, flags | MAP_ALIGNED(n), fd);
       if (p==MAP_FAILED || !_mi_is_aligned(p,try_alignment)) {
         int err = errno;
+        #if !MI_CRAN_COMPLIANT  // asan sometimes does not instrument errno correctly?
         _mi_trace_message("unable to directly request aligned OS memory (error: %d (0x%x), size: 0x%zx bytes, alignment: 0x%zx, hint address: %p)\n", err, err, size, try_alignment, addr);
+        #endif
       }
       if (p!=MAP_FAILED) return p;
       // fall back to regular mmap
@@ -351,7 +353,9 @@ static void* unix_mmap_prim_aligned(void* addr, size_t size, size_t try_alignmen
         #else
         int err = errno;
         #endif
+        #if !MI_CRAN_COMPLIANT
         _mi_trace_message("unable to directly request hinted aligned OS memory (error: %d (0x%x), size: 0x%zx bytes, alignment: 0x%zx, hint address: %p)\n", err, err, size, try_alignment, hint);
+        #endif
       }
       if (p!=MAP_FAILED) return p;
       // fall back to regular mmap
@@ -440,7 +444,9 @@ static void* unix_mmap(void* addr, size_t size, size_t try_alignment, int protec
         if (p == NULL && (lflags & MAP_HUGE_1GB) == MAP_HUGE_1GB) {
           mi_atomic_store_relaxed(&mi_huge_1gib_pages_unavailable,1); // don't try huge 1GiB pages again
           if (large_only) {
+            #if !MI_CRAN_COMPLIANT
             _mi_warning_message("unable to allocate huge (1GiB) page, trying large (2MiB) pages instead (errno: %i)\n", errno);
+            #endif
           }
           lflags = ((lflags & ~MAP_HUGE_1GB) | MAP_HUGE_2MB);
           p = unix_mmap_prim_aligned(addr, size, try_alignment, protect_flags, lflags, lfd);
@@ -507,9 +513,11 @@ int _mi_prim_alloc(void* hint_addr, size_t size, size_t try_alignment, bool comm
 static void unix_mprotect_hint(int err) {
   #if defined(__linux__) && (MI_SECURE>=5 || MI_GUARDED) // guard page around every mimalloc page
   if (err == ENOMEM) {
+    #if !MI_CRAN_COMPLIANT
     _mi_warning_message("The next warning may be caused by a low memory map limit.\n"
                         "  On Linux this is controlled by the vm.max_map_count -- maybe increase it?\n"
                         "  For example: sudo sysctl -w vm.max_map_count=262144\n");
+    #endif
   }
   #else
   MI_UNUSED(err);
@@ -641,7 +649,9 @@ int _mi_prim_alloc_huge_os_pages(void* hint_addr, size_t size, int numa_node, bo
     long err = mi_prim_mbind(*addr, size, MPOL_PREFERRED, &numa_mask, 8*MI_INTPTR_SIZE, 0);
     if (err != 0) {
       err = errno;
+      #if !MI_CRAN_COMPLIANT
       _mi_warning_message("failed to bind huge (1GiB) pages to numa node %d (error: %ld (0x%lx))\n", numa_node, err, err);
+      #endif
     }
   }
   return (*addr != NULL ? 0 : errno);

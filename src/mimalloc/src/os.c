@@ -189,7 +189,7 @@ size_t _mi_os_secure_guard_page_size(void) {
 // In secure mode, try to decommit an area and output a warning if this fails.
 bool _mi_os_secure_guard_page_set_at(mi_subproc_t* subproc, void* addr, mi_memid_t memid) {
   if (addr == NULL) return true;
-  #if MI_SECURE > 0
+  #if MI_SECURE > 0 && !MI_CRAN_COMPLIANT
   bool ok = false;
   if (!memid.is_pinned) {
     mi_arena_t* const arena = mi_memid_arena(memid);
@@ -252,7 +252,9 @@ static void mi_os_prim_free(mi_subproc_t* subproc, void* addr, size_t size, size
   if (addr == NULL) return; // || _mi_os_is_huge_reserved(addr)
   int err = _mi_prim_free(addr, size);  // allow size==0 (issue #1041)
   if (err != 0) {
+    #if !MI_CRAN_COMPLIANT
     _mi_warning_message("unable to free OS memory (error: %d (0x%x), size: 0x%zx bytes, address: %p)\n", err, err, size, addr);
+    #endif
   }
   if (adjust) {
     if (commit_size>0) { mi_subproc_stat_adjust_decrease(subproc, committed, commit_size); }
@@ -327,7 +329,9 @@ static void* mi_os_prim_alloc_at(mi_subproc_t* subproc, void* hint_addr, size_t 
   void* p = NULL;
   int err = _mi_prim_alloc(hint_addr, size, try_alignment, commit, allow_large, is_large, is_zero, &p);
   if (err != 0) {
+    #if !MI_CRAN_COMPLIANT
     _mi_warning_message("unable to allocate OS memory (error: %d (0x%x), addr: %p, size: 0x%zx bytes, align: 0x%zx, commit: %d, allow large: %d)\n", err, err, hint_addr, size, try_alignment, commit, allow_large);
+    #endif
   }
 
   mi_subproc_stat_counter_increase(subproc, mmap_calls, 1);
@@ -383,7 +387,7 @@ static void* mi_os_prim_alloc_aligned(mi_subproc_t* subproc, size_t size, size_t
   }
   else {
     // if not aligned, free it, overallocate, and unmap around it
-    #if !MI_TRACK_ASAN
+    #if !MI_TRACK_ASAN && !MI_CRAN_COMPLIANT
     if (try_direct_alloc) {
       _mi_warning_message("unable to allocate aligned OS memory directly, fall back to over-allocation (size: 0x%zx bytes, address: %p, alignment: 0x%zx, commit: %d)\n", size, p, alignment, commit);
     }
@@ -578,7 +582,9 @@ bool _mi_os_commit_ex(mi_subproc_t* subproc, void* addr, size_t size, bool* is_z
   bool os_is_zero = false;
   int err = _mi_prim_commit(start, csize, &os_is_zero);
   if (err != 0) {
+    #if !MI_CRAN_COMPLIANT
     _mi_warning_message("cannot commit OS memory (error: %d (0x%x), address: %p, size: 0x%zx bytes)\n", err, err, start, csize);
+    #endif
     return false;
   }
   if (os_is_zero && is_zero != NULL) {
@@ -610,7 +616,9 @@ static bool mi_os_decommit_ex(mi_subproc_t* subproc, void* addr, size_t size, bo
   *needs_recommit = true;
   int err = _mi_prim_decommit(start,csize,needs_recommit);
   if (err != 0) {
+    #if !MI_CRAN_COMPLIANT
     _mi_warning_message("cannot decommit OS memory (error: %d (0x%x), address: %p, size: 0x%zx bytes)\n", err, err, start, csize);
+    #endif
   }
   else if (*needs_recommit) {
     mi_subproc_stat_decrease(subproc, committed, stat_size);
@@ -643,7 +651,9 @@ bool _mi_os_reset(mi_subproc_t* subproc, void* addr, size_t size) {
 
   int err = _mi_prim_reset(start, csize);
   if (err != 0) {
+    #if !MI_CRAN_COMPLIANT
     _mi_warning_message("cannot reset OS memory (error: %d (0x%x), address: %p, size: 0x%zx bytes)\n", err, err, start, csize);
+    #endif
   }
   return (err == 0);
 }
@@ -657,7 +667,9 @@ void _mi_os_reuse( mi_subproc_t* subproc, void* addr, size_t size ) {
   if (csize == 0) return;
   const int err = _mi_prim_reuse(start, csize);
   if (err != 0) {
+    #if !MI_CRAN_COMPLIANT
     _mi_warning_message("cannot reuse OS memory (error: %d (0x%x), address: %p, size: 0x%zx bytes)\n", err, err, start, csize);
+    #endif
   }
 }
 
@@ -708,7 +720,9 @@ static  bool mi_os_protectx(void* addr, size_t size, bool protect) {
   */
   int err = _mi_prim_protect(start,csize,protect);
   if (err != 0) {
+    #if !MI_CRAN_COMPLIANT
     _mi_warning_message("cannot %s OS memory (error: %d (0x%x), address: %p, size: 0x%zx bytes)\n", (protect ? "protect" : "unprotect"), err, err, start, csize);
+    #endif
   }
   return (err == 0);
 }
@@ -739,7 +753,9 @@ static uint8_t* mi_os_claim_huge_pages(size_t pages, size_t* total_size) {
   if (total_size != NULL) *total_size = 0;
   size_t size = 0;
   if (mi_mul_overflow(pages,MI_HUGE_OS_PAGE_SIZE,&size)) {
+    #if !MI_CRAN_COMPLIANT
     _mi_warning_message("too many huge pages requested: %zu\n", pages);
+    #endif
     return NULL;
   }
 
@@ -799,7 +815,9 @@ void* _mi_os_alloc_huge_os_pages(mi_subproc_t* subproc, size_t pages, int numa_n
     int err = _mi_prim_alloc_huge_os_pages(addr, MI_HUGE_OS_PAGE_SIZE, numa_node, &is_zero, &p);
     if (!is_zero) { all_zero = false;  }
     if (err != 0) {
+      #if !MI_CRAN_COMPLIANT
       _mi_warning_message("unable to allocate huge OS page (error: %d (0x%x), address: %p, size: %zx bytes)\n", err, err, addr, MI_HUGE_OS_PAGE_SIZE);
+      #endif
       break;
     }
 
@@ -807,7 +825,9 @@ void* _mi_os_alloc_huge_os_pages(mi_subproc_t* subproc, size_t pages, int numa_n
     if (p != addr) {
       // no success, issue a warning and break
       if (p != NULL) {
+        #if !MI_CRAN_COMPLIANT
         _mi_warning_message("could not allocate contiguous huge OS page %zu at %p\n", page, addr);
+        #endif
         mi_os_prim_free(subproc, p, MI_HUGE_OS_PAGE_SIZE, MI_HUGE_OS_PAGE_SIZE, true /* adjust */);
       }
       break;
@@ -828,7 +848,9 @@ void* _mi_os_alloc_huge_os_pages(mi_subproc_t* subproc, size_t pages, int numa_n
         }
       }
       if (elapsed > max_msecs) {
+        #if !MI_CRAN_COMPLIANT
         _mi_warning_message("huge OS page allocation timed out (after allocating %zu page(s))\n", page);
+        #endif
         break;
       }
     }
@@ -881,7 +903,9 @@ int _mi_os_numa_node_count(void) {
                             else { count = n; }
     }
     mi_atomic_store_release(&mi_numa_node_count, count); // save it
+    #if !MI_CRAN_COMPLIANT
     if (count>1) { _mi_verbose_message("using %zd numa regions\n", count); }
+    #endif
   }
   mi_assert_internal(count > 0 && count <= INT_MAX);
   return (int)count;

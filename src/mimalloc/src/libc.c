@@ -145,7 +145,9 @@ mi_decl_noinline bool _mi_pthread_key_create(pthread_key_t* pkey, void (*destruc
   int err = pthread_key_create(pkey,destruct);
   if mi_unlikely(err!=0) {
     *pkey = MI_PTHREAD_KEY_INVALID;
+    #if !MI_CRAN_COMPLIANT
     _mi_error_message(ENOMEM,"unable to allocate a thread local variable (error %d)\n", err);
+    #endif
     return false;
   }
   mi_assert_internal(*pkey != MI_PTHREAD_KEY_INVALID);
@@ -311,7 +313,7 @@ static void mi_out_num(uintmax_t x, size_t base, char prefix, char** out, char* 
 #define MI_NEXTC()  c = *in; if (c==0) break; in++;
 
 int _mi_vsnprintf(char* buf, size_t bufsize, const char* fmt, va_list args) {
-  #if defined(MI_CRAN_COMPLIANT)
+  #if MI_CRAN_COMPLIANT
   return 0;  // disable vsnprintf for CRAN compliance
   #endif
   if (buf == NULL || bufsize == 0 || fmt == NULL) return 0;

@@ -30,6 +30,8 @@
     * Updated C compilation flags in `src/Makevars`
     * Updated C compilation flags in `src/Makevars.ucrt`
     * Added `tests/namespace.R` to test exported objects
+    * Updated C and header files in the folder `src/mimalloc/` to avoid
+      startup messages
 
 2026-09-13 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 26.9.13 has been created

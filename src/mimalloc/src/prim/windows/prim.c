@@ -157,7 +157,9 @@ static bool win_enable_large_os_pages_once(size_t* large_page_size)
   }
   if (!ok) {
     if (err == 0) { err = GetLastError(); }
+    #if !MI_CRAN_COMPLIANT
     _mi_warning_message("cannot enable large OS page support, error %lu\n", err);
+    #endif
   }
   return (ok!=0);
 }
@@ -290,7 +292,9 @@ static void* win_virtual_alloc_prim_once(void* addr, size_t size, size_t try_ali
     if (hint != NULL) {
       void* p = VirtualAlloc(hint, size, flags, PAGE_READWRITE);
       if (p != NULL) return p;
+      #if !MI_CRAN_COMPLIANT
       _mi_verbose_message("warning: unable to allocate hinted aligned OS memory (%zu bytes, error code: 0x%x, address: %p, alignment: %zu, flags: 0x%x)\n", size, GetLastError(), hint, try_alignment, flags);
+      #endif
       // fall through on error
     }
   }
@@ -304,7 +308,9 @@ static void* win_virtual_alloc_prim_once(void* addr, size_t size, size_t try_ali
     param.Arg.Pointer = &reqs;
     void* p = (*pVirtualAlloc2)(GetCurrentProcess(), addr, size, flags, PAGE_READWRITE, &param, 1);
     if (p != NULL) return p;
+    #if !MI_CRAN_COMPLIANT
     _mi_warning_message("unable to allocate aligned OS memory (0x%zx bytes, error code: 0x%x, address: %p, alignment: 0x%zx, flags: 0x%x)\n", size, GetLastError(), addr, try_alignment, flags);
+    #endif
     // fall through on error
   }
   // last resort
@@ -337,7 +343,9 @@ static void* win_virtual_alloc_prim(void* addr, size_t size, size_t try_alignmen
               win_is_out_of_memory_error(GetLastError())) {
       // if committing regular memory and being out-of-memory,
       // keep trying for a bit in case memory frees up after all. See issue #894
+      #if !MI_CRAN_COMPLIANT
       _mi_warning_message("out-of-memory on OS allocation, try again... (attempt %lu, 0x%zx bytes, error code: 0x%x, address: %p, alignment: 0x%zx, flags: 0x%x)\n", tries, size, GetLastError(), addr, try_alignment, flags);
+      #endif
       long sleep_msecs = tries*40;  // increasing waits
       if (sleep_msecs > max_retry_msecs) { sleep_msecs = max_retry_msecs; }
       max_retry_msecs -= sleep_msecs;
@@ -481,7 +489,9 @@ static void* _mi_prim_alloc_huge_os_pagesx(void* hint_addr, size_t size, int num
     else {
       // fall back to regular large pages
       mi_atomic_store_release(&mi_huge_pages_available,0); // don't try further huge pages
+      #if !MI_CRAN_COMPLIANT
       _mi_warning_message("unable to allocate using huge (1GiB) pages, trying large (2MiB) pages instead (status 0x%lx)\n", err);
+      #endif
     }
   }
   // on modern Windows try use VirtualAlloc2 for numa aware large OS page allocation

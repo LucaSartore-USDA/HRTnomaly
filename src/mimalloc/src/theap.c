@@ -325,7 +325,9 @@ mi_theap_t* _mi_theap_alloc(mi_heap_t* heap, mi_tld_t* tld) {
     theap = (mi_theap_t*)_mi_arenas_alloc(heap, size, true, true, heap->exclusive_arena, tld->thread_seq, tld->numa_node, &memid);    
   }
   if (theap==NULL) {
+    #if !MI_CRAN_COMPLIANT
     _mi_error_message(ENOMEM, "unable to allocate theap meta-data\n");
+    #endif
     return NULL;
   }
 

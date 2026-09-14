@@ -287,7 +287,9 @@ static mi_decl_noinline void* mi_arena_try_alloc_at(
       #if MI_DEBUG > 1
       if (memid->initially_zero) {
         if (!mi_mem_is_zero(p, mi_size_of_slices(slice_count))) {
+          #if !MI_CRAN_COMPLIANT
           _mi_error_message(EFAULT, "internal error: arena allocation was not zero-initialized!\n");
+          #endif
           memid->initially_zero = false;
         }
       }
@@ -828,7 +830,9 @@ static uint8_t* mi_arenas_page_alloc_fresh_area(mi_theap_t* theap, size_t slice_
     else {
       // if we allow alignment >= MI_PAGE_META_ALIGNMENT we need to substract 1 from a pointer
       // in _mi_aligned_ptr_page (and test for (intptr_t)p < 0 instead of NULL). We avoid this by limiting the max alignment.
+      #if !MI_CRAN_COMPLIANT
       _mi_warning_message("requested alignment is too large (%zu KiB)\n", block_alignment / MI_KiB);
+      #endif
       errno = EINVAL;
       return NULL;
       // page_offset = MI_PAGE_META_ALIGNMENT;
@@ -1055,7 +1059,9 @@ static mi_page_t* mi_arenas_page_alloc_fresh(mi_theap_t* theap, size_t slice_cou
   #if MI_DEBUG > 1
   if (memid.initially_zero && memid.initially_committed) {
     if (!mi_mem_is_zero(slice_start, page_noguard_size)) {
+      #if !MI_CRAN_COMPLIANT
       _mi_error_message(EFAULT, "internal error: page memory was not zero initialized.\n");
+      #endif
       memid.initially_zero = false;
       if (block_start > 0) { _mi_memzero_aligned(page, sizeof(*page)); }
     }
@@ -1464,13 +1470,17 @@ void _mi_arenas_free(mi_subproc_t* subproc, void* p, size_t size, mi_memid_t mem
     mi_assert_internal(mi_arena_slice_start(arena,slice_index) + mi_size_of_slices(slice_count) > (uint8_t*)p);
     // checks
     if (arena == NULL) {
+      #if !MI_CRAN_COMPLIANT
       _mi_error_message(EINVAL, "trying to free from an invalid arena: %p, size %zu, memkind: 0x%x\n", p, size, memid.memkind);
+      #endif
       return;
     }
     mi_assert_internal(slice_index < arena->slice_count);
     mi_assert_internal(slice_index >= mi_arena_info_slices(arena));
     if (slice_index < mi_arena_info_slices(arena) || slice_index >= arena->slice_count) {
+      #if !MI_CRAN_COMPLIANT
       _mi_error_message(EINVAL, "trying to free from an invalid arena block: %p, size %zu, memkind: 0x%x\n", p, size, memid.memkind);
+      #endif
       return;
     }
 
@@ -1483,7 +1493,9 @@ void _mi_arenas_free(mi_subproc_t* subproc, void* p, size_t size, mi_memid_t mem
     // and make it available to others again
     bool all_inuse = mi_bbitmap_setN(arena->slices_free, slice_index, slice_count);
     if (!all_inuse) {
+      #if !MI_CRAN_COMPLIANT
       _mi_error_message(EAGAIN, "trying to free an already freed arena block: %p, size %zu\n", mi_arena_slice_start(arena,slice_index), mi_size_of_slices(slice_count));
+      #endif
       return;
     };
   }
@@ -1813,7 +1825,9 @@ static bool mi_manage_os_memory_ex2(mi_subproc_t* subproc, void* start, size_t s
     void* const aligned_start = _mi_align_up_ptr(start, MI_ARENA_ALIGNMENT);
     const size_t diff = (uint8_t*)aligned_start - (uint8_t*)start;
     if (diff >= size || (size - diff) < MI_ARENA_ALIGNMENT) {
+      #if !MI_CRAN_COMPLIANT
       _mi_warning_message("after alignment, the size of the arena becomes too small (memory at %p with size %zu)\n", start, size);
+      #endif
       return false;
     }
     start = aligned_start;
@@ -1825,7 +1839,9 @@ static bool mi_manage_os_memory_ex2(mi_subproc_t* subproc, void* start, size_t s
   size_t total_slice_count = _mi_align_down(size / MI_ARENA_SLICE_SIZE, MI_BCHUNK_BITS);
   size_t total_size = mi_size_of_slices(total_slice_count);
   if (total_size < MI_ARENA_MIN_SIZE) {
+    #if !MI_CRAN_COMPLIANT
     _mi_warning_message("cannot use OS memory since it is not large enough (size %zu KiB, minimum required is %zu KiB)", size/MI_KiB, MI_ARENA_MIN_SIZE/MI_KiB);
+    #endif
     return false;
   }
 
@@ -1899,7 +1915,9 @@ static int mi_reserve_os_memory_ex2(mi_subproc_t* subproc, size_t size, bool com
     size = _mi_align_up(size, MI_ARENA_SLICE_SIZE); // at least one slice
   }
   if (size > MI_MAX_ALLOC_SIZE) {
+    #if !MI_CRAN_COMPLIANT
     _mi_error_message(EOVERFLOW, "memory reservation request is too large (size %zu)\n", size);
+    #endif
     return ENOMEM;
   }
   mi_memid_t memid;
@@ -1907,10 +1925,14 @@ static int mi_reserve_os_memory_ex2(mi_subproc_t* subproc, size_t size, bool com
   if (start == NULL) return ENOMEM;
   if (!mi_manage_os_memory_ex2(subproc, start, size, -1 /* numa node */, exclusive, memid, NULL, NULL, arena_id)) {
     _mi_os_free_ex(subproc, start, size, commit, memid);
+    #if !MI_CRAN_COMPLIANT
     _mi_verbose_message("failed to reserve %zu KiB memory\n", _mi_divide_up(size, 1024));
+    #endif
     return ENOMEM;
   }
+  #if !MI_CRAN_COMPLIANT
   _mi_verbose_message("reserved %zu KiB memory%s\n", _mi_divide_up(size, 1024), memid.is_pinned ? " (in large os pages)" : "");
+  #endif
   // mi_debug_show_arenas(true, true, false);
 
   return 0;
@@ -2047,7 +2069,9 @@ static size_t mi_debug_show_chunks(const char* header1, const char* header2, con
                                    size_t slice_count, size_t chunk_count,
                                    mi_bchunk_t* chunks, mi_bchunkmap_t* chunk_bins, bool invert, mi_arena_t* arena, bool narrow)
 {
+  #if !MI_CRAN_COMPLIANT
   _mi_raw_message("\x1B[37m%s%s%s (use/commit: \x1B[31m0 - 25%%\x1B[33m - 50%%\x1B[36m - 75%%\x1B[32m - 100%%\x1B[0m)\n", header1, header2, header3);
+  #endif
   const size_t fields_per_line = (narrow ? 2 : 4);
   const size_t used_slice_count = mi_arena_used_slices(arena);
   size_t bit_count = 0;
@@ -2059,7 +2083,9 @@ static size_t mi_debug_show_chunks(const char* header1, const char* header2, con
     if (bit_count > used_slice_count && i+2 < chunk_count) {
       const size_t diff = chunk_count - 1 - i;
       bit_count += diff*MI_BCHUNK_BITS;
+      #if !MI_CRAN_COMPLIANT
       _mi_raw_message("  |\n");
+      #endif
       i = chunk_count-1;
     }
 
@@ -2086,8 +2112,10 @@ static size_t mi_debug_show_chunks(const char* header1, const char* header2, con
 
     for (size_t j = 0; j < MI_BCHUNK_FIELDS; j++) {
       if (j > 0 && (j % fields_per_line) == 0) {
+        #if !MI_CRAN_COMPLIANT
         // buf[k++] = '\n'; _mi_memset(buf+k,' ',7); k += 7;
         _mi_raw_message("  %s\n\x1B[37m", buf);
+        #endif
         _mi_memzero(buf, sizeof(buf));
         _mi_memset(buf, ' ', 5); k = 5;
       }
@@ -2109,9 +2137,13 @@ static size_t mi_debug_show_chunks(const char* header1, const char* header2, con
       }
       bit_count += MI_BFIELD_BITS;
     }
+    #if !MI_CRAN_COMPLIANT
     _mi_raw_message("  %s\n\x1B[37m", buf);
+    #endif
   }
+  #if !MI_CRAN_COMPLIANT
   _mi_raw_message("\x1B[0m  total pages: %zu\n", bit_set_count);
+  #endif
   return bit_set_count;
 }
 
@@ -2132,10 +2164,12 @@ static void mi_debug_show_arenas_ex(mi_heap_t* heap, bool show_pages, bool narro
     if (arena == NULL) continue;
     mi_assert(arena->subproc == subproc);
     // slice_total += arena->slice_count;
+    #if !MI_CRAN_COMPLIANT
     _mi_raw_message("%sarena %zu at %p: %zu slices (%zu MiB)%s%s, subproc: %zu, numa: %i\n",
         (arena->parent==NULL ? "" : "(sub)"), i, arena, arena->slice_count, (size_t)(mi_size_of_slices(arena->slice_count)/MI_MiB),
         (arena->memid.is_pinned ? ", pinned" : ""), (arena->is_exclusive ? ", exclusive" : ""),
         arena->subproc->subproc_seq, arena->numa_node);
+
     //if (show_inuse) {
     //  free_total += mi_debug_show_bbitmap("in-use slices", arena->slice_count, arena->slices_free, true, NULL);
     //}
@@ -2158,10 +2192,13 @@ static void mi_debug_show_arenas_ex(mi_heap_t* heap, bool show_pages, bool narro
                                            arena->slices_free->chunkmap_bins, false, arena, narrow);
       }
     }
+    #endif
   }
+  #if !MI_CRAN_COMPLIANT
   // if (show_inuse)     _mi_raw_message("total inuse slices    : %zu\n", slice_total - free_total);
   // if (show_abandoned) _mi_raw_message("total abandoned slices: %zu\n", abandoned_total);
   if (show_pages) _mi_raw_message("total pages in arenas: %zu\n", page_total);
+  #endif
 }
 
 void mi_debug_show_arenas(void) mi_attr_noexcept {
@@ -2188,10 +2225,14 @@ int mi_reserve_huge_os_pages_at_ex(size_t pages, int numa_node, size_t timeout_m
   mi_memid_t memid;
   void* p = _mi_os_alloc_huge_os_pages(subproc, pages, numa_node, timeout_msecs, &pages_reserved, &hsize, &memid);
   if (p==NULL || pages_reserved==0) {
+    #if !MI_CRAN_COMPLIANT
     _mi_warning_message("failed to reserve %zu GiB huge pages\n", pages);
+    #endif
     return ENOMEM;
   }
+  #if !MI_CRAN_COMPLIANT
   _mi_verbose_message("numa node %i: reserved %zu GiB huge pages (of the %zu GiB requested)\n", numa_node, pages_reserved, pages);
+  #endif
 
   if (!mi_manage_os_memory_ex2(subproc, p, hsize, numa_node, exclusive, memid, NULL, NULL, arena_id)) {
     _mi_os_free(subproc, p, hsize, memid);
@@ -2234,7 +2275,9 @@ int mi_reserve_huge_os_pages_interleave(size_t pages, size_t numa_nodes, size_t 
 
 int mi_reserve_huge_os_pages(size_t pages, double max_secs, size_t* pages_reserved) mi_attr_noexcept {
   MI_UNUSED(max_secs);
+  #if !MI_CRAN_COMPLIANT
   _mi_warning_message("mi_reserve_huge_os_pages is deprecated: use mi_reserve_huge_os_pages_interleave/at instead\n");
+  #endif
   if (pages_reserved != NULL) *pages_reserved = 0;
   int err = mi_reserve_huge_os_pages_interleave(pages, 0, (size_t)(max_secs * 1000.0));
   if (err==0 && pages_reserved!=NULL) *pages_reserved = pages;

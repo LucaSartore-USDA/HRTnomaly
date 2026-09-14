@@ -10,7 +10,11 @@ terms of the MIT license. A copy of the license can be found in the file
 #include "bitmap.h"
 
 static void mi_page_map_cannot_commit(void) {
+  #if !MI_CRAN_COMPLIANT
   _mi_warning_message("unable to commit the allocation page-map on-demand\n" );
+  #else
+  return;
+  #endif
 }
 
 #if MI_PAGE_MAP_FLAT
@@ -65,11 +69,15 @@ bool _mi_page_map_init(void) {
   mi_subproc_t* const subproc = _mi_subproc_main();
   uint8_t* const base = (uint8_t*)_mi_os_alloc_aligned(subproc, reserve_size, 1, commit, true /* allow large */, &mi_page_map_memid);
   if (base==NULL) {
+    #if !MI_CRAN_COMPLIANT
     _mi_error_message(ENOMEM, "unable to reserve virtual memory for the page map (%zu KiB)\n", page_map_size / MI_KiB);
+    #endif
     return false;
   }
   if (mi_page_map_memid.initially_committed && !mi_page_map_memid.initially_zero) {
+    #if !MI_CRAN_COMPLIANT
     _mi_warning_message("internal: the page map was committed but not zero initialized!\n");
+    #endif
     _mi_memzero_aligned(base, reserve_size);
   }
   if (bitmap_size > 0) {
@@ -301,7 +309,9 @@ static bool mi_page_map_init_once(void) {
   mi_memid_t memid;
   mi_page_map_t* const pmap = (mi_page_map_t*)_mi_os_alloc_aligned(subproc, extra_reserve_size, 1, commit, true /* allow large */, &memid);
   if mi_unlikely(pmap==NULL) {
+    #if !MI_CRAN_COMPLIANT
     _mi_error_message(ENOMEM, "unable to reserve virtual memory for the page map (%zu KiB)\n", extra_reserve_size / MI_KiB);
+    #endif
     return false;
   }
  
@@ -309,7 +319,9 @@ static bool mi_page_map_init_once(void) {
   size_t commit_count;
   if (memid.initially_committed) {
     if (!memid.initially_zero) {
+      #if !MI_CRAN_COMPLIANT
       _mi_warning_message("internal: the page map was committed but not zero initialized!\n");
+      #endif
       _mi_memzero_aligned(pmap, extra_reserve_size);
       memid.initially_zero = true;
     }
@@ -396,7 +408,9 @@ mi_decl_nodiscard static mi_decl_noinline mi_submap_t mi_page_map_alloc_submap_a
       const size_t submap_size = MI_PAGE_MAP_SUB_SIZE;        
       sub = (mi_submap_t)_mi_os_zalloc(subproc, submap_size, &memid);        
       if (sub==NULL) {
+        #if !MI_CRAN_COMPLIANT
         _mi_warning_message("internal error: unable to extend the page map\n");          
+        #endif
       }
       else {
         mi_submap_t expect = NULL;

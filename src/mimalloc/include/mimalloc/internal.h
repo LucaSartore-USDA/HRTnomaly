@@ -611,7 +611,7 @@ static inline bool mi_count_size_overflow(size_t count, size_t size, size_t* tot
     return false;
   }
   else {
-    #if MI_DEBUG > 0
+    #if MI_DEBUG > 0 && !MI_CRAN_COMPLIANT
     _mi_error_message(EOVERFLOW, "allocation request is too large (%zu * %zu bytes)\n", count, size);
     #endif
     *total = SIZE_MAX;
@@ -790,7 +790,7 @@ static inline mi_page_t* _mi_aligned_ptr_page0(const void* p) {
 static inline mi_page_t* _mi_aligned_ptr_page(const void* p) {
   mi_page_t* const page = _mi_aligned_ptr_page0(p);
   if mi_unlikely(page==NULL) return NULL;
-  #if MI_DEBUG
+  #if MI_DEBUG && !MI_CRAN_COMPLIANT
     mi_page_t* const cpage = _mi_checked_ptr_page(p);
     if mi_unlikely(cpage==NULL) { 
       _mi_error_message(EINVAL, "_mi_aligned_ptr_page: invalid pointer: %p\n", p); 

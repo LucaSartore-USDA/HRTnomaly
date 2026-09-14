@@ -76,7 +76,9 @@ static mi_decl_noinline mi_theap_t* mi_heap_init_theap(const mi_heap_t* const_he
     // allocate a fresh theap
     theap = _mi_theap_create(heap, mi_theap_get_default()->tld); // sets the theap thread local
     if (theap==NULL) {
+      #if !MI_CRAN_COMPLIANT
       _mi_error_message(EFAULT, "unable to allocate memory for a thread local heap\n");
+      #endif
       return NULL;
     }
     _mi_heap_theap_set(heap, theap);
@@ -135,7 +137,9 @@ mi_heap_t* _mi_heap_new_for_subproc(mi_subproc_t* subproc, mi_arena_id_t exclusi
   // reserve a thread local slot for this heap (see also issue #1230)
   mi_thread_local_t theap_slot = (is_main_heap ? mi_thread_local_key_fast : _mi_thread_local_create());
   if (theap_slot == 0) {
+    #if !MI_CRAN_COMPLIANT
     _mi_error_message(EFAULT, "unable to dynamically create a thread local for a heap\n");
+    #endif
     mi_free(heap);
     return NULL;
   }
@@ -230,7 +234,9 @@ void mi_heap_delete(mi_heap_t* heap) {
   if (heap==NULL) return;
   mi_heap_t* heap_main = mi_heap_get_heap_main(heap);
   if (heap == heap_main) {
+    #if !MI_CRAN_COMPLIANT
     _mi_warning_message("cannot delete the main heap\n");
+    #endif
     return;
   }
   mi_heap_free_theaps(heap);
@@ -254,7 +260,9 @@ void _mi_heap_force_destroy(mi_heap_t* heap, bool acquire_heaps_lock) {
 void mi_heap_destroy(mi_heap_t* heap) {
   if (heap==NULL) return;
   if (_mi_is_heap_main(heap)) {
+    #if !MI_CRAN_COMPLIANT
     _mi_warning_message("cannot destroy the main heap\n");
+    #endif
     return;
   }
   _mi_heap_force_destroy(heap,true /* acquire subproc->heaps_lock */);

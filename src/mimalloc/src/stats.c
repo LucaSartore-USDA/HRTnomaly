@@ -354,6 +354,9 @@ mi_decl_export void mi_process_info_print_out(mi_output_fun* out, void* arg) mi_
 }
 
 void _mi_stats_print(const char* name, size_t id, const mi_stats_t* stats, mi_output_fun* out0, void* arg0) mi_attr_noexcept {
+  #if MI_CRAN_COMPLIANT
+  return; // CRAN does not allow printing to stdout/stderr
+  #endif
   // wrap the output function to be line buffered
   char buf[256]; _mi_memzero_var(buf);
   buffered_t buffer = { out0, arg0, NULL, 0, 255 };
@@ -679,6 +682,9 @@ static bool mi_json_buf_expand(mi_json_buf_t* hbuf) {
 }
 
 static void mi_json_buf_print(mi_json_buf_t* hbuf, const char* msg) {
+  #if MI_CRAN_COMPLIANT
+  return; // CRAN does not allow printing to stdout/stderr
+  #endif
   if (msg==NULL || hbuf==NULL) return;
   if (hbuf->used + 1 >= hbuf->size && !hbuf->can_realloc) return;
   for (const char* src = msg; *src != 0; src++) {
@@ -698,6 +704,9 @@ static void mi_json_buf_print_count_bin(mi_json_buf_t* hbuf, const char* prefix,
   const size_t pagesize = (binsize <= MI_SMALL_MAX_OBJ_SIZE ? MI_SMALL_PAGE_SIZE :
                             (binsize <= MI_MEDIUM_MAX_OBJ_SIZE ? MI_MEDIUM_PAGE_SIZE :
                               (binsize <= MI_LARGE_MAX_OBJ_SIZE ? MI_LARGE_PAGE_SIZE : 0)));
+  #if MI_CRAN_COMPLIANT
+  return;
+  #endif
   char buf[128];
   _mi_snprintf(buf, 128, "%s{ \"total\": %lld, \"peak\": %lld, \"current\": %lld, \"block_size\": %zu, \"page_size\": %zu }%s\n", prefix, stat->total, stat->peak, stat->current, binsize, pagesize, (add_comma ? "," : ""));
   buf[127] = 0;
@@ -736,6 +745,9 @@ static void mi_json_buf_print_count_value(mi_json_buf_t* hbuf, const char* name,
 }
 
 static void mi_json_buf_print_value(mi_json_buf_t* hbuf, const char* name, int64_t val) {
+  #if MI_CRAN_COMPLIANT
+  return; // CRAN does not allow printing to stdout/stderr
+  #endif
   char buf[128];
   _mi_snprintf(buf, 128, "  \"%s\": %lld,\n", name, val);
   buf[127] = 0;
@@ -743,6 +755,9 @@ static void mi_json_buf_print_value(mi_json_buf_t* hbuf, const char* name, int64
 }
 
 static void mi_json_buf_print_size(mi_json_buf_t* hbuf, const char* name, size_t val, bool add_comma) {
+  #if MI_CRAN_COMPLIANT
+  return;
+  #endif
   char buf[128];
   _mi_snprintf(buf, 128, "    \"%s\": %zu%s\n", name, val, (add_comma ? "," : ""));
   buf[127] = 0;
@@ -800,6 +815,7 @@ static char* mi_stats_get_json_from(const mi_stats_t* stats, size_t output_size,
   #undef MI_STAT_COUNTER
 
   // size bins
+  #if !MI_CRAN_COMPLIANT
   mi_json_buf_print(&hbuf, "  \"malloc_bins\": [\n");
   for (size_t i = 0; i <= MI_BIN_HUGE; i++) {
     mi_json_buf_print_count_bin(&hbuf, "    ", &stats->malloc_bins[i], i, i!=MI_BIN_HUGE);
@@ -816,6 +832,7 @@ static char* mi_stats_get_json_from(const mi_stats_t* stats, size_t output_size,
   }
   mi_json_buf_print(&hbuf, "  ]\n");
   mi_json_buf_print(&hbuf, "}\n");
+  #endif
   if (hbuf.used + 1 >= hbuf.size) {
     // failed
     if (hbuf.can_realloc) { mi_free(hbuf.buf); }

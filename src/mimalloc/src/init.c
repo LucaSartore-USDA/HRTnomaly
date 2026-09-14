@@ -264,7 +264,9 @@ static mi_tld_t* mi_tld_create(mi_subproc_t* subproc) {
     tld  = (mi_tld_t*)_mi_meta_zalloc(subproc, sizeof(mi_tld_t), &memid);
   }
   if (tld==NULL) {
+    #if !MI_CRAN_COMPLIANT
     _mi_error_message(ENOMEM, "unable to allocate memory for thread local data\n");
+    #endif
     return NULL;
   }
   tld->memid = memid;
@@ -509,7 +511,9 @@ void _mi_auto_process_init(void) {
   mi_process_setup_auto_thread_done();
 
   _mi_options_post_init();  // now we can print to stderr
+  #if !MI_CRAN_COMPLIANT
   if (_mi_is_redirected()) _mi_verbose_message("malloc is redirected.\n");
+  #endif
 
   // show message from the redirector (if present)
   const char* msg = NULL;
@@ -537,7 +541,9 @@ static void mi_process_init_once(void) {
   #if defined(__CYGWIN__)   // we need to kickstart the cygwin runtime
   __mi_thread_id_helper = NULL;
   #endif
+  #if !MI_CRAN_COMPLIANT
   _mi_verbose_message("process init: 0x%zx\n", _mi_thread_id());
+  #endif
 
   _mi_detect_cpu_features();
   _mi_options_init();        // read environment (if possible)
@@ -638,7 +644,9 @@ static void mi_process_done_once(void) {
   _mi_tls_slots_done();
   _mi_subproc_main_done();
   _mi_allocator_done();
+  #if !MI_CRAN_COMPLIANT
   _mi_verbose_message("process done %zu\n", sizeof(mi_page_t)); // : 0x%zx\n", mi_process_tld_main.thread_id);
+  #endif
   os_preloading = true; // don't call the C runtime anymore
 }
 

@@ -290,7 +290,9 @@ void mi_subproc_add_current_thread(mi_subproc_id_t subproc_id) {
   mi_theap_t* theap = _mi_theap_default();
   if (mi_theap_is_initialized(theap)) {
     if (theap->tld!=NULL && theap->tld->subproc != subproc) {
+      #if !MI_CRAN_COMPLIANT
       _mi_warning_message("unable to add thread to the subprocess as it was already in another subprocess (at %p)\n", theap->tld->subproc);
+      #endif
     }
     return;
   }
