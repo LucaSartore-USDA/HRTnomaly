@@ -3,7 +3,7 @@
     * Updated `DESCRIPTION` file with current information
     * Updated `README.md` file with current GitHub version
     * Updated `inst/INSTALL.md` file with current GitHub version
-    * Updated roxygen2 code in `R/HRTnomaly.R`
+    * Updated roxygen2 tags in `R/HRTnomaly.R` to improve namespace exports
     * Updated `NAMESPACE` to avoid exporting objects starting with `.` or `C`
     * Removed `man/C_bayes_boot.Rd`
     * Removed `man/C_getNThreads.Rd`
@@ -26,6 +26,9 @@
     * Removed `man/C_isOmp.Rd`
     * Removed `man/C_relat_check.Rd`
     * Removed `man/C_wbayeswise.Rd`
+    * Updated C compilation flags in `src/Makevars`
+    * Updated C compilation flags in `src/Makevars.ucrt`
+    * Added `tests/namespace.R` to test exported objects
 
 2026-09-13 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 26.9.13 has been created
@@ -65,8 +68,6 @@
     * Updated doxygen tags in `src/HRTnomaly.c`
     * Updated doxygen tags in `src/pif.c`
     * Updated doxygen tags in `src/post_thresh.c`
-    * Updated flags in `src/Makevars`
-    * Updated flags in `src/Makevars.ucrt`
 
 2026-09-12 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 26.9.12 has been created

@@ -6,7 +6,16 @@
 #' @rawNamespace importFrom("stats", "na.omit")
 #' @rawNamespace importFrom("stats", "sd")
 #' @rawNamespace useDynLib(HRTnomaly, .registration = TRUE, .fixes = "C_")
-#' @rawNamespace exportPattern("^[^.C]")
+#' @rawNamespace export("bayesHRT")
+#' @rawNamespace export("bootHRT")
+#' @rawNamespace export("bayeswise")
+#' @rawNamespace export("cellwise")
+#' @rawNamespace export("class_check")
+#' @rawNamespace export("dif")
+#' @rawNamespace export("fuzzyHRT")
+#' @rawNamespace export("gif")
+#' @rawNamespace export("pif")
+#' @rawNamespace export("setCores")
 #' @rawNamespace S3method(print, checkwise)
 #'
 #' @name HRTnomaly-package
