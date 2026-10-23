@@ -454,7 +454,7 @@ static inline void init_param(double *mat, double *dta, double *wt, int *dim) {
     #if __VOPENMP
     #pragma omp parallel for
     #endif
-    for (i = 0; i < p; i++) mat[p * i + i] = 0.0;
+    for (i = 0; i < p; i++) mat[(p + 1) * i] = 0.0;
 }
 
 /**
@@ -523,7 +523,9 @@ static void mat_val_grad(double *grd_v, double *param, int *len, void *info) {
                     slp += fxa * tmp * w;
 		        }
             } /* This assure that the diagonal is zero (by assumption/constraint) */
-            grd_v[p * i + j] = slp;
+            tmp = param[p * i + j];
+            tmp = exp(-tmp * tmp * M_PI * 2.0) * M_PI * 2.0 * ((double) (tmp > 0.0) - (double) (tmp < 0.0));
+            grd_v[p * i + j] = slp + tmp;
         }
     }
     #if __VOPENMP
