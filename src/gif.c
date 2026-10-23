@@ -1,10 +1,8 @@
-#include "myomp.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
-#include "allocator.h"
 #include <R.h>
 #include <Rmath.h>
 
@@ -77,7 +75,7 @@ static inline void swap(uint32_t *a, uint32_t *b) {
  */
 static inline void sample(uint32_t nr, uint32_t psi) {
     uint32_t i;
-    subs = (uint32_t *) mi_calloc(nr, sizeof(uint32_t));
+    subs = (uint32_t *) calloc(nr, sizeof(uint32_t));
     if (subs) {
         if (psi == nr) {
             // #pragma omp for simd
@@ -91,7 +89,7 @@ static inline void sample(uint32_t nr, uint32_t psi) {
             }
         }
         else {
-            mi_free(subs);
+            free(subs);
         }
     }
 }
@@ -154,8 +152,8 @@ static iTrees * iTree(double *X, uint32_t pstrt, uint32_t psi, uint32_t nr, uint
     uint32_t szl = 0, szr = 0;
     iTrees *my_tree = NULL;
     double *w = NULL;
-    my_tree = (iTrees *) mi_calloc(1, sizeof(iTrees));
-    my_tree->lincon = (double *) mi_calloc(nv , sizeof(double));
+    my_tree = (iTrees *) calloc(1, sizeof(iTrees));
+    my_tree->lincon = (double *) calloc(nv , sizeof(double));
     w = my_tree->lincon;
     if (my_tree && w) {
         if (e >= l || psi <= 1) {
@@ -219,19 +217,19 @@ static iTrees ** iForest(double *X, int *dimX, int *nt, int *nss) {
 
     if (l > 30) return NULL;
     GetRNGstate();
-    Forest = (iTrees **) mi_calloc(t, sizeof(iTrees *));
-    proj = (vector *) mi_malloc(psi * sizeof(vector));
+    Forest = (iTrees **) calloc(t, sizeof(iTrees *));
+    proj = (vector *) malloc(psi * sizeof(vector));
     // #pragma omp parallel for
     if (Forest && proj) for (i = 0; i < t; i++) {
             sample(nr, psi);
             init_proj(nr, psi);
             if (subs) {
 		Forest[i] = iTree(X, 0, psi, nr, nv, 0, l);
-		mi_free(subs);
+		free(subs);
 	    }
     }
     PutRNGstate();
-    if (proj) mi_free(proj);
+    if (proj) free(proj);
     return Forest;
 }
 
@@ -290,12 +288,12 @@ static double enhanced_anomaly_score(double *x, int nv, iTrees **Forest, int *t,
  */
 static void free_tree(iTrees *tree) {
     if (tree) {
-        if (tree->lincon) mi_free(tree->lincon);
+        if (tree->lincon) free(tree->lincon);
         if (tree->type) {
             free_tree(tree->left);
             free_tree(tree->right);
         }
-        mi_free(tree);
+        free(tree);
     }
 }
 
@@ -310,7 +308,7 @@ static inline void free_forest(iTrees **Forest, int *t) {
     for (i = 0; i < (uint32_t) *t; i++) {
         free_tree(Forest[i]);
     }
-    if (Forest) mi_free(Forest);
+    if (Forest) free(Forest);
 }
 
 /**
@@ -331,8 +329,8 @@ extern void gif(double *res, double *dta, int *dimD, int *nt, int *nss) {
     if (*nt <= 0) return;
     if (dimD[0] <= 0 || dimD[1] <= 0) return;
 
-    H = (double *) mi_malloc(dimD[0] * sizeof(double));
-    dat = (double *) mi_malloc(dimD[1] * sizeof(double));
+    H = (double *) malloc(dimD[0] * sizeof(double));
+    dat = (double *) malloc(dimD[1] * sizeof(double));
     if (H && dat) {
         H[0] = 1.0;
         for (i = 1; i < (uint32_t) *nss; i++)
@@ -347,8 +345,8 @@ extern void gif(double *res, double *dta, int *dimD, int *nt, int *nss) {
         }
         free_forest(forest, nt);
     }
-    if (H) mi_free(H);
-    if (dat) mi_free(dat);
+    if (H) free(H);
+    if (dat) free(dat);
 }
 
 /*

@@ -1,3 +1,4 @@
+#include "myomp.h"
 #include <math.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -5,7 +6,6 @@
 #include <time.h>
 #include <stdio.h>
 #include "allocator.h"
-#include "myomp.h"
 
 #define MAX_ITER 2000
 #define EPS_TOLL 1e-16
@@ -139,7 +139,7 @@ extern void history_check(double *hScore, double *zScore, double *x, double *w, 
 	double *hdta;
 	double tmp, vr = 0.0;
 	int i, nn = 0;
-	hdta = (double *) mi_malloc(*n * sizeof(double));
+	hdta = (double *) malloc(*n * sizeof(double));
 	if (hdta) {
 		#if __VOPENMP
 		#pragma omp parallel for simd reduction(+ : vr, nn)
@@ -160,7 +160,7 @@ extern void history_check(double *hScore, double *zScore, double *x, double *w, 
 			hScore[i] = tmp < 1.0 ? tmp : 1.0;
 		}
 	}
-	if (hdta) mi_free(hdta);
+	if (hdta) free(hdta);
 }
 
 /**
@@ -305,7 +305,7 @@ extern void relat_check(double *A, int *dim) { /** FIXME: introduce new pointer 
 	int i;
 	double *E;
 
-	E = (double *) mi_malloc(dim[0] * dim[1] * sizeof(double));
+	E = (double *) malloc(dim[0] * dim[1] * sizeof(double));
 	if (E) {
 		#if __VOPENMP
 		#pragma omp parallel for default(shared) private(i)
@@ -320,7 +320,7 @@ extern void relat_check(double *A, int *dim) { /** FIXME: introduce new pointer 
 			A[i] = E[i];
 		}
 	}
-	if (E) mi_free(E);
+	if (E) free(E);
 }
 
 /****************************************************/
@@ -460,7 +460,7 @@ extern void relat_res(double *A, int *dim) {
 	int i;
 	double *E;
 
-	E = (double *) mi_malloc(dim[0] * dim[1] * sizeof(double));
+	E = (double *) malloc(dim[0] * dim[1] * sizeof(double));
 	if (E) {
 		#if __VOPENMP
 		#pragma omp parallel for default(shared) private(i)
@@ -475,5 +475,5 @@ extern void relat_res(double *A, int *dim) {
 			A[i] = E[i];
 		}
 	}
-	if (E) mi_free(E);
+	if (E) free(E);
 }

@@ -2,20 +2,22 @@
 
     #define HRTNOMALY_ALLOCATOR_H
 
-    #ifndef MI_CRAN_COMPLIANT
-        #define MI_CRAN_COMPLIANT 0
-    #endif
+    #include "myomp.h"
 
-    #if MI_CRAN_COMPLIANT
+    #if __VOPENMP
 
-        #include <mimalloc.h>
-
+        #define mi_malloc(size) omp_alloc(size, omp_null_allocator)
+        #define mi_calloc(n, size) omp_calloc(n, size, omp_null_allocator)
+        #define mi_free(ptr) omp_free(ptr, omp_null_allocator)
+        #define mi_realloc(ptr, size) omp_realloc(ptr, size, omp_null_allocator, omp_null_allocator)
+    
     #else
 
         #include <stdlib.h>
 
         #define mi_malloc malloc
         #define mi_calloc calloc
+        #define mi_realloc realloc
         #define mi_free free
 
     #endif

@@ -1,3 +1,27 @@
+2026-10-23 Luca Sartore <drwolf85@gmail.com>
+    * The HRTnomaly package VERSION 26.10.23 has been created
+    * Updated `README.md` file with current GitHub version
+    * Updated `DESCRIPTION` file with current information
+    * Updated `inst/INSTALL.md` file with current GitHub version
+    * Removed the folder `src/mimalloc/` and all its content
+    * Updated PKG_CFLAGS in `src/Makevars`
+    * Updated PKG_CFLAGS in `src/Makevars.ucrt`
+    * Updated `src/allocator.h` to use memory functions provided by
+      OpenMP >= 5.1 when allocation is performed in parallel
+    * Modified `src/myomp.h` to ignore OpenMP prior to version 5.1
+    * Updated the header files included in `src/post_thresh.c` and
+      memory allocation/free function calls
+    * Updated the header files included in `src/pif.c` and
+      memory allocation/free function calls
+    * Updated the header files included in `src/gif.c` and
+      memory allocation/free function calls
+    * Updated the header files included in `src/FuzzyHRT.c` and
+      memory allocation/free function calls
+    * Remove serial test code and updated the header files and
+      memory allocation/free function calls of `src/cellwise.c`
+    * Updated order of the header files in `src/bayes_hppc.c`
+    * Updated order of the header files in `src/dif.c`
+
 2026-09-19 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 26.9.19 has been created
     * Updated `DESCRIPTION` file with current information

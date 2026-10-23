@@ -1,10 +1,8 @@
-#include "myomp.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <math.h>
-#include "allocator.h"
 #include <R.h>
 #include <Rmath.h>
 #include <Rinternals.h>
@@ -52,7 +50,7 @@ static inline double cfun(uint64_t n) {
  * @return A pointer to a node structure
  */
 static inline node * alloc_node(void) {
-        node *n = (node *) mi_calloc(1, sizeof(node));
+        node *n = (node *) calloc(1, sizeof(node));
         return n;
 }
 
@@ -76,7 +74,7 @@ static void free_node(node *n, int nt) {
             if(n[i].left) free_node(n[i].left, 1);
             if(n[i].right) free_node(n[i].right, 1);
         }
-        mi_free(n);
+        free(n);
     }
 }
 
@@ -411,8 +409,8 @@ static inline node * train_pif(int prx, int nt, int n,
                                int subs, int l,
                                SEXP dst_fun, SEXP Rnv) {
     int i, j;
-    node *roots = (node *) mi_calloc(nt, sizeof(node));
-    idx = (dblvec *) mi_calloc(subs, sizeof(dblvec));
+    node *roots = (node *) calloc(nt, sizeof(node));
+    idx = (dblvec *) calloc(subs, sizeof(dblvec));
     if (__builtin_expect(roots && idx, 1)) {
         switch (prx)
         {
@@ -439,7 +437,7 @@ static inline node * train_pif(int prx, int nt, int n,
             break;
         }
     }
-    if (__builtin_expect(idx != NULL, 1)) mi_free(idx);
+    if (__builtin_expect(idx != NULL, 1)) free(idx);
     return roots;
 }
 
@@ -690,7 +688,7 @@ extern SEXP pif(SEXP dta, SEXP _prx, SEXP _nt, SEXP _nss, SEXP max_depth, SEXP d
     PROTECT(dta = AS_LIST(dta));
 	PROTECT(res = NEW_NUMERIC(n));
 
-	H = (double *) mi_malloc(nss * sizeof(double));
+	H = (double *) malloc(nss * sizeof(double));
 	if (__builtin_expect(H != NULL, 1)) {
 		H[0] = 1.0;
 		for (i = 1; i < nss; i++)
@@ -714,7 +712,7 @@ extern SEXP pif(SEXP dta, SEXP _prx, SEXP _nt, SEXP _nss, SEXP max_depth, SEXP d
         if (__builtin_expect(forest != NULL, 1))
 			free_node(forest, nt);
 	}
-	if (__builtin_expect(H != NULL, 1)) mi_free(H);
+	if (__builtin_expect(H != NULL, 1)) free(H);
 
     PutRNGstate();
 	UNPROTECT(6);

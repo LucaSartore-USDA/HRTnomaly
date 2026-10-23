@@ -1,8 +1,8 @@
+#include "myomp.h"
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <math.h>
-#include "myomp.h"
 
 double const inv_thresh = 1.0 / 2.575829303548899940068; /* One percent on normal tails */
 

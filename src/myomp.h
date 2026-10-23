@@ -2,7 +2,7 @@
 #define __MYOMP_H__
 
 #if defined _OPENMP
-  #if (_OPENMP > 200800)
+  #if (_OPENMP > 202000)
     #ifdef __clang__
     #define __VOPENMP 0
     #else

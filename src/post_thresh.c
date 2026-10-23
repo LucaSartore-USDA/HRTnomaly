@@ -1,9 +1,9 @@
+#include "myomp.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <math.h>
 #include "allocator.h"
-#include "myomp.h"
 
 #define RAND_MAX_PCG32 (~(uint32_t) 0)
 
@@ -36,6 +36,7 @@ static inline void pcg32_srand(uint64_t seed)
 	mcg_state = 2 * seed + 1;
 	(void) pcg32_rand();
 }
+
 /**
  * @brief Random Dirichlet sequentially cumulated
  * @param x pointer to an empty vector

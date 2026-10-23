@@ -1,3 +1,4 @@
+#include "myomp.h"
 #include <math.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -5,7 +6,6 @@
 #include <time.h>
 #include <stdio.h>
 #include "allocator.h"
-#include "myomp.h"
 
 #define EPS_TOLL 1e-10
 #define RHO .9
@@ -434,7 +434,7 @@ static inline void init_param(double *mat, double *dta, double *wt, int *dim) {
                 n = 0.0;
                 tmp = 0.0;
                 for (k = 0; k < *dim; k++) {
-		    w = wt ? wt[k] : 1.0;
+		            w = wt ? wt[k] : 1.0;
                     x = dta[*dim * i + k];
                     y = dta[*dim * j + k];
                     if (isfinite(x) && isfinite(y)) {
@@ -476,9 +476,9 @@ static inline void residuals(double *res, double *A, int *dimA, double *R, int *
     for (j = 0; j < dimA[1]; j++) {
         for (i = 0; i < *dimA; i++) {
             pos = *dimA * j + i;
-	    fixa = A[pos];
-	    fixa -= (double)(fixa < -LEVEL_TRK) * (LEVEL_TRK + fixa);
-	    fixa -= (double)(fixa > LEVEL_TRK) * (fixa - LEVEL_TRK);
+            fixa = A[pos];
+            fixa -= (double)(fixa < -LEVEL_TRK) * (LEVEL_TRK + fixa);
+            fixa -= (double)(fixa > LEVEL_TRK) * (fixa - LEVEL_TRK);
             if (isfinite(res[pos]) && isfinite(fixa))
                 res[pos] -= fixa;
         }
@@ -515,18 +515,18 @@ static void mat_val_grad(double *grd_v, double *param, int *len, void *info) {
             if (i != j) for (k = 0; k < n; k++) {
                 tmp = dta.E[n * i + k];
                 tmp = (double) (tmp > 0.0) - (double) (tmp < 0.0);
-		w = dta.wt ? dta.wt[k] : 1.0;
+		        w = dta.wt ? dta.wt[k] : 1.0;
                 if (isfinite(dta.A[n * j + k])) {
-		    fxa = dta.A[n * j + k];
-	            fxa -= (double)(fxa < -LEVEL_TRK) * (LEVEL_TRK + fxa);
-	            fxa -= (double)(fxa > LEVEL_TRK) * (fxa - LEVEL_TRK);
+		            fxa = dta.A[n * j + k];
+	                fxa -= (double)(fxa < -LEVEL_TRK) * (LEVEL_TRK + fxa);
+	                fxa -= (double)(fxa > LEVEL_TRK) * (fxa - LEVEL_TRK);
                     slp += fxa * tmp * w;
-		}
+		        }
             } /* This assure that the diagonal is zero (by assumption/constraint) */
             grd_v[p * i + j] = slp;
         }
     }
-    #if _VOPENMP
+    #if __VOPENMP
     #pragma omp parallel for
     #endif
     for (i = 0; i < p; i++) grd_v[(p + 1) * i] = 0.0;
@@ -552,10 +552,10 @@ static inline void lion(double *param, int *len, int *n_iter, void *info,
     double *mom_m;
     double sgn = 1.0;
 
-    grd_v = (double *) mi_malloc(np * sizeof(double));
-    old_w = (double *) mi_calloc(np, sizeof(double));
-    stp_o = (double *) mi_calloc(np, sizeof(double));
-    mom_m = (double *) mi_calloc(np, sizeof(double));
+    grd_v = (double *) malloc(np * sizeof(double));
+    old_w = (double *) calloc(np, sizeof(double));
+    stp_o = (double *) calloc(np, sizeof(double));
+    mom_m = (double *) calloc(np, sizeof(double));
     if (mom_m && grd_v && old_w && stp_o) {
         for (t = 0; t < *n_iter && sgn > MY_EPS_LEARN_RATE; t++) {
             /* Update the gradient */
@@ -585,10 +585,10 @@ static inline void lion(double *param, int *len, int *n_iter, void *info,
             }
         }
     }
-    if (mom_m) mi_free(mom_m);
-    if (grd_v) mi_free(grd_v);
-    if (stp_o) mi_free(stp_o);
-    if (old_w) mi_free(old_w);
+    if (mom_m) free(mom_m);
+    if (grd_v) free(grd_v);
+    if (stp_o) free(stp_o);
+    if (old_w) free(old_w);
 }
 
 /**
@@ -606,14 +606,14 @@ static inline void relat_check(double *rScore, double *A, double *wt, int *dim) 
     int i, lenR, dimR[2];
     int n_iter = N_ITERATIONS;
 
-    E = (double *) mi_malloc(dim[0] * dim[1] * sizeof(double));
-    R = (double *) mi_calloc(dim[1] * dim[1], sizeof(double));
+    E = (double *) malloc(dim[0] * dim[1] * sizeof(double));
+    R = (double *) calloc(dim[1] * dim[1], sizeof(double));
     if (E && R) {
         mydata.E = E;
         mydata.A = A;
         mydata.dimA = dim;
-	mydata.wt = 0;
-	if (wt) mydata.wt = wt;
+        mydata.wt = 0;
+        if (wt) mydata.wt = wt;
         dimR[0] = dimR[1] = dim[1];
         lenR = dim[1] * dim[1];
     	/* Computes robust regression coefficients */
@@ -621,7 +621,7 @@ static inline void relat_check(double *rScore, double *A, double *wt, int *dim) 
         for (i = 0; i < N_EPOCHS; i++)
             lion(R, &lenR, &n_iter, (void *) &mydata, mat_val_grad);
     	/* Residual standardization */
-	residuals(E, A, dim, R, dimR);
+	    residuals(E, A, dim, R, dimR);
         normalize(E, dim);
         /* Compute the relational score */
         if (BAYES) {
@@ -642,8 +642,8 @@ static inline void relat_check(double *rScore, double *A, double *wt, int *dim) 
             }
         }
     }
-    if (E) mi_free(E);
-    if (R) mi_free(R);
+    if (E) free(E);
+    if (R) free(R);
 }
 
 /**
@@ -776,193 +776,6 @@ extern void wbayeswise(double *s, int *G, double *z, double *h, double *r, doubl
         s[i] *= z[i];
     }
     post_results(s, G, dimX, h, r, t);
-}
-#endif
-
-#ifdef MY_TEST
-int main() {
-    int i, j, n;
-    int dim4[] = {4, 7};
-    int dim7[] = {7, 4};
-    double a,  b, c;
-/* Non-sense values */
-    double x[] = {nan(""), 2.0, -4.0, 0.5, -1.0, nan(""), 0.0, \
-                  -1.0, nan(""), 4.0, 0.5, nan(""), -1.2, 0.0, \
-                  1.0, -1.3, -4.0, 0.5, 0.9, -1.2, 0.0, \
-                  -1.1, 2.3, nan(""), 0.5, -5.0, 1.2, 0.0 };
-    /* I cannot remember what w[] stands for */
-    double w[] = {nan(""), nan(""), -1.0, 0.7, -0.7, nan(""), 0.3, \
-                  0.75, nan(""), nan(""), 0.35, nan(""), -6.4, 2.0, \
-                  0.0, -0.3, 14.0, -0.15, nan(""), nan(""), 20.0, \
-                  -1.57, 111.3, nan(""), 0.4, nan(""), -0.2, 1.0 };
-    double B[16] = {0.0};
-    double G[16] = {0.0};
-    double s[28];
-    double z[28] = {0.0}, h[28] = {0.0}, r[28] = {0.0}, t[28] = {0.0};
-    double weights[] = {0.1, 0.1, 0.1, 0.9, 0.9, 0.9, 0.9};
-    mydata_str info;
-    a = 1.0;
-    b = 2.0;
-    c = 1.0;
-    printf("Testing \e[1;31mcmp_dbl\e[0m:\n");
-    printf("a >= b ? %d\n", cmp_dbl((void *) &a, (void *) &b));
-    printf("a >= c ? %d\n", cmp_dbl((void *) &a, (void *) &c));
-    printf("b >= c ? %d\n", cmp_dbl((void *) &b, (void *) &c));
-    printf("\n");
-    printf("Testing \e[1;31mmedian_wna\e[0m:\n");
-    printf("Median: %f", median_wna(x, 7));
-    printf("\n");
-    printf("Testing \e[1;31mwmedian_wna\e[0m:\n");
-    printf("Weighted median: %f", wmedian_wna(x + 7, w + 7, 7));
-    printf("\n");
-    printf("Testing \e[1;31mscoring_tain with median and no data update\e[0m:\n");
-    memset(s, 0, sizeof(double) * 28);
-    scoring_tails(s, x, 7, 4, 0, 0); /* Scores with median and no data update */
-    for (i = 0; i < 4; i++) {
-        for (j = 0; j < 7; j++) {
-            printf("%.2f ", s[i * 7 + j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-    printf("Testing \e[1;31mscoring_tain with zero median and no data update\e[0m:\n");
-    memset(s, 0, sizeof(double) * 28);
-    scoring_tails(s, x, 7, 4, 1, 0); /* Scores without median and no data update */
-    for (i = 0; i < 4; i++) {
-        for (j = 0; j < 7; j++) {
-            printf("%.2f ", s[i * 7 + j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-    printf("Testing \e[1;31mscoring_tain with median and data update\e[0m:\n");
-    memset(s, 0, sizeof(double) * 28);
-    scoring_tails(s, x, 7, 4, 0, 1); /* Scores with median and no data update */
-    for (i = 0; i < 4; i++) {
-        for (j = 0; j < 7; j++) {
-            printf("%.2f ", s[i * 7 + j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-    printf("Testing \e[1;31mformat_check\e[0m:\n");
-    memset(s, 0, sizeof(double) * 28);
-    i = 28;
-    format_check(s, x, &i); /* Scores for format check */
-    for (i = 0; i < 4; i++) {
-        for (j = 0; j < 7; j++) {
-            printf("%.2f ", s[i * 7 + j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-    printf("Testing \e[1;31mhistory_check\e[0m:\n");
-    memset(s, 0, sizeof(double) * 28);
-    i = 28;
-    history_check(s, x, w, 7, 4); /* Scores for history check */
-    for (i = 0; i < 4; i++) {
-        for (j = 0; j < 7; j++) {
-            printf("%.2f ", s[i * 7 + j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-    printf("Testing \e[1;31mtail_check\e[0m:\n");
-    memset(s, 0, sizeof(double) * 28);
-    i = 28;
-    tail_check(s, x, 7, 4); /* Scores for tail check */
-    for (i = 0; i < 4; i++) {
-        for (j = 0; j < 7; j++) {
-            printf("%.2f ", s[i * 7 + j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-    printf("Testing \e[1;31mdgemm\e[0m:\n");
-    dgemm(B, x, dim4, w, dim7);
-    for (i = 0; i < 4; i++) {
-        for (j = 0; j < 4; j++) {
-            printf("%.2f ", B[i * 4 + j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-    printf("Testing \e[1;31mnormalize\e[0m:\n");
-    normalize(w, dim7);
-    for (i = 0; i < 4; i++) {
-        for (j = 0; j < 7; j++) {
-            printf("%.2f ", w[i * 7 + j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-    printf("Testing \e[1;31minit_param\e[0m:\n");
-    init_param(B, w, weights, dim7);
-    for (i = 0; i < 4; i++) {
-        for (j = 0; j < 4; j++) {
-            printf("%.2f ", B[i * 4 + j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-    printf("Testing \e[1;31mresiduals\e[0m:\n");
-    dim4[1] = 4;
-    residuals(w, x, dim7, B, dim4);
-    for (i = 0; i < 4; i++) {
-        for (j = 0; j < 7; j++) {
-            printf("%.2f ", w[i * 7 + j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-    printf("Testing \e[1;31mmat_val_grad\e[0m:\n");
-    info.A = x;
-    info.dimA = dim7;
-    info.E = w;
-    info.wt = weights;
-    n = 16;
-    mat_val_grad(G, B, &n, (void *) &info);
-    for (i = 0; i < 4; i++) {
-        for (j = 0; j < 4; j++) {
-            printf("%.2f ", G[i * 4 + j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-    printf("Testing \e[1;31mlion\e[0m:\n");
-    i = 10;
-    lion(B, &n, &i, (void *) &info, mat_val_grad);
-    for (i = 0; i < 4; i++) {
-        for (j = 0; j < 4; j++) {
-            printf("%.2f ", B[i * 4 + j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-    N_EPOCHS = 5;
-    printf("Testing \e[1;31mrelat_check\e[0m:\n");
-    memset(s, 0, sizeof(double) * 28);
-    relat_check(s, x, weights, dim7);
-    for (i = 0; i < 4; i++) {
-        for (j = 0; j < 7; j++) {
-            printf("%.2f ", w[i * 7 + j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-    printf("Testing \e[1;31mcellwise\e[0m:\n");
-    memset(s, 0, sizeof(double) * 28);
-    int maxepoch = 10;
-    cellwise(s, z, h, r, t, x, w, dim7, &maxepoch);
-    for (i = 0; i < 4; i++) {
-        for (j = 0; j < 7; j++) {
-            printf("%.2f ", s[i * 7 + j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-    printf("Test ended successfully\n\n");
-    return 0;
 }
 #endif
 
