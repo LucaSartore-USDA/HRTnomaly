@@ -2,13 +2,13 @@
     * The HRTnomaly package VERSION 26.10.23 has been created
     * Updated `README.md` file with current GitHub version
     * Updated `DESCRIPTION` file with current information
-    * Updated `inst/INSTALL.md` file with current GitHub version
+    * Updated `inst/INSTALL.md` file with current GitHub version and removed third-party notice for mimalloc
     * Removed the folder `src/mimalloc/` and all its content
     * Updated PKG_CFLAGS in `src/Makevars`
     * Updated PKG_CFLAGS in `src/Makevars.ucrt`
     * Updated `src/allocator.h` to use memory functions provided by
-      OpenMP >= 5.1 when allocation is performed in parallel
-    * Modified `src/myomp.h` to ignore OpenMP prior to version 5.1
+      OpenMP >= 5.0 when allocation is performed in parallel
+    * Modified `src/myomp.h` to ignore OpenMP prior to version 5.0
     * Updated the header files included in `src/post_thresh.c` and
       memory allocation/free function calls
     * Updated the header files included in `src/pif.c` and

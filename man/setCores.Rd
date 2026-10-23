@@ -10,10 +10,10 @@ setCores(n)
 \item{n}{an integer value denoting the number of CPU cores to use; if it exceeds the total number of cores, all of them will be used. If missing, the number of CPU cores in use will be displayed.}
 }
 \value{
-The total number of CPU cores in use will be returned and a message will be displayed. If the package was not complied with the library OpenMP (>= 3.0), the value one will be returned.
+The total number of CPU cores in use will be returned and a message will be displayed. If the package was not complied with the library OpenMP (>= 5.0), the value one will be returned.
 }
 \description{
-The function set the number of CPU cores for parallel computation by the use of OpenMP library (\url{https://www.openmp.org/}). If the package was not complied with the library OpenMP (>= 3.0), this function is disabled.
+The function set the number of CPU cores for parallel computation by the use of OpenMP library (\url{https://www.openmp.org/}). If the package was not complied with the library OpenMP (>= 5.0), this function is disabled.
 }
 \details{
 When the package is loaded, only one CPU core is used.
@@ -31,7 +31,7 @@ setCores(1)
 }
 }
 \references{
-SunTM ONE Studio 8 (2003) \emph{OpenMP API User's Guide}. Sun Microsystems Inc., Santa Clara, U.S.A.
+OpenMP Architecture Review Board (2018) \emph{OpenMP Application Programming Interface, Version 5.0}.
 }
 \author{
 Luca Sartore \email{drwolf85@gmail.com}
