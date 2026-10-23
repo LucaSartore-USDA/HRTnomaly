@@ -512,20 +512,23 @@ static void mat_val_grad(double *grd_v, double *param, int *len, void *info) {
     for (i = 0; i < p; i++) {
         for (j = 0; j < p; j++) {
             slp = 0.0;
-            if (i != j) for (k = 0; k < n; k++) {
-                tmp = dta.E[n * i + k];
-                tmp = (double) (tmp > 0.0) - (double) (tmp < 0.0);
-		        w = dta.wt ? dta.wt[k] : 1.0;
-                if (isfinite(dta.A[n * j + k])) {
-		            fxa = dta.A[n * j + k];
-	                fxa -= (double)(fxa < -LEVEL_TRK) * (LEVEL_TRK + fxa);
-	                fxa -= (double)(fxa > LEVEL_TRK) * (fxa - LEVEL_TRK);
-                    slp += fxa * tmp * w;
-		        }
+            if (i != j) {
+                for (k = 0; k < n; k++) {
+                    tmp = dta.E[n * i + k];
+                    tmp = (double) (tmp > 0.0) - (double) (tmp < 0.0);
+                    w = dta.wt ? dta.wt[k] : 1.0;
+                    if (isfinite(dta.A[n * j + k])) {
+                        fxa = dta.A[n * j + k];
+                        fxa -= (double)(fxa < -LEVEL_TRK) * (LEVEL_TRK + fxa);
+                        fxa -= (double)(fxa > LEVEL_TRK) * (fxa - LEVEL_TRK);
+                        slp += fxa * tmp * w;
+                    }
+                }
+                tmp = param[p * i + j];
+                tmp = exp(-tmp * tmp * M_PI * 2.0) * M_PI * 2.0 * ((double) (tmp > 0.0) - (double) (tmp < 0.0));
+                slp += tmp;
             } /* This assure that the diagonal is zero (by assumption/constraint) */
-            tmp = param[p * i + j];
-            tmp = exp(-tmp * tmp * M_PI * 2.0) * M_PI * 2.0 * ((double) (tmp > 0.0) - (double) (tmp < 0.0));
-            grd_v[p * i + j] = slp + tmp;
+            grd_v[p * i + j] = slp;
         }
     }
     #if __VOPENMP
