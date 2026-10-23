@@ -37,7 +37,7 @@ set.seed(2025L)
 # Load the 'toy' data
 data(toy)
 # Detect cellwise outliers using Bayesian Analysis
-res <- cellwise(toy[sample.int(100), ], 0.5, 10L)
+res <- bayeswise(toy[sample.int(100), ], 0.5, 10L)
 print(class_check(res$outlier, res$anomaly_flag != ""))
 }
 \author{
