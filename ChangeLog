@@ -1,8 +1,18 @@
+2026-10-26 Luca Sartore <drwolf85@gmail.com>
+    * The HRTnomaly package VERSION 26.10.26 has been created
+    * Updated `README.md` file with current GitHub version
+    * Updated `DESCRIPTION` file with current information
+    * Updated `inst/INSTALL.md` file with current GitHub version
+    * Modified `src/myomp.h` to set `__VOPENMP` to zero for version
+      prior to 5.0
+    * Fixed derivatives in `src/cellwise.c`
+
 2026-10-23 Luca Sartore <drwolf85@gmail.com>
     * The HRTnomaly package VERSION 26.10.23 has been created
     * Updated `README.md` file with current GitHub version
     * Updated `DESCRIPTION` file with current information
-    * Updated `inst/INSTALL.md` file with current GitHub version and removed third-party notice for mimalloc
+    * Updated `inst/INSTALL.md` file with current GitHub version and
+      removed third-party notice for mimalloc
     * Removed the folder `src/mimalloc/` and all its content
     * Updated PKG_CFLAGS in `src/Makevars`
     * Updated PKG_CFLAGS in `src/Makevars.ucrt`

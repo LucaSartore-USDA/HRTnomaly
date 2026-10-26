@@ -524,8 +524,8 @@ static void mat_val_grad(double *grd_v, double *param, int *len, void *info) {
                         slp += fxa * tmp * w;
                     }
                 }
-                tmp = param[p * i + j];
-                tmp = exp(-tmp * tmp * M_PI * 2.0) * M_PI * 2.0 * ((double) (tmp > 0.0) - (double) (tmp < 0.0));
+                tmp = param[p * i + j] * M_PI * 2.0;
+                tmp = exp(-tmp * tmp) * M_PI * 2.0 * ((double) (tmp > 0.0) - (double) (tmp < 0.0));
                 slp += tmp;
             } /* This assure that the diagonal is zero (by assumption/constraint) */
             grd_v[p * i + j] = slp;
@@ -729,7 +729,6 @@ extern void wcellwise(double *s, double *z, double *h, double *r, double *t, dou
  * @param dimX Pointer to a vector with the dimensions of `Xc` and `Xp`
  * @param epochs Pointer to the number of gradient-descent epochs
  */
-#ifndef MY_TEST
 extern void bayeswise(double *s, int *G, double *z, double *h, double *r, double *t, double *Xc, double *Xp, int *dimX, int *epochs) {
     int i;
     int len = dimX[0] * dimX[1];
@@ -782,7 +781,6 @@ extern void wbayeswise(double *s, int *G, double *z, double *h, double *r, doubl
     }
     post_results(s, G, dimX, h, r, t);
 }
-#endif
 
 /*
 library(HRTnomaly)

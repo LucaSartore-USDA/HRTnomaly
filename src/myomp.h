@@ -4,11 +4,13 @@
 #if defined _OPENMP
   #if (_OPENMP > 201800)
     #ifdef __clang__
-    #define __VOPENMP 0
+      #define __VOPENMP 0
     #else
-    #include <omp.h>
-    #define __VOPENMP 1
+      #include <omp.h>
+      #define __VOPENMP 1
     #endif
+  #else
+    #define __VOPENMP 0
   #endif
 #else
   #define __VOPENMP 0
